@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Android Adapters</string>
+    <string name="add">Add Value</string>
+    <string name="listview">List View</string>
+    <string name="recyclerview">Recycler View</string>
+    <string name="add_random">Random Add</string>
+    <string name="start_delete">Start Deletion</string>
+    <string name="delete">Delete</string>
+</resources>

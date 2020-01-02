@@ -1,0 +1,48 @@
+package com.example.myrealmrecyclerview.model
+
+import io.realm.Realm
+import io.realm.RealmList
+import io.realm.RealmObject
+import io.realm.annotations.PrimaryKey
+import io.realm.kotlin.createObject
+import java.lang.RuntimeException
+import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
+
+open class Training : RealmObject() {
+    @PrimaryKey
+    var uuid:Long=0
+    var notes: String = ""
+    var date: Date = Date()
+    //duration, location, time, blabla
+    var exercises: RealmList<Exercise> = RealmList()
+    var duration: Long = 0
+
+
+
+    companion object{
+         const val FIELD_UUID="uuid"
+        private val INTEGER_COUNTER = AtomicInteger(0)
+
+        fun create(realm:Realm){
+//            val realm=Realm.getDefaultInstance()
+            val masterParent = realm.where(MasterParent::class.java).findFirst()
+            val trainings: RealmList<Training>? = masterParent?.trainingList
+            val training =realm.createObject(Training::class.java, increment())
+            trainings?.add(training)
+//            realm.close()
+        }
+        fun delete(realm: Realm, uuid: Int){
+            val training=realm.where(Training::class.java).equalTo(FIELD_UUID,uuid).findFirst()
+            training?.deleteFromRealm()
+        }
+
+        private fun increment(): Int {
+            return INTEGER_COUNTER.getAndIncrement()
+        }
+
+
+    }
+
+
+}
