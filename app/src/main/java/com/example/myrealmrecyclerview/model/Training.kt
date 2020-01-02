@@ -8,6 +8,7 @@ import io.realm.kotlin.createObject
 import java.lang.RuntimeException
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicLong
 
 open class Training : RealmObject() {
     @PrimaryKey
@@ -22,22 +23,25 @@ open class Training : RealmObject() {
 
     companion object{
          const val FIELD_UUID="uuid"
-        private val INTEGER_COUNTER = AtomicInteger(0)
+        private val INTEGER_COUNTER = AtomicLong(0)
 
         fun create(realm:Realm){
 //            val realm=Realm.getDefaultInstance()
             val masterParent = realm.where(MasterParent::class.java).findFirst()
             val trainings: RealmList<Training>? = masterParent?.trainingList
+            val maxid=trainings?.max("uuid")?.toLong()
+            maxid?.let { INTEGER_COUNTER.set(it+1) }
+
             val training =realm.createObject(Training::class.java, increment())
             trainings?.add(training)
 //            realm.close()
         }
-        fun delete(realm: Realm, uuid: Int){
+        fun delete(realm: Realm, uuid: Long){
             val training=realm.where(Training::class.java).equalTo(FIELD_UUID,uuid).findFirst()
             training?.deleteFromRealm()
         }
 
-        private fun increment(): Int {
+        private fun increment(): Long {
             return INTEGER_COUNTER.getAndIncrement()
         }
 

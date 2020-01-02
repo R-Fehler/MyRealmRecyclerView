@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
     private var menu: Menu? = null
     private var adapter: MyRecyclerViewAdapter? = null
 
-    private inner class TouchHelperCallback internal constructor() :
+     inner class TouchHelperCallback internal constructor() :
         ItemTouchHelper.SimpleCallback(
             ItemTouchHelper.UP or ItemTouchHelper.DOWN,
             ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
@@ -39,6 +39,8 @@ class MainActivity : AppCompatActivity() {
 
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
             Toast.makeText(this@MainActivity,"swiped",Toast.LENGTH_SHORT).show()
+            realm?.let { DataHelper.deleteTrainingAsync(it, viewHolder.itemId) }
+
         }
 
         override fun isLongPressDragEnabled(): Boolean {
@@ -109,7 +111,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setUpRecyclerView() {
-        adapter = MyRecyclerViewAdapter(realm!!.where(MasterParent::class.java!!).findFirst()!!.trainingList)
+        adapter = MyRecyclerViewAdapter(realm!!.where(MasterParent::class.java).findFirst()!!.trainingList)
         recyclerView!!.layoutManager = LinearLayoutManager(this)
         recyclerView!!.adapter = adapter
         recyclerView!!.setHasFixedSize(true)

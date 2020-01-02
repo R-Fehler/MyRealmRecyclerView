@@ -19,7 +19,7 @@ init {
 
 }
     private var inDeletionMode = false
-    val uuidsToDelete: MutableSet<Int> = HashSet<Int>()
+    val uuidsToDelete: MutableSet<Long> = HashSet()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyRecyclerViewAdapter.MyViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.training_item, parent, false)
@@ -50,11 +50,15 @@ init {
 //        holder.deletedCheckBox.visibility = if (inDeletionMode) View.VISIBLE else View.GONE
     }
 
+    override fun getItemId(index: Int): Long {
+
+        return getItem(index)!!.uuid
+    }
 
         fun enableDeletionMode(enabled: Boolean) {
             inDeletionMode = enabled
             if (!enabled) {
-//            uuidsToDelete.clear()
+            uuidsToDelete.clear()
             }
             notifyDataSetChanged()
         }

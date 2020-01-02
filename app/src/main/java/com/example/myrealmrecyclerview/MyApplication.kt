@@ -30,7 +30,7 @@ class MyApplication : Application() {
         val realmConfig = RealmConfiguration.Builder()
             .initialData { realm -> realm.createObject(MasterParent::class.java) }
             .build()
-        Realm.deleteRealm(realmConfig) // Delete Realm between app restarts.
+//        Realm.deleteRealm(realmConfig) // Delete Realm between app restarts.
         Realm.setDefaultConfiguration(realmConfig)
     }
 }
