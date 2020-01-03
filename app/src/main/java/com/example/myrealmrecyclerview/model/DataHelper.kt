@@ -19,6 +19,13 @@ class DataHelper {
                 }
             }
         }
+        fun addExerciseAsync(realm: Realm, trainingUUID:Long){
+            realm.executeTransactionAsync { Exercise.create(it,trainingUUID) }
+        }
+        fun addExerciseSetAsync(realm: Realm, exerciseUUID:Long){
+            realm.executeTransactionAsync { ExerciseSet.create(it,exerciseUUID) }
+        }
+
 
 
 

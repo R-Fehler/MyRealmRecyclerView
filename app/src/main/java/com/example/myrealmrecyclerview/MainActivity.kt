@@ -1,5 +1,6 @@
 package com.example.myrealmrecyclerview
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
@@ -52,7 +53,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         realm = Realm.getDefaultInstance()
-        recyclerView = findViewById(R.id.recycler_view)
+        recyclerView = findViewById(R.id.recycler_view_trainings)
         setUpRecyclerView()
     }
 
@@ -112,6 +113,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun setUpRecyclerView() {
         adapter = MyRecyclerViewAdapter(realm!!.where(MasterParent::class.java).findFirst()!!.trainingList)
+        adapter!!.setOnItemClickListener(object : MyRecyclerViewAdapter.OnItemClickListener {
+            override fun onItemClick(training: Training) {
+                var intent = Intent(baseContext, EditTrainingActivity::class.java)
+                intent.putExtra(EditTrainingActivity.TRAINING_ID, training.uuid) //TODO LongExtra?
+
+
+                startActivityForResult(intent,1)
+            }
+        })
         recyclerView!!.layoutManager = LinearLayoutManager(this)
         recyclerView!!.adapter = adapter
         recyclerView!!.setHasFixedSize(true)

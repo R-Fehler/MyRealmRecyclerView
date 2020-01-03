@@ -7,4 +7,5 @@
     <string name="add_random">Random Add</string>
     <string name="start_delete">Start Deletion</string>
     <string name="delete">Delete</string>
+    <string name="title_activity_edit_training">EditTrainingActivity</string>
 </resources>

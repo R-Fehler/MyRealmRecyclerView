@@ -4,16 +4,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
+import android.widget.EditText
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myrealmrecyclerview.R
+import com.example.myrealmrecyclerview.model.Exercise
 import com.example.myrealmrecyclerview.model.Training
 import io.realm.OrderedRealmCollection
 import io.realm.RealmRecyclerViewAdapter
 import java.util.*
 
-class MyRecyclerViewAdapter(data: OrderedRealmCollection<Training>) :
-    RealmRecyclerViewAdapter<Training, MyRecyclerViewAdapter.MyViewHolder>(data, true) {
+class ExercisesRecyclerViewAdapter(data: OrderedRealmCollection<Exercise>) :
+    RealmRecyclerViewAdapter<Exercise, ExercisesRecyclerViewAdapter.MyViewHolder>(data, true) {
 init {
     setHasStableIds(true)
 
@@ -24,8 +26,8 @@ init {
     private var listener: OnItemClickListener? = null
 
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyRecyclerViewAdapter.MyViewHolder {
-        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.training_item, parent, false)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExercisesRecyclerViewAdapter.MyViewHolder {
+        val itemView = LayoutInflater.from(parent.context).inflate(R.layout.exercise_item, parent, false)
         return MyViewHolder(itemView)
     }
 
@@ -43,12 +45,12 @@ init {
         }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        val training = getItem(position)
-        holder.data = training
-        val itemUUID = training?.uuid
+        val exercise = getItem(position)
+        holder.data = exercise
+        val itemUUID = exercise?.uuid
 
-        holder.date.text = training?.date.toString()
-        holder.description.text = training?.uuid.toString()
+        holder.name.hint = exercise?.knownExercise?.name ?: "DefaultName"
+        holder.description.text = exercise?.uuid.toString()
 //        holder.deletedCheckBox.isChecked = uuidsToDelete.contains(itemUUID)
 //        if (inDeletionMode) {
 //            holder.deletedCheckBox.setOnCheckedChangeListener { buttonView, isChecked ->
@@ -67,7 +69,7 @@ init {
     }
 
     interface OnItemClickListener {
-        fun onItemClick(training: Training)
+        fun onItemClick(exercise: Exercise)
     }
 
     fun setOnItemClickListener(listener: OnItemClickListener) {
@@ -75,10 +77,9 @@ init {
     }
 
         inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-            val date: TextView = itemView.findViewById(R.id.date)
-            val description: TextView = itemView.findViewById(R.id.description)
-            var data: Training? = null
-            val deletedCheckBox: CheckBox = itemView.findViewById(R.id.checkBox)
+            val name: EditText = itemView.findViewById(R.id.exerciseName)
+            val description: TextView = itemView.findViewById(R.id.sets_Text)
+            var data: Exercise? = null
             init {
                 itemView.setOnClickListener {
                     val position = adapterPosition
