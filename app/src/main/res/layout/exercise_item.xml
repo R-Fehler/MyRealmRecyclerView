@@ -1,33 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_height="56dp"
-        android:layout_width="match_parent">
-    <EditText
-            android:id="@+id/exerciseName"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+                                   android:layout_width="match_parent"
+                                   android:layout_height="wrap_content"
+                                   android:layout_marginStart="4dp"
+                                   android:layout_marginEnd="4dp"
+                                   android:layout_marginTop="4dp"
+                                   android:layout_marginBottom="4dp"
+                                   android:nestedScrollingEnabled="false">
+
+    <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Name"
-            android:background="?android:attr/selectableItemBackground"
-            android:gravity="center_vertical"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:textSize="16sp"
-            android:textStyle="bold"
-/>
+            android:paddingStart="16dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="8dp">
+
+        <EditText
+                android:id="@+id/exerciseName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Name"
+                android:background="?android:attr/selectableItemBackground"
+                android:gravity="center_vertical"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:textSize="16sp"
+                android:textStyle="bold"
+        />
 
 
-    <TextView android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:id="@+id/sets_Text"
-              android:text="100/ 3/4.."
-              android:gravity="center_vertical"
-              android:paddingLeft="16dp"
-              android:paddingRight="16dp"
-              android:textSize="12sp"
-              android:textStyle="bold"
-              android:layout_below="@+id/exerciseName"
-              android:layout_marginTop="5dp"/>
+        <TextView android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:id="@+id/sets_Text"
+                  android:text="100/ 3/4.."
+                  android:gravity="center_vertical"
+                  android:paddingLeft="16dp"
+                  android:paddingRight="16dp"
+                  android:textSize="12sp"
+                  android:textStyle="bold"
+                  android:layout_below="@+id/exerciseName"
+                  android:layout_marginTop="5dp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/exerciseSetRV"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+        android:layout_below="@+id/sets_Text"/>
+
+<Button android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="Add Set"
+        android:id="@+id/add_set_btn"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/exerciseSetRV"/>
 
 
-</RelativeLayout>
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>

@@ -26,7 +26,7 @@ class DataHelper {
             realm.executeTransactionAsync { ExerciseSet.create(it,exerciseUUID) }
         }
 
-
+        //TODO delete Exer und Sets
 
 
     }

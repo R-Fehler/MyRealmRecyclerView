@@ -1,5 +1,6 @@
 package com.example.myrealmrecyclerview.model
 
+import android.util.Log
 import io.realm.Realm
 import io.realm.RealmList
 import io.realm.RealmObject
@@ -39,8 +40,11 @@ open class Training : RealmObject() {
         }
         fun delete(realm: Realm, uuid: Long){
             val training=realm.where(Training::class.java).equalTo(FIELD_UUID,uuid).findFirst()
-            training?.exercises?.deleteAllFromRealm()
-            training?.deleteFromRealm()
+            for(exercise in training?.exercises!!){
+                exercise.sets.deleteAllFromRealm()
+            }
+            training.exercises.deleteAllFromRealm()
+            training.deleteFromRealm()
         }
 
         private fun increment(): Long {

@@ -1,13 +1,18 @@
 package com.example.myrealmrecyclerview.ui.recyclerview
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.TextView
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myrealmrecyclerview.R
+import com.example.myrealmrecyclerview.model.DataHelper
 import com.example.myrealmrecyclerview.model.Exercise
 import com.example.myrealmrecyclerview.model.Training
 import io.realm.OrderedRealmCollection
@@ -24,7 +29,10 @@ init {
     val uuidsToDelete: MutableSet<Long> = HashSet()
 
     private var listener: OnItemClickListener? = null
+    private var addSetListener: OnAddClickListener?=null
 
+    //  Nested RV
+    private val viewPool = RecyclerView.RecycledViewPool()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExercisesRecyclerViewAdapter.MyViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.exercise_item, parent, false)
@@ -44,42 +52,54 @@ init {
             notifyDataSetChanged()
         }
 
+    interface OnItemClickListener {
+
+        fun onItemClick(exercise: Exercise)
+    }
+    interface OnAddClickListener {
+        fun onAddClick(uuid:Long,adapter: ExerciseSetAdapter)
+    }
+    fun setOnItemClickListener(listener: OnItemClickListener) {
+        this.listener = listener
+    }
+
+    fun setAddClickListener(listener: OnAddClickListener){
+        this.addSetListener=listener
+    }
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val exercise = getItem(position)
         holder.data = exercise
         val itemUUID = exercise?.uuid
 
+
+        //Child ExerciseSet RV
+
+        val childManager=LinearLayoutManager(holder.recyclerView.context)
+        val childAdapter= holder.data?.sets?.let { ExerciseSetAdapter(it) }
+        holder.add_btn.setOnClickListener{
+            holder.data?.uuid?.let { it1 -> childAdapter?.let { it2 -> addSetListener?.onAddClick(it1, it2) } }
+        }
+
+        holder.recyclerView.apply {
+            layoutManager=childManager
+            adapter=childAdapter
+
+            setRecycledViewPool(viewPool)
+        }
+            .setHasFixedSize(true)
+        holder.recyclerView.addItemDecoration(DividerItemDecoration(holder.recyclerView.context,DividerItemDecoration.VERTICAL))
+
         holder.name.hint = exercise?.knownExercise?.name ?: "DefaultName"
         holder.description.text = exercise?.uuid.toString()
-//        holder.deletedCheckBox.isChecked = uuidsToDelete.contains(itemUUID)
-//        if (inDeletionMode) {
-//            holder.deletedCheckBox.setOnCheckedChangeListener { buttonView, isChecked ->
-//                if (isChecked) {
-//                    if (itemUUID != null) {
-//                        uuidsToDelete.add(itemUUID)
-//                    }
-//                } else {
-//                    uuidsToDelete.remove(itemUUID)
-//                }
-//            }
-//        } else {
-//            holder.deletedCheckBox.setOnCheckedChangeListener(null)
-//        }
-//        holder.deletedCheckBox.visibility = if (inDeletionMode) View.VISIBLE else View.GONE
-    }
-
-    interface OnItemClickListener {
-        fun onItemClick(exercise: Exercise)
-    }
-
-    fun setOnItemClickListener(listener: OnItemClickListener) {
-        this.listener = listener
     }
 
         inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             val name: EditText = itemView.findViewById(R.id.exerciseName)
             val description: TextView = itemView.findViewById(R.id.sets_Text)
             var data: Exercise? = null
+            val recyclerView: RecyclerView = itemView.findViewById(R.id.exerciseSetRV)
+            val add_btn: Button =itemView.findViewById(R.id.add_set_btn)
+
             init {
                 itemView.setOnClickListener {
                     val position = adapterPosition

@@ -2,6 +2,7 @@ package com.example.myrealmrecyclerview
 
 import android.content.Intent
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.view.Menu
 import android.widget.Toast
 import com.google.android.material.snackbar.Snackbar
@@ -14,13 +15,15 @@ import com.example.myrealmrecyclerview.model.DataHelper
 import com.example.myrealmrecyclerview.model.Exercise
 import com.example.myrealmrecyclerview.model.MasterParent
 import com.example.myrealmrecyclerview.model.Training
+import com.example.myrealmrecyclerview.ui.recyclerview.ExerciseSetAdapter
 import com.example.myrealmrecyclerview.ui.recyclerview.ExercisesRecyclerViewAdapter
 import com.example.myrealmrecyclerview.ui.recyclerview.MyRecyclerViewAdapter
 import io.realm.Realm
 
 import kotlinx.android.synthetic.main.activity_edit_training.*
+import java.sql.Time
 
-class EditTrainingActivity : AppCompatActivity() {
+class EditTrainingActivity : AppCompatActivity(), ExercisesRecyclerViewAdapter.OnAddClickListener {
 
     private var realm: Realm? = null
     private var recyclerView: RecyclerView? = null
@@ -30,12 +33,21 @@ class EditTrainingActivity : AppCompatActivity() {
     companion object {
         const val TRAINING_ID = "com.example.myrealmrecyclerview"
     }
+
+    override fun onAddClick(uuid: Long, adapter: ExerciseSetAdapter) {
+
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_training)
         realm = Realm.getDefaultInstance()
+//        for (i in 0..10){
+//
+//            realm?.let { DataHelper.addExerciseSetAsync(it,14) }
+//        }
+
+
         recyclerView = findViewById(R.id.recycler_view_exercises)
-        setUpRecyclerView()
         val training_uuid=intent.getLongExtra(TRAINING_ID,0)
         Toast.makeText(this,"$training_uuid ist die UUID", Toast.LENGTH_LONG).show()
 
@@ -45,11 +57,16 @@ class EditTrainingActivity : AppCompatActivity() {
 
         fab.setOnClickListener { view ->
             ///TODO SAVE TRAINING
-            realm?.let { DataHelper.addExerciseAsync(it,training_uuid) }
+            realm?.let {
+                DataHelper.addExerciseAsync(it, training_uuid)
+            }
+
+
 
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()
         }
+        setUpRecyclerView()
     }
     /*
  * It is good practice to null the reference from the view to the adapter when it is no longer needed.
@@ -72,8 +89,15 @@ class EditTrainingActivity : AppCompatActivity() {
 //
 //
 //                startActivityForResult(intent,1)
+                // TODO add new Set to Exercise
                 Toast.makeText(this@EditTrainingActivity,"next Activity",Toast.LENGTH_SHORT).show()
             }
+        })
+        adapter!!.setAddClickListener(object : ExercisesRecyclerViewAdapter.OnAddClickListener {
+            override fun onAddClick(uuid: Long, adapter: ExerciseSetAdapter) {
+                realm?.let { DataHelper.addExerciseSetAsync(it,uuid) }
+                Toast.makeText(this@EditTrainingActivity,"uuid ist $uuid",Toast.LENGTH_SHORT).show()            }
+
         })
         recyclerView!!.layoutManager = LinearLayoutManager(this)
         recyclerView!!.adapter = adapter
