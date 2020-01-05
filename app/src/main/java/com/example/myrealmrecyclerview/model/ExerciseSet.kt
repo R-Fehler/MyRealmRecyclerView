@@ -21,7 +21,7 @@ open class ExerciseSet : RealmObject() {
         fun create(realm: Realm, exerciseID: Long){
 
             val sets = realm.where(Exercise::class.java).equalTo(FIELD_UUID,exerciseID).findFirst()?.sets
-            val maxid=sets?.max("uuid")?.toLong()
+            val maxid = realm.where(ExerciseSet::class.java).findAll()?.max(ExerciseSet.FIELD_UUID)?.toLong()
             maxid?.let { INTEGER_COUNTER.set(it+1) }
 
             val exerciseSet =realm.createObject(ExerciseSet::class.java, increment())

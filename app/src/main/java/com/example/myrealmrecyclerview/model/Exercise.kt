@@ -20,9 +20,9 @@ open class Exercise : RealmObject() {
         private val INTEGER_COUNTER = AtomicLong(0)
 
         fun create(realm: Realm, trainingID: Long){
-
             val exercises = realm.where(Training::class.java).equalTo(FIELD_UUID,trainingID).findFirst()?.exercises
-            val maxid=exercises?.max("uuid")?.toLong()
+
+            val maxid = realm.where(Exercise::class.java).findAll()?.max(FIELD_UUID)?.toLong()
             maxid?.let { INTEGER_COUNTER.set(it+1) }
 
             val exercise =realm.createObject(Exercise::class.java, increment())
@@ -30,6 +30,7 @@ open class Exercise : RealmObject() {
         }
         fun delete(realm: Realm, uuid: Long){
             val exercise =realm.where(Exercise::class.java).equalTo(FIELD_UUID,uuid).findFirst()
+            exercise?.sets?.deleteAllFromRealm()
             exercise?.deleteFromRealm()
         }
 

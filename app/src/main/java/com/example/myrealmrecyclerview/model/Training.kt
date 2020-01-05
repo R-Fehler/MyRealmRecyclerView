@@ -29,7 +29,8 @@ open class Training : RealmObject() {
 //            val realm=Realm.getDefaultInstance()
             val masterParent = realm.where(MasterParent::class.java).findFirst()
             val trainings: RealmList<Training>? = masterParent?.trainingList
-            val maxid=trainings?.max("uuid")?.toLong()
+            val maxid = realm.where(Training::class.java).findAll()?.max(FIELD_UUID)?.toLong()
+
             maxid?.let { INTEGER_COUNTER.set(it+1) }
 
             val training =realm.createObject(Training::class.java, increment())
@@ -38,6 +39,7 @@ open class Training : RealmObject() {
         }
         fun delete(realm: Realm, uuid: Long){
             val training=realm.where(Training::class.java).equalTo(FIELD_UUID,uuid).findFirst()
+            training?.exercises?.deleteAllFromRealm()
             training?.deleteFromRealm()
         }
 
