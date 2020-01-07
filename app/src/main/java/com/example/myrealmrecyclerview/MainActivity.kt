@@ -11,11 +11,20 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myrealmrecyclerview.model.DataHelper
+import com.example.myrealmrecyclerview.model.KnownExercise
 import com.example.myrealmrecyclerview.model.MasterParent
 import com.example.myrealmrecyclerview.model.Training
 import com.example.myrealmrecyclerview.ui.recyclerview.MyRecyclerViewAdapter
 import io.realm.Realm
+/*TODO
+In Traininglist suchen: Namen, known exercise, Monat/Jahr,
+Training(Planung) aus txt parsen und verschicken können. Zb für coaches bzw Freunde. Gleiche Schnittstelle wie gadget?? Oder kompakte Schreibweise?
+Trainingsplanung zb wöchentlich kopieren. Mit neuen RealmObjects die aber die selben properties ausser primary key haben
+Traininglist: die Views der einzelnen Trainings anpassen um Datum, Wochentag, Uhrzeit, Dauer, exercises und Kurzfassung der Sets anzuzeigen. Dazu Gesamtvolumen und PRs
+Bei add Training neuen erstellen und gleich edit Training acitivity mit der uuid starten
+Training als geplant in Traininglist activity markieren.. Dient später als Plan für gadget. (Das mit dem aktuellsten Datum)
 
+ */
 class MainActivity : AppCompatActivity() {
 
 
@@ -117,9 +126,10 @@ class MainActivity : AppCompatActivity() {
             override fun onItemClick(training: Training) {
                 var intent = Intent(baseContext, EditTrainingActivity::class.java)
                 intent.putExtra(EditTrainingActivity.TRAINING_ID, training.uuid) //TODO LongExtra?
+                var knownExIntent=Intent(baseContext,KnownExerciseListActivity::class.java)
 
-
-                startActivityForResult(intent,1)
+//                startActivityForResult(intent,1)
+                startActivity(knownExIntent)
             }
         })
         recyclerView!!.layoutManager = LinearLayoutManager(this)

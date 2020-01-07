@@ -2,6 +2,8 @@ package com.example.myrealmrecyclerview.model
 
 import io.realm.Realm
 import io.realm.RealmObject
+import io.realm.RealmResults
+import io.realm.annotations.LinkingObjects
 import io.realm.annotations.PrimaryKey
 import io.realm.kotlin.createObject
 import java.util.*
@@ -12,6 +14,13 @@ open class KnownExercise: RealmObject() {
     var uuid: Long=0
     var name: String = ""
     var id: Int = 0
+    var category: String=""
+    var prWeight: Int = 0
+    var repsAtPRWeight: Int = 0
+    var prCalculated: Int= 0
+    @LinkingObjects("knownExercise")
+    val doneInExercises: RealmResults<Exercise>?=null
+
 
 
     companion object{

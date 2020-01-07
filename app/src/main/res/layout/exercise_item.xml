@@ -1,60 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-                                   android:layout_width="match_parent"
-                                   android:layout_height="wrap_content"
-                                   android:layout_marginStart="4dp"
-                                   android:layout_marginEnd="4dp"
-                                   android:layout_marginTop="4dp"
-                                   android:layout_marginBottom="4dp"
-                                   android:nestedScrollingEnabled="false">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_marginStart="4dp"
+    android:layout_marginEnd="4dp"
+    android:layout_marginTop="4dp"
+    android:layout_marginBottom="4dp"
+    android:nestedScrollingEnabled="false">
 
-    <RelativeLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="8dp">
+
+        <Button
+            android:id="@+id/exerciseName"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_marginTop="4dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:text="Name Squat"
+            android:textAlignment="viewStart"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintLeft_toRightOf="@+id/exerciseName_ID"
+           app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/exerciseName_ID"
+            android:layout_margin="5dp"
+            android:ems="3"
+            android:text="ID"
+            android:textAlignment="center"
+            app:layout_constraintBaseline_toBaselineOf="@+id/exerciseName"
+            app:layout_constraintLeft_toLeftOf="parent"
+            />
+
+
+        <TextView
+            android:id="@+id/sets_Text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="16dp"
-            android:paddingTop="8dp"
-            android:paddingEnd="16dp"
-            android:paddingBottom="8dp">
-
-        <EditText
-                android:id="@+id/exerciseName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Name"
-                android:background="?android:attr/selectableItemBackground"
-                android:gravity="center_vertical"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
-                android:textSize="16sp"
-                android:textStyle="bold"
-        />
-
-
-        <TextView android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:id="@+id/sets_Text"
-                  android:text="100/ 3/4.."
-                  android:gravity="center_vertical"
-                  android:paddingLeft="16dp"
-                  android:paddingRight="16dp"
-                  android:textSize="12sp"
-                  android:textStyle="bold"
-                  android:layout_below="@+id/exerciseName"
-                  android:layout_marginTop="5dp"/>
+            android:layout_marginTop="5dp"
+            android:gravity="center_vertical"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:text="100/ 3/4.."
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@+id/exerciseName" />
 
         <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/exerciseSetRV"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-        android:layout_below="@+id/sets_Text"/>
+            android:id="@+id/exerciseSetRV"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/sets_Text"
+            android:layout_marginTop="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sets_Text" />
 
-<Button android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:text="Add Set"
-        android:id="@+id/add_set_btn"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@+id/exerciseSetRV"/>
+        <Button
+            android:id="@+id/add_set_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/exerciseSetRV"
+            android:layout_marginTop="10dp"
+            android:text="Add Set"
+            app:layout_constraintLeft_toLeftOf="parent"
+
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/exerciseSetRV" />
 
 
-    </RelativeLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.cardview.widget.CardView>

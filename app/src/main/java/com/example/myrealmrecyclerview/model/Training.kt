@@ -15,11 +15,12 @@ open class Training : RealmObject() {
     @PrimaryKey
     var uuid:Long=0
     var notes: String = ""
+    var name: String = ""
     var date: Date = Date()
     //duration, location, time, blabla
     var exercises: RealmList<Exercise> = RealmList()
-    var duration: Long = 0
-
+    var duration: Long = 0 // in minutes
+    var tonnage=0.0
 
 
     companion object{

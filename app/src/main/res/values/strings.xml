@@ -8,4 +8,6 @@
     <string name="start_delete">Start Deletion</string>
     <string name="delete">Delete</string>
     <string name="title_activity_edit_training">EditTrainingActivity</string>
+    <string name="title_activity_known_exercise_list">KnownExerciseListActivity</string>
+    <string name="action_settings">Settings</string>
 </resources>

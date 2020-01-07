@@ -22,7 +22,14 @@ import io.realm.Realm
 
 import kotlinx.android.synthetic.main.activity_edit_training.*
 import java.sql.Time
+/*TODO
+In edit exercise activity noch oben edit Text mit Datum, Notizen dauer usw.
+Edittraining activity in readonly Mode um alte Trainings anzuschauen ohne was ausversehen zu löschen oder zu ändern. Kann man edittext noneditable machen wenn ein intentcode gesetzt wird
+Testen wie die edit Text persistent werden : ontextchanged updaterealm
+Geplant vs done? : setze den Wert von planned in normale properties. Wenn gleich ist der Set wie geplant ausgeführt
+Vorschläge in edittext aufgrund des letzten Trainings mit der known exercise. Query in oncreate für exercise mit known exercise Feld equalto this known exercise und Sets orderNo equalto this orderNo Else den vom letzten Satz
 
+ */
 class EditTrainingActivity : AppCompatActivity(), ExercisesRecyclerViewAdapter.OnAddClickListener {
 
     private var realm: Realm? = null

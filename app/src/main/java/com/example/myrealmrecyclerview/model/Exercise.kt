@@ -14,7 +14,6 @@ open class Exercise : RealmObject() {
     var knownExercise: KnownExercise? = null
 
     var sets: RealmList<ExerciseSet> = RealmList()
-
     companion object{
         const val FIELD_UUID="uuid"
         private val INTEGER_COUNTER = AtomicLong(0)

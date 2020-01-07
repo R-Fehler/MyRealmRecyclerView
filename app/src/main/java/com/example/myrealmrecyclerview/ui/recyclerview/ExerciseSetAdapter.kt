@@ -3,16 +3,12 @@ package com.example.myrealmrecyclerview.ui.recyclerview
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.CheckBox
-import android.widget.TextView
+import android.widget.EditText
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myrealmrecyclerview.R
 import com.example.myrealmrecyclerview.model.ExerciseSet
-import com.example.myrealmrecyclerview.model.Training
 import io.realm.OrderedRealmCollection
 import io.realm.RealmRecyclerViewAdapter
-import java.util.*
 
 class ExerciseSetAdapter(data: OrderedRealmCollection<ExerciseSet>) :
     RealmRecyclerViewAdapter<ExerciseSet, ExerciseSetAdapter.MyViewHolder>(data, true) {
@@ -39,15 +35,15 @@ class ExerciseSetAdapter(data: OrderedRealmCollection<ExerciseSet>) :
         holder.data = ExerciseSet
         val itemUUID = ExerciseSet?.uuid
 
-        holder.weight.text = ExerciseSet?.weight.toString()
-        holder.reps.text = ExerciseSet?.uuid.toString()
+        holder.weight.hint = ExerciseSet?.weight.toString()
+        holder.reps.hint = ExerciseSet?.uuid.toString()
 
     }
 
 
     inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val reps: TextView = itemView.findViewById(R.id.textView_reps)
-        val weight: TextView = itemView.findViewById(R.id.textView_weight)
+        val reps: EditText = itemView.findViewById(R.id.editTextView_reps)
+        val weight: EditText = itemView.findViewById(R.id.editTextView_weight)
         var data: ExerciseSet? = null
 
         }
