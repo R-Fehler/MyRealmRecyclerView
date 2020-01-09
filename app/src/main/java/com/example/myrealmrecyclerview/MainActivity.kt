@@ -11,10 +11,9 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myrealmrecyclerview.model.DataHelper
-import com.example.myrealmrecyclerview.model.KnownExercise
 import com.example.myrealmrecyclerview.model.MasterParent
 import com.example.myrealmrecyclerview.model.Training
-import com.example.myrealmrecyclerview.ui.recyclerview.MyRecyclerViewAdapter
+import com.example.myrealmrecyclerview.ui.recyclerview.TrainingRecyclerViewAdapter
 import io.realm.Realm
 /*TODO
 In Traininglist suchen: Namen, known exercise, Monat/Jahr,
@@ -31,7 +30,7 @@ class MainActivity : AppCompatActivity() {
     private var realm: Realm? = null
     private var recyclerView: RecyclerView? = null
     private var menu: Menu? = null
-    private var adapter: MyRecyclerViewAdapter? = null
+    private var adapter: TrainingRecyclerViewAdapter? = null
 
      inner class TouchHelperCallback internal constructor() :
         ItemTouchHelper.SimpleCallback(
@@ -121,15 +120,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setUpRecyclerView() {
-        adapter = MyRecyclerViewAdapter(realm!!.where(MasterParent::class.java).findFirst()!!.trainingList)
-        adapter!!.setOnItemClickListener(object : MyRecyclerViewAdapter.OnItemClickListener {
+        adapter = TrainingRecyclerViewAdapter(realm!!.where(MasterParent::class.java).findFirst()!!.trainingList)
+        adapter!!.setOnItemClickListener(object : TrainingRecyclerViewAdapter.OnItemClickListener {
             override fun onItemClick(training: Training) {
                 var intent = Intent(baseContext, EditTrainingActivity::class.java)
                 intent.putExtra(EditTrainingActivity.TRAINING_ID, training.uuid) //TODO LongExtra?
-                var knownExIntent=Intent(baseContext,KnownExerciseListActivity::class.java)
 
 //                startActivityForResult(intent,1)
-                startActivity(knownExIntent)
+                startActivity(intent)
             }
         })
         recyclerView!!.layoutManager = LinearLayoutManager(this)

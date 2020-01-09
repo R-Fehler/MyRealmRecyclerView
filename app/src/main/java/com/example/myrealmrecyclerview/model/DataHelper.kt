@@ -19,11 +19,27 @@ class DataHelper {
                 }
             }
         }
-        fun addExerciseAsync(realm: Realm, trainingUUID:Long){
+        fun addExerciseAsync(realm: Realm, trainingUUID:Long) {
+
             realm.executeTransactionAsync { Exercise.create(it,trainingUUID) }
+
         }
-        fun addExerciseSetAsync(realm: Realm, exerciseUUID:Long){
+        fun addExercise(realm: Realm,trainingUUID:Long): Long {
+            var primary:Long=0
+            realm.executeTransaction {primary= Exercise.create(it,trainingUUID) }
+            return primary
+        }
+
+        fun addExerciseSetAsync(realm: Realm, exerciseUUID:Long) {
             realm.executeTransactionAsync { ExerciseSet.create(it,exerciseUUID) }
+        }
+
+        fun createKnownExerciseAsync(realm: Realm,name:String, customID:Int){
+            realm.executeTransactionAsync { KnownExercise.create(it,name,customID) }
+        }
+
+        fun addKnownExToExerciseAsync(realm:Realm,knownUUID:Long,exerciseUUID: Long){
+            realm.executeTransactionAsync { KnownExercise.addToExercise(it,exerciseUUID,knownUUID) }
         }
 
         //TODO delete Exer und Sets

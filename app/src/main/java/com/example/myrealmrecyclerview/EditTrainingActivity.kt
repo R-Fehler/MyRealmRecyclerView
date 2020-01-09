@@ -1,27 +1,24 @@
 package com.example.myrealmrecyclerview
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.provider.ContactsContract
 import android.view.Menu
 import android.widget.Toast
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myrealmrecyclerview.model.DataHelper
 import com.example.myrealmrecyclerview.model.Exercise
-import com.example.myrealmrecyclerview.model.MasterParent
 import com.example.myrealmrecyclerview.model.Training
 import com.example.myrealmrecyclerview.ui.recyclerview.ExerciseSetAdapter
 import com.example.myrealmrecyclerview.ui.recyclerview.ExercisesRecyclerViewAdapter
-import com.example.myrealmrecyclerview.ui.recyclerview.MyRecyclerViewAdapter
 import io.realm.Realm
 
 import kotlinx.android.synthetic.main.activity_edit_training.*
-import java.sql.Time
+
 /*TODO
 In edit exercise activity noch oben edit Text mit Datum, Notizen dauer usw.
 Edittraining activity in readonly Mode um alte Trainings anzuschauen ohne was ausversehen zu löschen oder zu ändern. Kann man edittext noneditable machen wenn ein intentcode gesetzt wird
@@ -38,7 +35,9 @@ class EditTrainingActivity : AppCompatActivity(), ExercisesRecyclerViewAdapter.O
     private var adapter: ExercisesRecyclerViewAdapter? = null
 
     companion object {
-        const val TRAINING_ID = "com.example.myrealmrecyclerview"
+        const val TRAINING_ID = "com.example.myrealmrecyclerview.TRAINING_ID"
+        const val KNOWNEXERCISE_ID = "com.example.myrealmrecyclerview.KNOWNEXERCISE_ID"
+        const val EXERCISE_ID = "com.example.myrealmrecyclerview.EXERCISE_ID"
     }
 
     override fun onAddClick(uuid: Long, adapter: ExerciseSetAdapter) {
@@ -65,7 +64,11 @@ class EditTrainingActivity : AppCompatActivity(), ExercisesRecyclerViewAdapter.O
         fab.setOnClickListener { view ->
             ///TODO SAVE TRAINING
             realm?.let {
-                DataHelper.addExerciseAsync(it, training_uuid)
+               val exerciseID=DataHelper.addExercise(it, training_uuid)
+                val intent= Intent(this@EditTrainingActivity,KnownExerciseListActivity::class.java)
+//                TODO
+                intent.putExtra(EXERCISE_ID,exerciseID)
+                startActivityForResult(intent,5)
             }
 
 
@@ -103,7 +106,7 @@ class EditTrainingActivity : AppCompatActivity(), ExercisesRecyclerViewAdapter.O
         adapter!!.setAddClickListener(object : ExercisesRecyclerViewAdapter.OnAddClickListener {
             override fun onAddClick(uuid: Long, adapter: ExerciseSetAdapter) {
                 realm?.let { DataHelper.addExerciseSetAsync(it,uuid) }
-                Toast.makeText(this@EditTrainingActivity,"uuid ist $uuid",Toast.LENGTH_SHORT).show()            }
+                         }
 
         })
         recyclerView!!.layoutManager = LinearLayoutManager(this)
@@ -114,6 +117,23 @@ class EditTrainingActivity : AppCompatActivity(), ExercisesRecyclerViewAdapter.O
 //        val touchHelperCallback = TouchHelperCallback()
 //        val touchHelper = ItemTouchHelper(touchHelperCallback)
 //        touchHelper.attachToRecyclerView(recyclerView)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode==5){
+            if(resultCode== Activity.RESULT_OK){
+                val knownExID=data?.getLongExtra(KNOWNEXERCISE_ID,111)
+                val ExID=data?.getLongExtra(EXERCISE_ID,111)
+                realm?.let {
+                    if (knownExID != null) {
+                        if (ExID != null) {
+                            DataHelper.addKnownExToExerciseAsync(it,knownExID,ExID)
+                        }
+                    }
+                }
+            }
+        }
     }
     }
 

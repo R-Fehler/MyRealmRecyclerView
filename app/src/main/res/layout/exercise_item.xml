@@ -18,56 +18,43 @@
         android:paddingEnd="16dp"
         android:paddingBottom="8dp">
 
-        <Button
+        <TextView
             android:id="@+id/exerciseName"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:layout_marginTop="4dp"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
-            android:text="Name Squat"
+            android:text="Name ..."
             android:textAlignment="viewStart"
             android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintLeft_toRightOf="@+id/exerciseName_ID"
            app:layout_constraintTop_toTopOf="parent" />
 
-        <Button
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/exerciseName_ID"
             android:layout_margin="5dp"
             android:ems="3"
             android:text="ID"
+            android:textSize="16sp"
             android:textAlignment="center"
             app:layout_constraintBaseline_toBaselineOf="@+id/exerciseName"
             app:layout_constraintLeft_toLeftOf="parent"
             />
 
 
-        <TextView
-            android:id="@+id/sets_Text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:gravity="center_vertical"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:text="100/ 3/4.."
-            android:textSize="12sp"
-            android:textStyle="bold"
-            app:layout_constraintTop_toBottomOf="@+id/exerciseName" />
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/exerciseSetRV"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/sets_Text"
-            android:layout_marginTop="10dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_below="@+id/exerciseName"
+            app:layout_constraintBottom_toTopOf="@id/add_set_btn"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/sets_Text" />
+            app:layout_constraintTop_toBottomOf="@+id/exerciseName" />
 
         <Button
             android:id="@+id/add_set_btn"
@@ -75,7 +62,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/exerciseSetRV"
             android:layout_marginTop="10dp"
-            android:text="Add Set"
+            android:text="@string/add_set"
             app:layout_constraintLeft_toLeftOf="parent"
 
             app:layout_constraintRight_toRightOf="parent"

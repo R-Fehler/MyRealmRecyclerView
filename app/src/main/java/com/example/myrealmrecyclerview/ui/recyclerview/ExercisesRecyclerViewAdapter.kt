@@ -1,20 +1,16 @@
 package com.example.myrealmrecyclerview.ui.recyclerview
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.CheckBox
-import android.widget.EditText
 import android.widget.TextView
+import androidx.core.view.get
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myrealmrecyclerview.R
-import com.example.myrealmrecyclerview.model.DataHelper
 import com.example.myrealmrecyclerview.model.Exercise
-import com.example.myrealmrecyclerview.model.Training
 import io.realm.OrderedRealmCollection
 import io.realm.RealmRecyclerViewAdapter
 import java.util.*
@@ -76,9 +72,6 @@ init {
 
         val childManager=LinearLayoutManager(holder.recyclerView.context)
         val childAdapter= holder.data?.sets?.let { ExerciseSetAdapter(it) }
-        holder.add_btn.setOnClickListener{
-            holder.data?.uuid?.let { it1 -> childAdapter?.let { it2 -> addSetListener?.onAddClick(it1, it2) } }
-        }
 
         holder.recyclerView.apply {
             layoutManager=childManager
@@ -87,15 +80,19 @@ init {
             setRecycledViewPool(viewPool)
         }
             .setHasFixedSize(true)
+        holder.add_btn.setOnClickListener{
+            holder.data?.uuid?.let { it1 -> childAdapter?.let { it2 -> addSetListener?.onAddClick(it1, it2) } }
+
+        }
         holder.recyclerView.addItemDecoration(DividerItemDecoration(holder.recyclerView.context,DividerItemDecoration.VERTICAL))
 
-        holder.name.hint = exercise?.knownExercise?.name ?: "DefaultName"
-        holder.description.text = exercise?.uuid.toString()
+        holder.name.text = exercise?.knownExercise?.name ?: "DefaultName"
+        holder.user_custom_id.text = exercise?.knownExercise?.user_custom_id.toString()
     }
 
         inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-            val name: EditText = itemView.findViewById(R.id.exerciseName)
-            val description: TextView = itemView.findViewById(R.id.sets_Text)
+            val name: TextView = itemView.findViewById(R.id.exerciseName)
+            val user_custom_id: TextView = itemView.findViewById(R.id.exerciseName_ID)
             var data: Exercise? = null
             val recyclerView: RecyclerView = itemView.findViewById(R.id.exerciseSetRV)
             val add_btn: Button =itemView.findViewById(R.id.add_set_btn)

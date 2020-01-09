@@ -18,14 +18,15 @@ open class Exercise : RealmObject() {
         const val FIELD_UUID="uuid"
         private val INTEGER_COUNTER = AtomicLong(0)
 
-        fun create(realm: Realm, trainingID: Long){
+        fun create(realm: Realm, trainingID: Long): Long {
             val exercises = realm.where(Training::class.java).equalTo(FIELD_UUID,trainingID).findFirst()?.exercises
 
             val maxid = realm.where(Exercise::class.java).findAll()?.max(FIELD_UUID)?.toLong()
             maxid?.let { INTEGER_COUNTER.set(it+1) }
-
-            val exercise =realm.createObject(Exercise::class.java, increment())
+            val primary= increment()
+            val exercise =realm.createObject(Exercise::class.java, primary)
             exercises?.add(exercise)
+            return primary
         }
         fun delete(realm: Realm, uuid: Long){
             val exercise =realm.where(Exercise::class.java).equalTo(FIELD_UUID,uuid).findFirst()

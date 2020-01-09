@@ -47,6 +47,8 @@ open class ExerciseSet : RealmObject() {
             exerciseSet?.deleteFromRealm()
         }
 
+
+
         private fun increment(): Long {
             return INTEGER_COUNTER.getAndIncrement()
         }

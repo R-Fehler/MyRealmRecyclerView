@@ -13,7 +13,7 @@ open class KnownExercise: RealmObject() {
     @PrimaryKey
     var uuid: Long=0
     var name: String = ""
-    var id: Int = 0
+    var user_custom_id: Int = 0
     var category: String=""
     var prWeight: Int = 0
     var repsAtPRWeight: Int = 0
@@ -27,19 +27,20 @@ open class KnownExercise: RealmObject() {
         const val FIELD_UUID="uuid"
         private val INTEGER_COUNTER = AtomicLong(0)
 
-        fun create(realm: Realm){
+        fun create(realm: Realm,name:String ,user_custom_id: Int){
             val maxid:Long? =realm.where(KnownExercise::class.java).max(FIELD_UUID)?.toLong()
             maxid?.let { KnownExercise.INTEGER_COUNTER.set(it+1) }
-            realm.createObject(KnownExercise::class.java,increment())
-
+            val knownExercise=realm.createObject(KnownExercise::class.java,increment())
+            knownExercise.name=name
+            knownExercise.user_custom_id=user_custom_id
         }
         fun addToExercise(realm: Realm, exerciseID : Long, knownExerciseID: Long){
             val exercise = realm.where(Exercise::class.java).equalTo(Exercise.FIELD_UUID,exerciseID).findFirst()
-            exercise?.knownExercise= realm.where(KnownExercise::class.java).equalTo(KnownExercise.FIELD_UUID,knownExerciseID).findFirst()
+            exercise?.knownExercise= realm.where(KnownExercise::class.java).equalTo(FIELD_UUID,knownExerciseID).findFirst()
 
         }
         fun delete(realm: Realm, uuid: Long){
-            val knownExercise =realm.where(KnownExercise::class.java).equalTo(KnownExercise.FIELD_UUID,uuid).findFirst()
+            val knownExercise =realm.where(KnownExercise::class.java).equalTo(FIELD_UUID,uuid).findFirst()
             knownExercise?.deleteFromRealm()
         }
         private fun increment(): Long {
