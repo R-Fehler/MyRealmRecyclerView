@@ -20,6 +20,7 @@ open class KnownExercise: RealmObject() {
     var prCalculated: Int= 0
     @LinkingObjects("knownExercise")
     val doneInExercises: RealmResults<Exercise>?=null
+    var doneInExercisesSize:Int=0
 
 
 
@@ -37,14 +38,20 @@ open class KnownExercise: RealmObject() {
         fun addToExercise(realm: Realm, exerciseID : Long, knownExerciseID: Long){
             val exercise = realm.where(Exercise::class.java).equalTo(Exercise.FIELD_UUID,exerciseID).findFirst()
             exercise?.knownExercise= realm.where(KnownExercise::class.java).equalTo(FIELD_UUID,knownExerciseID).findFirst()
-
+            exercise?.knownExercise?.doneInExercisesSize=exercise?.knownExercise?.doneInExercises?.size!!
         }
-        fun delete(realm: Realm, uuid: Long){
-            val knownExercise =realm.where(KnownExercise::class.java).equalTo(FIELD_UUID,uuid).findFirst()
-            knownExercise?.deleteFromRealm()
-        }
+//        fun delete(realm: Realm, uuid: Long){
+//            val knownExercise =realm.where(KnownExercise::class.java).equalTo(FIELD_UUID,uuid).findFirst()
+//            knownExercise?.deleteFromRealm()
+//        }
         private fun increment(): Long {
             return INTEGER_COUNTER.getAndIncrement()
+        }
+
+        fun changeNameAndID(realm: Realm, knownExerciseUUID: Long, name: String, id: Int) {
+            val knownExercise=realm.where(KnownExercise::class.java).equalTo(FIELD_UUID,knownExerciseUUID).findFirst()
+            knownExercise?.name=name
+            knownExercise?.user_custom_id=id
         }
     }
 }

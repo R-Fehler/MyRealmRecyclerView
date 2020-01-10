@@ -33,5 +33,13 @@
         android:text="Name der Exercise"
         android:textSize="24sp"
         />
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/doneInNumber_TextView"
+        android:textSize="24sp"
+        android:layout_weight="0.2"
+        />
 </LinearLayout>
 </androidx.cardview.widget.CardView>

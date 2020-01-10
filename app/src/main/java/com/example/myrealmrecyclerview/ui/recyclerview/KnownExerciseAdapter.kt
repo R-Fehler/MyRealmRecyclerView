@@ -45,6 +45,7 @@ class KnownExerciseAdapter(data: OrderedRealmCollection<KnownExercise>) :
 
         holder.knownExerciseName.text = knownExercise?.name.toString()
         holder.user_custom_id.text = knownExercise?.user_custom_id.toString()
+        holder.doneInTextView.text=knownExercise?.doneInExercises?.size.toString()
     }
 
     interface OnItemClickListener {
@@ -59,6 +60,7 @@ class KnownExerciseAdapter(data: OrderedRealmCollection<KnownExercise>) :
         val user_custom_id: TextView = itemView.findViewById(R.id.knownExerciseRV_ID)
         val knownExerciseName: TextView = itemView.findViewById(R.id.knownExerciseRV_Name)
         var data: KnownExercise? = null
+        val doneInTextView: TextView = itemView.findViewById(R.id.doneInNumber_TextView)
         init {
             itemView.setOnClickListener {
                 val position = adapterPosition

@@ -21,7 +21,7 @@ open class Training : RealmObject() {
     var exercises: RealmList<Exercise> = RealmList()
     var duration: Long = 0 // in minutes
     var tonnage=0.0
-
+    var isDone:Boolean=false
 
     companion object{
          const val FIELD_UUID="uuid"

@@ -6,21 +6,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
-import android.widget.CompoundButton
 import android.widget.EditText
-import androidx.core.text.isDigitsOnly
-import androidx.core.widget.addTextChangedListener
-import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myrealmrecyclerview.R
-import com.example.myrealmrecyclerview.model.Exercise
 import com.example.myrealmrecyclerview.model.ExerciseSet
 import io.realm.OrderedRealmCollection
 import io.realm.Realm
 import io.realm.RealmRecyclerViewAdapter
 
 class ExerciseSetAdapter(data: OrderedRealmCollection<ExerciseSet>) :
-    RealmRecyclerViewAdapter<ExerciseSet, ExerciseSetAdapter.MyViewHolder>(data, true) {
+    RealmRecyclerViewAdapter<ExerciseSet, ExerciseSetAdapter.MyViewHolder>(data, false) {
 //    private var weightTextChangedListener:onWeightTextChangedListener?=null
     private var realm: Realm?=null
     init {
@@ -50,45 +45,87 @@ class ExerciseSetAdapter(data: OrderedRealmCollection<ExerciseSet>) :
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
 
-        val ExerciseSet = getItem(position)
-        holder.data = ExerciseSet
-        val itemUUID = ExerciseSet?.uuid
+        val exerciseSet = getItem(position)
+        holder.data = exerciseSet
+        val itemUUID = exerciseSet?.uuid
         val bool = holder.data?.isDone
 
         holder.checkBox.isChecked = bool!!
+        if (holder.checkBox.isChecked){
+            holder.weightEditText.isEnabled=false
+            holder.repsEditText.isEnabled=false
+        }
+        else{
+            holder.weightEditText.isEnabled=true
+            holder.repsEditText.isEnabled=true
+        }
 
         var weightString = holder.data?.weight.toString()
         var repsString = holder.data?.reps.toString()
-        holder.weight.text.clear()
-        holder.weight.text.insert(0, weightString)
-        holder.reps.text.clear()
-        holder.reps.text.insert(0, repsString)
-        if (holder.checkBox.isChecked){
-            holder.weight.isEnabled=false
-            holder.reps.isEnabled=false
+
+        holder.weightEditText.text.clear()
+        holder.weightEditText.text.insert(0, weightString)
+        //TODO finde raus wie man die IME Action macht dass das nachstte edittext im nachsten holder aktiviert ist usw
+        holder.weightEditText.setOnEditorActionListener { v, actionId, event ->
+            holder.repsEditText.selectAll()
+            holder.repsEditText.isActivated
         }
-        else{
-            holder.weight.isEnabled=true
-            holder.reps.isEnabled=true
+
+        holder.weightEditText.addTextChangedListener(object: TextWatcher{
+            override fun afterTextChanged(s: Editable?) {
+                if(!s.isNullOrEmpty()) {
+                    if (s.toString() != holder.data?.weight.toString()) {
+                        realm?.executeTransaction { holder.data?.weight = holder.weightEditText.text.toString().trim().toInt() }
+                    }
+                }
+            }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+        holder.repsEditText.addTextChangedListener(object: TextWatcher{
+            override fun afterTextChanged(s: Editable?) {
+                if(!s.isNullOrEmpty()) {
+                    if (s.toString() != holder.data?.reps.toString()) {
+                        realm?.executeTransaction { holder.data?.reps = holder.repsEditText.text.toString().trim().toInt() }
+                    }
+                }
+            }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+        holder.repsEditText.text.clear()
+        holder.repsEditText.text.insert(0, repsString)
+        holder.repsEditText.setOnClickListener {
+            holder.repsEditText.selectAll()
         }
+
         holder.checkBox.setOnClickListener {
-            if (holder.checkBox.isChecked) {
-                realm?.executeTransaction { holder.data?.weight = holder.weight.text.toString().toInt() }
-                realm?.executeTransaction { holder.data?.reps = holder.reps.text.toString().toInt() }
-                realm?.executeTransaction{ holder.data?.isDone=true }
-            } else {
-                realm?.executeTransaction{holder.data?.isDone=false}
+            realm?.executeTransaction{ holder.data?.isDone = holder.checkBox.isChecked }
+            if (holder.checkBox.isChecked){
+                holder.weightEditText.isEnabled=false
+                holder.repsEditText.isEnabled=false
+            }
+            else{
+                holder.weightEditText.isEnabled=true
+                holder.repsEditText.isEnabled=true
             }
         }
 
+
     }
 
-
     inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val reps: EditText = itemView.findViewById(R.id.editTextView_reps)
-        val weight: EditText = itemView.findViewById(R.id.editTextView_weight)
+        val repsEditText: EditText = itemView.findViewById(R.id.editTextView_reps)
+        val weightEditText: EditText = itemView.findViewById(R.id.editTextView_weight)
         var data: ExerciseSet? = null
         val checkBox: CheckBox=itemView.findViewById(R.id.set_done_checkbox)
+        fun save(set:ExerciseSet){
+            realm?.executeTransaction { set.weight = weightEditText.text.toString().toInt() }
+            realm?.executeTransaction { set.reps = repsEditText.text.toString().toInt() }
+            realm?.executeTransaction { set.isDone = checkBox.isChecked }
+        }
+
+
         }
 
 

@@ -4,10 +4,12 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
+import android.widget.EditText
 import android.widget.Toast
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.core.view.get
+import androidx.core.view.size
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myrealmrecyclerview.model.DataHelper
@@ -27,7 +29,7 @@ Geplant vs done? : setze den Wert von planned in normale properties. Wenn gleich
 Vorschläge in edittext aufgrund des letzten Trainings mit der known exercise. Query in oncreate für exercise mit known exercise Feld equalto this known exercise und Sets orderNo equalto this orderNo Else den vom letzten Satz
 
  */
-class EditTrainingActivity : AppCompatActivity(), ExercisesRecyclerViewAdapter.OnAddClickListener {
+class EditTrainingActivity : AppCompatActivity() {
 
     private var realm: Realm? = null
     private var recyclerView: RecyclerView? = null
@@ -40,17 +42,10 @@ class EditTrainingActivity : AppCompatActivity(), ExercisesRecyclerViewAdapter.O
         const val EXERCISE_ID = "com.example.myrealmrecyclerview.EXERCISE_ID"
     }
 
-    override fun onAddClick(uuid: Long, adapter: ExerciseSetAdapter) {
-
-    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_training)
         realm = Realm.getDefaultInstance()
-//        for (i in 0..10){
-//
-//            realm?.let { DataHelper.addExerciseSetAsync(it,14) }
-//        }
 
 
         recyclerView = findViewById(R.id.recycler_view_exercises)
@@ -105,19 +100,29 @@ class EditTrainingActivity : AppCompatActivity(), ExercisesRecyclerViewAdapter.O
         })
         adapter!!.setAddClickListener(object : ExercisesRecyclerViewAdapter.OnAddClickListener {
             override fun onAddClick(uuid: Long, adapter: ExerciseSetAdapter) {
-                realm?.let { DataHelper.addExerciseSetAsync(it,uuid) }
+                realm?.let { DataHelper.addExerciseSet(it,uuid) }
                          }
 
         })
+        adapter!!.setOnNameClickListener(object :ExercisesRecyclerViewAdapter.OnNameClickListener{
+            override fun onNameClick(exercise: Exercise) {
+                val intent= Intent(this@EditTrainingActivity,KnownExerciseListActivity::class.java)
+                   intent.putExtra(EXERCISE_ID,exercise.uuid)
+                    startActivityForResult(intent,5)
+
+            }
+        })
+
+
         recyclerView!!.layoutManager = LinearLayoutManager(this)
         recyclerView!!.adapter = adapter
         recyclerView!!.setHasFixedSize(true)
-        recyclerView!!.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
+        }
 
 //        val touchHelperCallback = TouchHelperCallback()
 //        val touchHelper = ItemTouchHelper(touchHelperCallback)
 //        touchHelper.attachToRecyclerView(recyclerView)
-    }
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -128,7 +133,8 @@ class EditTrainingActivity : AppCompatActivity(), ExercisesRecyclerViewAdapter.O
                 realm?.let {
                     if (knownExID != null) {
                         if (ExID != null) {
-                            DataHelper.addKnownExToExerciseAsync(it,knownExID,ExID)
+                            DataHelper.addKnownExToExercise(it,knownExID,ExID)
+                            adapter?.updateData(adapter?.data)
                         }
                     }
                 }

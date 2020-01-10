@@ -1,6 +1,5 @@
 package com.example.myrealmrecyclerview.ui.recyclerview
 
-import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,21 +9,23 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.myrealmrecyclerview.R
 import com.example.myrealmrecyclerview.model.Training
 import io.realm.OrderedRealmCollection
+import io.realm.Realm
 import io.realm.RealmRecyclerViewAdapter
 import java.text.SimpleDateFormat
 import java.util.*
 
 class TrainingRecyclerViewAdapter(data: OrderedRealmCollection<Training>) :
     RealmRecyclerViewAdapter<Training, TrainingRecyclerViewAdapter.MyViewHolder>(data, true) {
-init {
-    setHasStableIds(true)
-
-}
     private var inDeletionMode = false
     val uuidsToDelete: MutableSet<Long> = HashSet()
-
     private var listener: OnItemClickListener? = null
+    var realm: Realm?=null
 
+    init {
+        setHasStableIds(true)
+        realm=Realm.getDefaultInstance()
+
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrainingRecyclerViewAdapter.MyViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.training_item, parent, false)
@@ -52,21 +53,19 @@ init {
         holder.date.text =SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss").format(training?.date)
 
         holder.description.text = training?.exercises.toString()
-//        holder.deletedCheckBox.isChecked = uuidsToDelete.contains(itemUUID)
-//        if (inDeletionMode) {
-//            holder.deletedCheckBox.setOnCheckedChangeListener { buttonView, isChecked ->
-//                if (isChecked) {
-//                    if (itemUUID != null) {
-//                        uuidsToDelete.add(itemUUID)
-//                    }
-//                } else {
-//                    uuidsToDelete.remove(itemUUID)
-//                }
-//            }
-//        } else {
-//            holder.deletedCheckBox.setOnCheckedChangeListener(null)
-//        }
-//        holder.deletedCheckBox.visibility = if (inDeletionMode) View.VISIBLE else View.GONE
+        holder.isDoneCheckBox.isChecked= holder.data?.isDone!!
+
+        holder.isDoneCheckBox.setOnClickListener {
+            realm?.executeTransaction{holder.data?.isDone=holder.isDoneCheckBox.isChecked
+            if(holder.isDoneCheckBox.isChecked){
+                for(exercise in holder.data?.exercises!!){
+                    for(set in exercise.sets) {
+                        set.isDone = true
+                    }
+                    }
+                }
+            }
+        }
     }
 
     interface OnItemClickListener {
@@ -81,7 +80,7 @@ init {
             val date: TextView = itemView.findViewById(R.id.date)
             val description: TextView = itemView.findViewById(R.id.description)
             var data: Training? = null
-            val deletedCheckBox: CheckBox = itemView.findViewById(R.id.checkBox)
+            val isDoneCheckBox: CheckBox = itemView.findViewById(R.id.isDoneCheckBox)
             init {
                 itemView.setOnClickListener {
                     val position = adapterPosition

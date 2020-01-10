@@ -14,6 +14,7 @@ import com.example.myrealmrecyclerview.model.DataHelper
 import com.example.myrealmrecyclerview.model.MasterParent
 import com.example.myrealmrecyclerview.model.Training
 import com.example.myrealmrecyclerview.ui.recyclerview.TrainingRecyclerViewAdapter
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import io.realm.Realm
 /*TODO
 In Traininglist suchen: Namen, known exercise, Monat/Jahr,
@@ -31,6 +32,7 @@ class MainActivity : AppCompatActivity() {
     private var recyclerView: RecyclerView? = null
     private var menu: Menu? = null
     private var adapter: TrainingRecyclerViewAdapter? = null
+    private var fabAddTraining:FloatingActionButton?=null
 
      inner class TouchHelperCallback internal constructor() :
         ItemTouchHelper.SimpleCallback(
@@ -62,6 +64,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         realm = Realm.getDefaultInstance()
         recyclerView = findViewById(R.id.recycler_view_trainings)
+        fabAddTraining=findViewById(R.id.add_Training_FAB)
+        fabAddTraining?.setOnClickListener {realm?.let { DataHelper.addTrainingAsync(it) }  }
         setUpRecyclerView()
     }
 

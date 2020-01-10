@@ -23,9 +23,9 @@
             android:paddingRight="16dp"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:layout_toLeftOf="@+id/checkBox" android:layout_toStartOf="@+id/checkBox"/>
+            android:layout_toLeftOf="@+id/isDoneCheckBox" android:layout_toStartOf="@+id/isDoneCheckBox"/>
     <CheckBox
-            android:id="@+id/checkBox"
+            android:id="@+id/isDoneCheckBox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" android:layout_alignBaseline="@+id/date"
             android:layout_alignBottom="@+id/date" android:layout_alignParentEnd="true"
