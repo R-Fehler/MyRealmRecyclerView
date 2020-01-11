@@ -1,54 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="horizontal"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:weightSum="1"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:weightSum="1"
 
->
-    <Button android:layout_width="0dp" android:layout_height="wrap_content"
-            android:id="@+id/btn_orderNumber_Warmup_DropSet"
-            android:layout_weight="0.1"
-            android:layout_marginHorizontal="4dp"
-            />
+    >
+
+    <Button
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_orderNumber_Warmup_DropSet"
+        android:layout_weight="0.1"
+        android:layout_marginHorizontal="4dp" />
 
 
-    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-              android:id="@+id/previousSet_TextView"
-              android:text="100 kg x 12 @ 9.5"
-              android:layout_weight="0.4"
-              android:textAlignment="center"
-              ></TextView>
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/previousSet_TextView"
+        android:text="100 kg x 12 @ 9.5"
+        android:layout_weight="0.4"
+        android:textAlignment="center"></TextView>
 
-    <EditText android:layout_width="0dp" android:layout_height="wrap_content"
-              android:id="@+id/editTextView_weight"
-              android:inputType="number"
-              android:ems="3"
-              android:hint="kg"
-              android:textAlignment="center"
-              android:layout_marginStart="6dp"
-              android:layout_marginEnd="6dp"
-              android:layout_marginTop="4dp"
-              android:layout_weight="0.2"
+    <EditText
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/editTextView_weight"
+        android:inputType="number"
+        android:ems="3"
+        android:hint="kg"
+        android:textAlignment="center"
+        android:layout_marginStart="6dp"
+        android:layout_marginEnd="6dp"
+        android:layout_marginTop="4dp"
+        android:layout_weight="0.2"
         android:maxLines="1"
+        android:imeOptions="actionNext"
 
-              />
-    <EditText android:layout_width="0dp" android:layout_height="wrap_content"
-              android:id="@+id/editTextView_reps"
-              android:inputType="number"
-              android:minEms="2"
-              android:maxEms="3"
-              android:textAlignment="center"
-              android:layout_weight="0.2"
-              android:layout_marginStart="6dp"
-              android:layout_marginEnd="6dp"
-              android:layout_marginTop="4dp"
-              android:layout_toRightOf="@+id/editTextView_weight"
-                android:hint="rps"
-            android:maxLines="1"
-              />
-    <CheckBox android:layout_width="wrap_content" android:layout_height="wrap_content"
+        />
+
+    <EditText
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/editTextView_reps"
+        android:inputType="number"
+        android:minEms="2"
+        android:maxEms="3"
+        android:textAlignment="center"
+        android:layout_weight="0.2"
+        android:layout_marginStart="6dp"
+        android:layout_marginEnd="6dp"
+        android:layout_marginTop="4dp"
+        android:layout_toRightOf="@+id/editTextView_weight"
+        android:hint="rps"
+        android:maxLines="1"
+        android:imeOptions="actionNext"
+
+        />
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:id="@+id/set_done_checkbox"
 
-              ></CheckBox>
+        ></CheckBox>
 </LinearLayout>

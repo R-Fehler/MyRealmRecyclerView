@@ -9,6 +9,8 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat.startActivityForResult
+import androidx.core.view.forEach
+import androidx.core.view.forEachIndexed
 import androidx.core.view.get
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -23,6 +25,7 @@ import io.realm.OrderedRealmCollection
 import io.realm.Realm
 import io.realm.RealmRecyclerViewAdapter
 import kotlinx.android.synthetic.main.exercise_item.view.*
+import kotlinx.android.synthetic.main.exercise_set_item.view.*
 import java.util.*
 
 class ExercisesRecyclerViewAdapter(data: OrderedRealmCollection<Exercise>) :
@@ -132,7 +135,6 @@ class ExercisesRecyclerViewAdapter(data: OrderedRealmCollection<Exercise>) :
             holder.data?.uuid?.let { it1 -> childAdapter?.let { it2 -> addSetListener?.onAddClick(it1, it2) } }
             updateData(data)
         }
-
 
         val touchHelperCallback = TouchHelperCallback()
         val touchHelper = ItemTouchHelper(touchHelperCallback)

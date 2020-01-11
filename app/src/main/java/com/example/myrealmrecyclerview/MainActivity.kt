@@ -25,6 +25,8 @@ Bei add Training neuen erstellen und gleich edit Training acitivity mit der uuid
 Training als geplant in Traininglist activity markieren.. Dient später als Plan für gadget. (Das mit dem aktuellsten Datum)
 
  */
+
+
 class MainActivity : AppCompatActivity() {
 
 
@@ -67,6 +69,7 @@ class MainActivity : AppCompatActivity() {
         fabAddTraining=findViewById(R.id.add_Training_FAB)
         fabAddTraining?.setOnClickListener {realm?.let { DataHelper.addTrainingAsync(it) }  }
         setUpRecyclerView()
+
     }
 
     /*
@@ -144,4 +147,9 @@ class MainActivity : AppCompatActivity() {
         touchHelper.attachToRecyclerView(recyclerView)
     }
 
+    fun getCSVFileForImport(){
+        val getFileIntent=Intent(Intent.ACTION_GET_CONTENT)
+        getFileIntent.type = "text/comma-separated-values"
+        startActivityForResult(getFileIntent,0)
+    }
 }

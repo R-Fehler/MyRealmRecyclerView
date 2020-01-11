@@ -23,7 +23,11 @@ class ExerciseSetAdapter(data: OrderedRealmCollection<ExerciseSet>) :
         realm= Realm.getDefaultInstance()
     }
 
+    interface EditTextActionListener {
+        fun onAction(position: Int): Boolean
+    }
 
+    var editTextActionListener: EditTextActionListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExerciseSetAdapter.MyViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.exercise_set_item, parent, false)
@@ -37,7 +41,7 @@ class ExerciseSetAdapter(data: OrderedRealmCollection<ExerciseSet>) :
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-
+        holder.itemView.parent
         val exerciseSet = getItem(position)
         holder.data = exerciseSet
         val itemUUID = exerciseSet?.uuid
@@ -59,10 +63,6 @@ class ExerciseSetAdapter(data: OrderedRealmCollection<ExerciseSet>) :
         holder.weightEditText.text.clear()
         holder.weightEditText.text.insert(0, weightString)
         //TODO finde raus wie man die IME Action macht dass das nachstte edittext im nachsten holder aktiviert ist usw
-        holder.weightEditText.setOnEditorActionListener { v, actionId, event ->
-            holder.repsEditText.selectAll()
-            holder.repsEditText.isActivated
-        }
 
         holder.weightEditText.addTextChangedListener(object: TextWatcher{
             override fun afterTextChanged(s: Editable?) {

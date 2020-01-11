@@ -49,8 +49,6 @@ class EditTrainingActivity : AppCompatActivity() {
 
 
         recyclerView = findViewById(R.id.recycler_view_exercises)
-        val training_uuid=intent.getLongExtra(TRAINING_ID,0)
-        Toast.makeText(this,"$training_uuid ist die UUID", Toast.LENGTH_LONG).show()
 
 
 
@@ -59,10 +57,9 @@ class EditTrainingActivity : AppCompatActivity() {
         fab.setOnClickListener { view ->
             ///TODO SAVE TRAINING
             realm?.let {
-               val exerciseID=DataHelper.addExercise(it, training_uuid)
+
                 val intent= Intent(this@EditTrainingActivity,KnownExerciseListActivity::class.java)
 //                TODO
-                intent.putExtra(EXERCISE_ID,exerciseID)
                 startActivityForResult(intent,5)
             }
 
@@ -129,15 +126,18 @@ class EditTrainingActivity : AppCompatActivity() {
         if (requestCode==5){
             if(resultCode== Activity.RESULT_OK){
                 val knownExID=data?.getLongExtra(KNOWNEXERCISE_ID,111)
-                val ExID=data?.getLongExtra(EXERCISE_ID,111)
+
                 realm?.let {
                     if (knownExID != null) {
-                        if (ExID != null) {
+
+                            val training_uuid=intent.getLongExtra(TRAINING_ID,0)
+                            val ExID=DataHelper.addExercise(it, training_uuid)
                             DataHelper.addKnownExToExercise(it,knownExID,ExID)
-                            adapter?.updateData(adapter?.data)
-                        }
+
+
                     }
                 }
+                adapter?.updateData(adapter?.data)
             }
         }
     }

@@ -26,6 +26,7 @@ open class Exercise : RealmObject() {
             val primary= increment()
             val exercise =realm.createObject(Exercise::class.java, primary)
             exercises?.add(exercise)
+            ExerciseSet.create(realm,primary)
             return primary
         }
         fun delete(realm: Realm, uuid: Long){
