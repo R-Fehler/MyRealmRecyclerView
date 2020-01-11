@@ -29,14 +29,7 @@ class ExerciseSetAdapter(data: OrderedRealmCollection<ExerciseSet>) :
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.exercise_set_item, parent, false)
         return MyViewHolder(itemView)
     }
-//TODO nochmal ansehen und denken
-//    interface onWeightTextChangedListener{
-//        fun onWeightTextChanged(exerciseSet :ExerciseSet)
-//    }
-//
-//    fun setOnWeightTextChangedListener(listener: onWeightTextChangedListener){
-//        this.weightTextChangedListener=listener
-//    }
+
 
     override fun getItemId(index: Int): Long {
 
