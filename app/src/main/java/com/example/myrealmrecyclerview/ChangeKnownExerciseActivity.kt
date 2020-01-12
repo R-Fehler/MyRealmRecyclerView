@@ -32,7 +32,6 @@ class ChangeKnownExerciseActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_change_known_exercise)
-        setSupportActionBar(toolbar)
 
         realm = Realm.getDefaultInstance()
         recyclerView = findViewById(R.id.OldKnownExerciseList_RecyclerView)

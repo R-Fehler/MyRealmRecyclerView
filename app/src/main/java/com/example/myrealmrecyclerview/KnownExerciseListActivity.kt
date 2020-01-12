@@ -28,32 +28,11 @@ class KnownExerciseListActivity : AppCompatActivity() {
     private var menu: Menu? = null
     private var adapter: KnownExerciseAdapter? = null
     private var allKnownExercises: RealmResults<KnownExercise>?= null
-    inner class TouchHelperCallback internal constructor() :
-        ItemTouchHelper.SimpleCallback(
-            ItemTouchHelper.UP or ItemTouchHelper.DOWN,
-            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
-        ) {
 
-        override fun onMove(
-            recyclerView: RecyclerView,
-            viewHolder: RecyclerView.ViewHolder,
-            target: RecyclerView.ViewHolder
-        ): Boolean {
-            return true
-        }
-
-        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-            //TODO duerfen nicht gel;escht werden da sonst alte Sets keiner knownExercise angehoeren
-            // nur name und id darf geaendert werden
-            Toast.makeText(this@KnownExerciseListActivity,"swiped", Toast.LENGTH_SHORT).show()
-            realm?.let { DataHelper.deleteTrainingAsync(it, viewHolder.itemId) }
-
-        }
-
-        override fun isLongPressDragEnabled(): Boolean {
-            return true
-        }
+    companion object{
+        val CHOOSEKNOWNEXERCISE= 5
     }
+
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -141,23 +120,34 @@ class KnownExerciseListActivity : AppCompatActivity() {
     private fun setUpRecyclerView() {
 
         adapter = KnownExerciseAdapter(allKnownExercises!!.sort("doneInExercisesSize"))
-        adapter!!.setOnItemClickListener(object : KnownExerciseAdapter.OnItemClickListener {
-            override fun onItemClick(knownExercise: KnownExercise) {
-                var returnIntent = Intent()
-                returnIntent.putExtra(EditTrainingActivity.KNOWNEXERCISE_ID, knownExercise.uuid)
-                returnIntent.putExtra(EditTrainingActivity.EXERCISE_ID,intent.getLongExtra(EditTrainingActivity.EXERCISE_ID,0))
-                setResult(Activity.RESULT_OK,returnIntent)
-                finish()
-            }
-        })
+        val isViewKnown=intent.getBooleanExtra(EditTrainingActivity.VIEWKNOWNEXERCISES,false)
+
+        if(isViewKnown){
+            adapter!!.setOnItemClickListener(object: KnownExerciseAdapter.OnItemClickListener{
+                override fun onItemClick(knownExercise: KnownExercise) {
+                    var chooseIntent=Intent(this@KnownExerciseListActivity,ChangeKnownExerciseActivity::class.java)
+                    chooseIntent.putExtra(EditTrainingActivity.KNOWNEXERCISE_ID,knownExercise.uuid)
+                    startActivity(chooseIntent)
+                }
+            })
+        }
+        else{
+            adapter!!.setOnItemClickListener(object : KnownExerciseAdapter.OnItemClickListener {
+
+                override fun onItemClick(knownExercise: KnownExercise) {
+                    var returnIntent = Intent()
+                    returnIntent.putExtra(EditTrainingActivity.KNOWNEXERCISE_ID, knownExercise.uuid)
+                    setResult(Activity.RESULT_OK,returnIntent)
+                    finish()
+                }
+            })
+        }
+
         recyclerView!!.layoutManager = LinearLayoutManager(this)
         recyclerView!!.adapter = adapter
         recyclerView!!.setHasFixedSize(true)
         recyclerView!!.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
 
-        val touchHelperCallback = TouchHelperCallback()
-        val touchHelper = ItemTouchHelper(touchHelperCallback)
-        touchHelper.attachToRecyclerView(recyclerView)
     }
 
     }

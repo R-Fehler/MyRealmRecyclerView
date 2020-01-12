@@ -40,6 +40,8 @@ class EditTrainingActivity : AppCompatActivity() {
         const val TRAINING_ID = "com.example.myrealmrecyclerview.TRAINING_ID"
         const val KNOWNEXERCISE_ID = "com.example.myrealmrecyclerview.KNOWNEXERCISE_ID"
         const val EXERCISE_ID = "com.example.myrealmrecyclerview.EXERCISE_ID"
+        const val VIEWKNOWNEXERCISES = "com.example.myrealmrecyclerview.VIEWKNOWNEXERCISES"
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,14 +54,12 @@ class EditTrainingActivity : AppCompatActivity() {
 
 
 
-        setSupportActionBar(toolbar)
 
         fab.setOnClickListener { view ->
             ///TODO SAVE TRAINING
             realm?.let {
 
                 val intent= Intent(this@EditTrainingActivity,KnownExerciseListActivity::class.java)
-//                TODO
                 startActivityForResult(intent,5)
             }
 
@@ -105,7 +105,7 @@ class EditTrainingActivity : AppCompatActivity() {
             override fun onNameClick(exercise: Exercise) {
                 val intent= Intent(this@EditTrainingActivity,KnownExerciseListActivity::class.java)
                    intent.putExtra(EXERCISE_ID,exercise.uuid)
-                    startActivityForResult(intent,5)
+                    startActivityForResult(intent,KnownExerciseListActivity.CHOOSEKNOWNEXERCISE)
 
             }
         })
@@ -123,9 +123,9 @@ class EditTrainingActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode==5){
+        if (requestCode==KnownExerciseListActivity.CHOOSEKNOWNEXERCISE){
             if(resultCode== Activity.RESULT_OK){
-                val knownExID=data?.getLongExtra(KNOWNEXERCISE_ID,111)
+                val knownExID=data?.getLongExtra(KNOWNEXERCISE_ID,0)
 
                 realm?.let {
                     if (knownExID != null) {

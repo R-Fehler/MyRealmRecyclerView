@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -16,6 +17,8 @@ import com.example.myrealmrecyclerview.model.Training
 import com.example.myrealmrecyclerview.ui.recyclerview.TrainingRecyclerViewAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import io.realm.Realm
+import kotlinx.android.synthetic.main.activity_main.*
+
 /*TODO
 In Traininglist suchen: Namen, known exercise, Monat/Jahr,
 Training(Planung) aus txt parsen und verschicken können. Zb für coaches bzw Freunde. Gleiche Schnittstelle wie gadget?? Oder kompakte Schreibweise?
@@ -73,6 +76,9 @@ class MainActivity : AppCompatActivity() {
         }
         setUpRecyclerView()
 
+        close_searchViews_btn.setOnClickListener {
+            CompleteSearchBar.visibility=View.GONE
+        }
     }
 
     /*
@@ -97,6 +103,19 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
         when (id) {
+
+            R.id.action_searchTrainings -> {
+            CompleteSearchBar.visibility= View.VISIBLE
+                return true
+            }
+
+            R.id.action_KnownExerciseOverView ->{
+                val knownExIntent=Intent(this,KnownExerciseListActivity::class.java)
+                knownExIntent.putExtra(EditTrainingActivity.VIEWKNOWNEXERCISES,true)
+                startActivity(knownExIntent)
+                return true
+            }
+
             R.id.action_add -> {
                 realm?.let { DataHelper.addTrainingAsync(it) }
                 return true

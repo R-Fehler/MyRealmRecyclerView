@@ -3,6 +3,17 @@
       xmlns:app="http://schemas.android.com/apk/res-auto"
       tools:context=".MyActivity">
     <group android:id="@+id/group_normal_mode">
+        <item
+            android:id="@+id/action_KnownExerciseOverView"
+            android:title="Übungskatalog"
+            app:showAsAction="ifRoom"
+
+            />
+        <item
+            android:id="@+id/action_searchTrainings"
+            android:title="Suche Training(s)"
+            app:showAsAction="ifRoom"
+            />
         <item android:id="@+id/action_add"
               android:icon="@android:drawable/ic_menu_add"
               android:title="@string/add"
