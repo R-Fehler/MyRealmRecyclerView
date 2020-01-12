@@ -66,8 +66,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         realm = Realm.getDefaultInstance()
         recyclerView = findViewById(R.id.recycler_view_trainings)
-        fabAddTraining=findViewById(R.id.add_Training_FAB)
-        fabAddTraining?.setOnClickListener {realm?.let { DataHelper.addTrainingAsync(it) }  }
+        fabAddTraining = findViewById(R.id.add_Training_FAB)
+        fabAddTraining?.setOnClickListener {
+            realm?.let { DataHelper.addTrainingAsync(it) }
+            adapter?.updateData(adapter?.data)
+        }
         setUpRecyclerView()
 
     }
@@ -139,8 +142,7 @@ class MainActivity : AppCompatActivity() {
         })
         recyclerView!!.layoutManager = LinearLayoutManager(this)
         recyclerView!!.adapter = adapter
-        recyclerView!!.setHasFixedSize(true)
-        recyclerView!!.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
+        recyclerView!!.setHasFixedSize(false)
 
         val touchHelperCallback = TouchHelperCallback()
         val touchHelper = ItemTouchHelper(touchHelperCallback)

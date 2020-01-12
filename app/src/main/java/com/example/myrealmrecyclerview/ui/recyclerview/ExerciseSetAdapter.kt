@@ -62,8 +62,6 @@ class ExerciseSetAdapter(data: OrderedRealmCollection<ExerciseSet>) :
 
         holder.weightEditText.text.clear()
         holder.weightEditText.text.insert(0, weightString)
-        //TODO finde raus wie man die IME Action macht dass das nachstte edittext im nachsten holder aktiviert ist usw
-
         holder.weightEditText.addTextChangedListener(object: TextWatcher{
             override fun afterTextChanged(s: Editable?) {
                 if(!s.isNullOrEmpty()) {

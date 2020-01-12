@@ -37,6 +37,7 @@
         android:layout_weight="0.2"
         android:maxLines="1"
         android:imeOptions="actionNext"
+        android:selectAllOnFocus="true"
 
         />
 
@@ -56,6 +57,7 @@
         android:hint="rps"
         android:maxLines="1"
         android:imeOptions="actionNext"
+        android:selectAllOnFocus="true"
 
         />
 

@@ -15,7 +15,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class TrainingRecyclerViewAdapter(data: OrderedRealmCollection<Training>) :
-    RealmRecyclerViewAdapter<Training, TrainingRecyclerViewAdapter.MyViewHolder>(data, true) {
+    RealmRecyclerViewAdapter<Training, TrainingRecyclerViewAdapter.MyViewHolder>(data, false) {
     private var inDeletionMode = false
     val uuidsToDelete: MutableSet<Long> = HashSet()
     private var listener: OnItemClickListener? = null
@@ -52,7 +52,13 @@ class TrainingRecyclerViewAdapter(data: OrderedRealmCollection<Training>) :
 
         holder.date.text =SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss").format(training?.date)
 
-        holder.description.text = training?.exercises.toString()
+        var text=""
+        for(exercise in holder.data?.exercises!!){
+            text += exercise.toString() +"\n"
+        }
+
+
+        holder.description.text =text
         holder.isDoneCheckBox.isChecked= holder.data?.isDone!!
 
         holder.isDoneCheckBox.setOnClickListener {

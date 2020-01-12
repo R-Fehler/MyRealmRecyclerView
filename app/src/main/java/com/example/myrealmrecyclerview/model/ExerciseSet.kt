@@ -19,6 +19,7 @@ open class ExerciseSet : RealmObject() {
     var isWarmUp: Boolean = false
     var isDropSet: Boolean = false
     var isCompetition: Boolean = false
+    var unit: String = "kg"
 //reps, time, duration, ...
 
     companion object{
@@ -54,5 +55,14 @@ open class ExerciseSet : RealmObject() {
         }
 
 
+    }
+
+    override fun toString(): String {
+        if(this.isDone){
+            return "${weight} $unit/ $reps; "
+        }
+        else{
+            return "(${weight} $unit/ $reps); "
+        }
     }
 }

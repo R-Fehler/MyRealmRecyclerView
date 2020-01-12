@@ -41,4 +41,12 @@ open class Exercise : RealmObject() {
 
 
     }
+
+    override fun toString(): String {
+        var text=""
+        for(set in sets){
+            text+=set.toString()
+        }
+        return "[${knownExercise?.user_custom_id}] ${knownExercise?.name} : $text"
+    }
 }
