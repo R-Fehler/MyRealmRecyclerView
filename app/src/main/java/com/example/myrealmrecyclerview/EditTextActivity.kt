@@ -18,7 +18,9 @@ class EditTextActivity : AppCompatActivity() {
             val returnIntent= Intent()
             returnIntent.putExtra(EditTrainingActivity.NOTES,editText.text.toString())
             val trainingID=intent.getLongExtra(EditTrainingActivity.TRAINING_ID,-1)
+            val exerciseID=intent.getLongExtra(EditTrainingActivity.EXERCISE_ID,-1)
             returnIntent.putExtra(EditTrainingActivity.TRAINING_ID,trainingID)
+            returnIntent.putExtra(EditTrainingActivity.EXERCISE_ID,exerciseID)
             setResult(Activity.RESULT_OK,returnIntent)
             finish()
         }

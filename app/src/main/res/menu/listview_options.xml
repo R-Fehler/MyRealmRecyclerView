@@ -15,5 +15,10 @@
             android:icon="@drawable/ic_search_white_24dp"
             app:showAsAction="ifRoom"
             />
+        <item
+            android:id="@+id/action_importCSV"
+            android:title="importiere Strong CSV"
+            app:showAsAction="never"
+            />
     </group>
 </menu>

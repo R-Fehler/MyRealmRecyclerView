@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myrealmrecyclerview.R
 import com.example.myrealmrecyclerview.model.ExerciseSet
@@ -56,9 +57,15 @@ class ExerciseSetAdapter(data: OrderedRealmCollection<ExerciseSet>) :
             holder.weightEditText.isEnabled=true
             holder.repsEditText.isEnabled=true
         }
+        val prevWeight= holder.data?.weightPlanned
+        val prevReps= holder.data?.repsPlanned
+        val prevtxt="$prevWeight kg / $prevReps "
+        holder.prev.text=prevtxt
 
-        var weightString = holder.data?.weight.toString()
-        var repsString = holder.data?.reps.toString()
+        val weightString = holder.data?.weight.toString()
+        val repsString = holder.data?.reps.toString()
+
+
 
         holder.weightEditText.text.clear()
         holder.weightEditText.text.insert(0, weightString)
@@ -86,9 +93,7 @@ class ExerciseSetAdapter(data: OrderedRealmCollection<ExerciseSet>) :
         })
         holder.repsEditText.text.clear()
         holder.repsEditText.text.insert(0, repsString)
-        holder.repsEditText.setOnClickListener {
-            holder.repsEditText.selectAll()
-        }
+
 
         holder.checkBox.setOnClickListener {
             realm?.executeTransaction{ holder.data?.isDone = holder.checkBox.isChecked }
@@ -110,6 +115,7 @@ class ExerciseSetAdapter(data: OrderedRealmCollection<ExerciseSet>) :
         val weightEditText: EditText = itemView.findViewById(R.id.editTextView_weight)
         var data: ExerciseSet? = null
         val checkBox: CheckBox=itemView.findViewById(R.id.set_done_checkbox)
+        val prev: TextView=itemView.findViewById(R.id.previousSet_TextView)
         fun save(set:ExerciseSet){
             realm?.executeTransaction { set.weight = weightEditText.text.toString().toInt() }
             realm?.executeTransaction { set.reps = repsEditText.text.toString().toInt() }

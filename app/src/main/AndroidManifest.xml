@@ -35,6 +35,15 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.ATTACH_DATA"/>
+
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW">
+
+                </action>
+            </intent-filter>
         </activity>
     </application>
 

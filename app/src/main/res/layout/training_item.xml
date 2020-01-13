@@ -58,7 +58,8 @@
             android:paddingEnd="10dp"
             android:text="&#8942;"
             android:textAlignment="textEnd"
-            android:textAppearance="?android:textAppearanceLarge" />
+            android:textAppearance="?android:textAppearanceLarge"
+            android:textColor="@color/colorAccent"/>
 
         <TextView
             android:layout_width="wrap_content"

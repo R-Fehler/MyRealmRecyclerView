@@ -45,6 +45,10 @@ class MainActivity : AppCompatActivity() {
     private var fabAddTraining: FloatingActionButton? = null
     private var dateSetListener: DatePickerDialog.OnDateSetListener? = null
 
+    companion object{
+        val REQUESTCSVCODE=0
+    }
+
     inner class TouchHelperCallback internal constructor() :
         ItemTouchHelper.SimpleCallback(
             ItemTouchHelper.UP or ItemTouchHelper.DOWN,
@@ -242,6 +246,10 @@ class MainActivity : AppCompatActivity() {
                 startActivity(knownExIntent)
                 return true
             }
+            R.id.action_importCSV ->{
+                getCSVFileForImport()
+                return true
+            }
 
             else -> return super.onOptionsItemSelected(item)
         }
@@ -281,6 +289,9 @@ class MainActivity : AppCompatActivity() {
                         training.date = date
                         training.year = year - 1900
                         training.month = month
+                        training.exercises.forEachIndexed { index, exercise ->
+                            exercise.date=Date(date.time + index)
+                        }
                     }
                     adapter?.updateData(adapter?.data)
                 }
@@ -308,7 +319,7 @@ class MainActivity : AppCompatActivity() {
     fun getCSVFileForImport() {
         val getFileIntent = Intent(Intent.ACTION_GET_CONTENT)
         getFileIntent.type = "text/comma-separated-values"
-        startActivityForResult(getFileIntent, 0)
+        startActivityForResult(getFileIntent, REQUESTCSVCODE)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -328,6 +339,10 @@ class MainActivity : AppCompatActivity() {
                 }
                 adapter?.updateData(adapter?.data)
             }
+        }
+
+        if(requestCode == REQUESTCSVCODE){
+            Toast.makeText(this,"Import noch WIP", Toast.LENGTH_SHORT).show()
         }
         //add to training
     }

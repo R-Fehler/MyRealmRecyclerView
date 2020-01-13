@@ -12,6 +12,8 @@ import java.util.concurrent.atomic.AtomicLong
 open class Exercise : RealmObject() {
     @PrimaryKey
     var uuid: Long=0
+    var notes: String=""
+    var date: Date = Date()
 
     var knownExercise: KnownExercise? = null
 
@@ -31,7 +33,7 @@ open class Exercise : RealmObject() {
             val primary= increment()
             val exercise =realm.createObject(Exercise::class.java, primary)
             exercises?.add(exercise)
-            ExerciseSet.create(realm,primary)
+//            ExerciseSet.create(realm,primary)
             return primary
         }
         fun delete(realm: Realm, uuid: Long){
@@ -44,7 +46,10 @@ open class Exercise : RealmObject() {
             return INTEGER_COUNTER.getAndIncrement()
         }
 
-
+        fun setNote(realm: Realm, uuid: Long, notes:String){
+            val exercise =realm.where(Exercise::class.java).equalTo(FIELD_UUID,uuid).findFirst()
+            exercise?.notes=notes
+        }
     }
 
     override fun toString(): String {

@@ -17,6 +17,7 @@ import com.example.myrealmrecyclerview.model.Exercise
 import com.example.myrealmrecyclerview.model.Training
 import com.example.myrealmrecyclerview.ui.recyclerview.ExerciseSetAdapter
 import com.example.myrealmrecyclerview.ui.recyclerview.ExercisesRecyclerViewAdapter
+import com.example.myrealmrecyclerview.ui.recyclerview.TrainingRecyclerViewAdapter
 import io.realm.Realm
 
 import kotlinx.android.synthetic.main.activity_edit_training.*
@@ -43,7 +44,7 @@ class EditTrainingActivity : AppCompatActivity() {
         const val EXERCISE_ID = "com.example.myrealmrecyclerview.EXERCISE_ID"
         const val VIEWKNOWNEXERCISES = "com.example.myrealmrecyclerview.VIEWKNOWNEXERCISES"
         const val NOTES = "com.example.myrealmrecyclerview.NOTES"
-
+        const val REQUESTCODE_NOTE=2
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -142,6 +143,15 @@ class EditTrainingActivity : AppCompatActivity() {
         recyclerView!!.adapter = adapter
         recyclerView!!.setHasFixedSize(true)
 
+        adapter!!.setOnNotesEditListener(object : ExercisesRecyclerViewAdapter.OnNotesEditListener {
+            override fun onNotesEdit(exercise: Exercise) {
+                val editIntent = Intent(this@EditTrainingActivity, EditTextActivity::class.java)
+                editIntent.putExtra(EXERCISE_ID, exercise.uuid)
+                editIntent.putExtra(NOTES, exercise.notes)
+                startActivityForResult(editIntent, REQUESTCODE_NOTE)
+            }
+        })
+
         recyclerView!!.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
@@ -193,6 +203,18 @@ class EditTrainingActivity : AppCompatActivity() {
                         }
                     }
                 }
+            }
+        }
+
+        if(requestCode== REQUESTCODE_NOTE){
+            if(resultCode==Activity.RESULT_OK){
+                val exerciseUUID=data?.getLongExtra(EXERCISE_ID,-1)
+                realm?.let {
+                    if (exerciseUUID!=null){
+                    DataHelper.setNotesToExercise(it,exerciseUUID,data.getStringExtra(NOTES))
+                    }
+                }
+
             }
         }
         adapter?.updateData(adapter?.data)

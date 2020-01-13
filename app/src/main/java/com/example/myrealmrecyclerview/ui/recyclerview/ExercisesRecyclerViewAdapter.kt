@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat.startActivityForResult
@@ -21,6 +22,7 @@ import com.example.myrealmrecyclerview.KnownExerciseListActivity
 import com.example.myrealmrecyclerview.R
 import com.example.myrealmrecyclerview.model.DataHelper
 import com.example.myrealmrecyclerview.model.Exercise
+import com.example.myrealmrecyclerview.model.Training
 import io.realm.OrderedRealmCollection
 import io.realm.Realm
 import io.realm.RealmRecyclerViewAdapter
@@ -57,14 +59,14 @@ class ExercisesRecyclerViewAdapter(data: OrderedRealmCollection<Exercise>) :
         }
     }
 
-    private var inDeletionMode = false
+    private var onNoteListener: OnNotesEditListener?=null
     val uuidsToDelete: MutableSet<Long> = HashSet()
 
-    var realm: Realm?=null
+    var realm: Realm? = null
 
     private var listener: OnItemClickListener? = null
-    private var addSetListener: OnAddClickListener?=null
-    private var namClickListener: OnNameClickListener?= null
+    private var addSetListener: OnAddClickListener? = null
+    private var namClickListener: OnNameClickListener? = null
 
     //  Nested RV
     private val viewPool = RecyclerView.RecycledViewPool()
@@ -84,35 +86,41 @@ class ExercisesRecyclerViewAdapter(data: OrderedRealmCollection<Exercise>) :
 
         return getItem(index)!!.uuid
     }
-        fun enableDeletionMode(enabled: Boolean) {
-            inDeletionMode = enabled
-            if (!enabled) {
-            uuidsToDelete.clear()
-            }
-            notifyDataSetChanged()
-        }
+
+
 
     interface OnItemClickListener {
 
         fun onItemClick(exercise: Exercise)
     }
-    interface OnNameClickListener{
+
+    interface OnNameClickListener {
 
         fun onNameClick(exercise: Exercise)
     }
+
     interface OnAddClickListener {
-        fun onAddClick(uuid:Long,adapter: ExerciseSetAdapter)
+        fun onAddClick(uuid: Long, adapter: ExerciseSetAdapter)
     }
+
     fun setOnItemClickListener(listener: OnItemClickListener) {
         this.listener = listener
     }
 
-    fun setAddClickListener(listener: OnAddClickListener){
-        this.addSetListener=listener
+    fun setAddClickListener(listener: OnAddClickListener) {
+        this.addSetListener = listener
     }
 
-    fun setOnNameClickListener(listener: OnNameClickListener){
-        this.namClickListener=listener
+    fun setOnNameClickListener(listener: OnNameClickListener) {
+        this.namClickListener = listener
+    }
+
+
+    interface OnNotesEditListener {
+        fun onNotesEdit(exercise: Exercise)
+    }
+    fun setOnNotesEditListener(listener: OnNotesEditListener){
+        onNoteListener=listener
     }
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val exercise = getItem(position)
@@ -122,16 +130,16 @@ class ExercisesRecyclerViewAdapter(data: OrderedRealmCollection<Exercise>) :
 
         //Child ExerciseSet RV
 
-        val childManager=LinearLayoutManager(holder.recyclerView.context)
-        val childAdapter= holder.data?.sets?.let { ExerciseSetAdapter(it) }
+        val childManager = LinearLayoutManager(holder.recyclerView.context)
+        val childAdapter = holder.data?.sets?.let { ExerciseSetAdapter(it) }
         holder.recyclerView.apply {
-            layoutManager=childManager
-            adapter=childAdapter
+            layoutManager = childManager
+            adapter = childAdapter
 
             setRecycledViewPool(viewPool)
         }
             .setHasFixedSize(true)
-        holder.add_btn.setOnClickListener{
+        holder.add_btn.setOnClickListener {
             holder.data?.uuid?.let { it1 -> childAdapter?.let { it2 -> addSetListener?.onAddClick(it1, it2) } }
             updateData(data)
         }
@@ -141,32 +149,70 @@ class ExercisesRecyclerViewAdapter(data: OrderedRealmCollection<Exercise>) :
         touchHelper.attachToRecyclerView(holder.recyclerView)
 
         holder.name.text = exercise?.knownExercise?.name ?: "DefaultName"
-        holder.user_custom_id.text = exercise?.knownExercise?.user_custom_id.toString()
-    }
+        val idText="[${exercise?.knownExercise?.user_custom_id.toString()}]"
+        holder.user_custom_id.text = idText
 
-        inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-            val name: TextView = itemView.findViewById(R.id.exerciseName)
-            val user_custom_id: TextView = itemView.findViewById(R.id.exerciseName_ID)
-            var data: Exercise? = null
-            val recyclerView: RecyclerView = itemView.findViewById(R.id.exerciseSetRV)
-            val add_btn: Button =itemView.findViewById(R.id.add_set_btn)
+        holder.notes.text=holder.data?.notes
 
-            init {
-                itemView.setOnClickListener {
-                    val position = adapterPosition
-                    if (position != RecyclerView.NO_POSITION) {
-                        getItem(position)?.let { it1 -> listener?.onItemClick(it1) }
-                    }
+
+        val popup = PopupMenu(holder.itemView.context, holder.menu)
+        popup.inflate(R.menu.exercise_menu)
+        popup.setOnMenuItemClickListener {
+            val id = it.itemId
+            when (id) {
+                R.id.action_exercise_addNote -> {
+                    holder.notes.visibility = View.VISIBLE
+                    holder.notesHeader.visibility = View.VISIBLE
+
+                    onNoteListener?.onNotesEdit(holder.data!!)
+
+
                 }
-                name.setOnClickListener{
-                    val position=adapterPosition
-                    if (position != RecyclerView.NO_POSITION) {
-                        getItem(position)?.let { it -> namClickListener?.onNameClick(it) }
+                R.id.action_exercise_remove_addNote -> {
+                    holder.notes.visibility = View.GONE
+                    holder.notesHeader.visibility = View.GONE
+
+                }
+                R.id.action_exercise_delete-> {
+                    realm?.executeTransaction {
+                        holder.data?.uuid?.let { it1 -> DataHelper.deleteExercise(it, it1) }
                     }
                 }
             }
 
+            true
+        }
+        holder.menu.setOnClickListener {
+            popup.show()
+        }
+    }
+
+    inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val name: TextView = itemView.findViewById(R.id.exerciseName)
+        val user_custom_id: TextView = itemView.findViewById(R.id.exerciseName_ID)
+        var data: Exercise? = null
+        val recyclerView: RecyclerView = itemView.findViewById(R.id.exerciseSetRV)
+        val add_btn: Button = itemView.findViewById(R.id.add_set_btn)
+        val menu: TextView = itemView.findViewById(R.id.exerciseItemOptions)
+        val notesHeader: TextView = itemView.findViewById(R.id.notesExerciseHeader)
+        val notes: TextView = itemView.findViewById(R.id.ExerciseNotesTextView)
+
+        init {
+            itemView.setOnClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    getItem(position)?.let { it1 -> listener?.onItemClick(it1) }
+                }
+            }
+            name.setOnClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    getItem(position)?.let { it -> namClickListener?.onNameClick(it) }
+                }
+            }
         }
 
-
     }
+
+
+}

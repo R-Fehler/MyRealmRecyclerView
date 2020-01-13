@@ -10,7 +10,7 @@
     android:layout_marginBottom="4dp"
     android:nestedScrollingEnabled="false">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingStart="16dp"
@@ -20,17 +20,29 @@
 
         <TextView
             android:id="@+id/exerciseName"
-            android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/exerciseName_ID"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
             android:text="Name ..."
             android:textAlignment="viewStart"
-            android:textSize="16sp"
+            android:textSize="24sp"
             android:textStyle="bold"
-            app:layout_constraintLeft_toRightOf="@+id/exerciseName_ID"
-           app:layout_constraintTop_toTopOf="parent" />
+            android:textColor="@color/colorAccent"/>
+
+        <TextView
+            android:id="@+id/exerciseItemOptions"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:paddingEnd="10dp"
+            android:text="&#8942;"
+            android:textAlignment="textEnd"
+            android:textAppearance="?android:textAppearanceLarge"
+            android:textColor="@color/colorAccent"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -39,22 +51,40 @@
             android:layout_margin="5dp"
             android:ems="3"
             android:text="ID"
-            android:textSize="16sp"
+            android:textSize="24sp"
+            android:textStyle="bold"
             android:textAlignment="center"
-            app:layout_constraintBaseline_toBaselineOf="@+id/exerciseName"
-            app:layout_constraintLeft_toLeftOf="parent"
-            />
+            android:layout_alignBaseline="@+id/exerciseName" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/notesExerciseHeader"
+            android:paddingStart="16dp"
+            android:paddingEnd="0dp"
+            android:text="@string/notesHeader"
+            android:visibility="gone"
+            android:layout_below="@+id/exerciseName" />
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/ExerciseNotesTextView"
+            android:layout_below="@+id/exerciseName"
+            android:paddingStart="0dp"
+            android:paddingEnd="16dp"
+            android:layout_marginTop="5dp"
+            android:layout_alignBaseline="@+id/notesExerciseHeader"
+            android:visibility="gone"
+            android:layout_toEndOf="@+id/notesExerciseHeader" />
 
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/exerciseSetRV"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/exerciseName"
-            app:layout_constraintBottom_toTopOf="@id/add_set_btn"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/exerciseName" />
+            android:layout_below="@+id/ExerciseNotesTextView" />
 
         <Button
             android:id="@+id/add_set_btn"
@@ -63,12 +93,10 @@
             android:layout_below="@+id/exerciseSetRV"
             android:layout_marginTop="10dp"
             android:text="@string/add_set"
-            app:layout_constraintLeft_toLeftOf="parent"
-
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/exerciseSetRV" />
+            android:layout_centerInParent="true"
+          />
 
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </RelativeLayout>
 
 </androidx.cardview.widget.CardView>

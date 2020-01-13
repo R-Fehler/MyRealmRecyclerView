@@ -36,7 +36,7 @@ class DataHelper {
         }
 
         fun createKnownExercise(realm: Realm, name:String, customID:Int){
-            realm.executeTransaction{ KnownExercise.create(it,name,customID) }
+            realm.executeTransaction { KnownExercise.create(it,name,customID) }
         }
 
         fun addKnownExToExercise(realm:Realm, knownUUID:Long, exerciseUUID: Long){
@@ -44,11 +44,15 @@ class DataHelper {
         }
 
         fun changeKnownExercise(realm: Realm, knownExerciseUUID: Long, name: String, id: Int) {
-        realm.executeTransactionAsync { KnownExercise.changeNameAndID(it,knownExerciseUUID,name,id) }
+        realm.executeTransaction { KnownExercise.changeNameAndID(it,knownExerciseUUID,name,id) }
         }
 
         fun setNotesToTraining(realm:Realm, uuid: Long, notes:String){
-            realm.executeTransactionAsync { Training.setNote(it,uuid,notes) }
+            realm.executeTransaction { Training.setNote(it,uuid,notes) }
+        }
+
+        fun setNotesToExercise(realm: Realm,uuid: Long,notes:String){
+            realm.executeTransaction {  Exercise.setNote(it,uuid,notes)}
         }
 
         //TODO delete Exer und Sets
