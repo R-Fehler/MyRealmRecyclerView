@@ -3,6 +3,8 @@ package com.example.myrealmrecyclerview.model
 import io.realm.Realm
 import io.realm.RealmList
 import io.realm.RealmObject
+import io.realm.RealmResults
+import io.realm.annotations.LinkingObjects
 import io.realm.annotations.PrimaryKey
 import java.util.*
 import java.util.concurrent.atomic.AtomicLong
@@ -14,6 +16,9 @@ open class Exercise : RealmObject() {
     var knownExercise: KnownExercise? = null
 
     var sets: RealmList<ExerciseSet> = RealmList()
+    @LinkingObjects("exercises")
+    val doneInTrainings: RealmResults<Training>?=null
+
     companion object{
         const val FIELD_UUID="uuid"
         private val INTEGER_COUNTER = AtomicLong(0)
@@ -43,10 +48,27 @@ open class Exercise : RealmObject() {
     }
 
     override fun toString(): String {
-        var text=""
-        for(set in sets){
-            text+=set.toString()
+        var text = ""
+        if (sets.size>1) {
+            for (n in 0..sets.size - 1) {
+                text += if (n <= sets.size - 1) {
+
+                    when {
+                        n == 0 -> "${sets[n]?.weight}kg:${sets[n]?.reps}"
+                        sets[n]?.weight == sets[n - 1]?.weight -> "/${sets[n]?.reps}"
+                        else -> "  ${sets[n]?.weight}kg:${sets[n]?.reps}"
+                    }
+                }
+                else ""
+            }
+            return "[${knownExercise?.user_custom_id}] ${knownExercise?.name} : $text"
         }
-        return "[${knownExercise?.user_custom_id}] ${knownExercise?.name} : $text"
+        else {
+            text += "${sets[0]?.weight}kg:${sets[0]?.reps}"
+            return "[${knownExercise?.user_custom_id}] ${knownExercise?.name} : $text"
+        }
+
+
+        return ""
     }
 }

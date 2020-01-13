@@ -1,24 +1,37 @@
 package com.example.myrealmrecyclerview.ui.recyclerview
 
+import android.app.Activity
+import android.graphics.Color
+import android.text.Spannable
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
+import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.myrealmrecyclerview.MainActivity
 import com.example.myrealmrecyclerview.R
 import com.example.myrealmrecyclerview.model.Training
 import io.realm.OrderedRealmCollection
 import io.realm.Realm
 import io.realm.RealmRecyclerViewAdapter
+import kotlinx.android.synthetic.main.training_item.view.*
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.regex.Pattern
 
 class TrainingRecyclerViewAdapter(data: OrderedRealmCollection<Training>) :
     RealmRecyclerViewAdapter<Training, TrainingRecyclerViewAdapter.MyViewHolder>(data, false) {
-    private var inDeletionMode = false
     val uuidsToDelete: MutableSet<Long> = HashSet()
     private var listener: OnItemClickListener? = null
+    private var onNoteListener: OnNotesEditListener?=null
+    private var onDateListener: OnDateClickListener?=null
     var realm: Realm?=null
 
     init {
@@ -37,13 +50,6 @@ class TrainingRecyclerViewAdapter(data: OrderedRealmCollection<Training>) :
 
         return getItem(index)!!.uuid
     }
-        fun enableDeletionMode(enabled: Boolean) {
-            inDeletionMode = enabled
-            if (!enabled) {
-            uuidsToDelete.clear()
-            }
-            notifyDataSetChanged()
-        }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val training = getItem(position)
@@ -51,14 +57,26 @@ class TrainingRecyclerViewAdapter(data: OrderedRealmCollection<Training>) :
         val itemUUID = training?.uuid
 
         holder.date.text =SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss").format(training?.date)
+        holder.date.setOnClickListener {
+            holder.data?.let { it1 -> onDateListener?.onDateClicked(it1) }
+        }
 
         var text=""
         for(exercise in holder.data?.exercises!!){
             text += exercise.toString() +"\n"
         }
+        val pattern= Pattern.compile("\\[\\d*][^:]*")
+        val matcher=pattern.matcher(text)
+        val str=SpannableStringBuilder(text)
+        while(matcher.find()){
+            Log.d("matcher","Test start: ${matcher.start()}")
+            str.setSpan(StyleSpan(android.graphics.Typeface.BOLD),matcher.start(),matcher.end(), Spanned.SPAN_INCLUSIVE_INCLUSIVE)
+        }
 
 
-        holder.description.text =text
+        holder.description.text =str
+        holder.notes.text= holder.data?.notes
+        holder.nameOfTraining.text=holder.data?.name
         holder.isDoneCheckBox.isChecked= holder.data?.isDone!!
 
         holder.isDoneCheckBox.setOnClickListener {
@@ -72,7 +90,33 @@ class TrainingRecyclerViewAdapter(data: OrderedRealmCollection<Training>) :
                 }
             }
         }
+        val popup= PopupMenu(holder.itemView.context,holder.menu)
+        popup.inflate(R.menu.training_menu)
+        popup.setOnMenuItemClickListener {
+            val id=it.itemId
+            when(id) {
+                R.id.action_training_addNote -> {
+                    holder.notes.visibility=View.VISIBLE
+                    holder.notesHeader.visibility=View.VISIBLE
+
+                    onNoteListener?.onNotesEdit(holder.data!!)
+
+
+                }
+                R.id.action_training_remove_addNote ->{
+                    holder.notes.visibility=View.GONE
+                    holder.notesHeader.visibility=View.GONE
+
+                }
+            }
+
+            true
+        }
+    holder.menu.setOnClickListener {
+        popup.show()
     }
+    }
+
 
     interface OnItemClickListener {
         fun onItemClick(training: Training)
@@ -82,11 +126,30 @@ class TrainingRecyclerViewAdapter(data: OrderedRealmCollection<Training>) :
         this.listener = listener
     }
 
+    interface OnNotesEditListener {
+        fun onNotesEdit(training: Training)
+    }
+    fun setOnNotesEditListener(listener: OnNotesEditListener){
+        onNoteListener=listener
+    }
+    
+    interface OnDateClickListener {
+        fun onDateClicked(training: Training)
+    }
+    
+    fun setOnDateClickListener(listener:OnDateClickListener){
+        this.onDateListener=listener
+    }
+
         inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             val date: TextView = itemView.findViewById(R.id.date)
             val description: TextView = itemView.findViewById(R.id.description)
             var data: Training? = null
             val isDoneCheckBox: CheckBox = itemView.findViewById(R.id.isDoneCheckBox)
+            val nameOfTraining: TextView=itemView.findViewById(R.id.nameOfTraining_TextView)
+            val menu: TextView = itemView.findViewById(R.id.trainingItemOptions)
+            val notes: TextView = itemView.findViewById(R.id.trainingNotesTextView)
+            val notesHeader= itemView.notesTrainingHeader
             init {
                 itemView.setOnClickListener {
                     val position = adapterPosition

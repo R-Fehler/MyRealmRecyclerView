@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/CompleteSearchBar"
+        android:visibility="gone"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:weightSum="1"
+            android:id="@+id/search_Bar_TrainingsName"
+            android:orientation="horizontal"
+            >
+            <EditText
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.3"
+                android:id="@+id/search_Date_EditText"
+                android:hint="Monat"
+                android:inputType="number"
+                />
+            <EditText
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.7"
+                android:id="@+id/search_TrainingName_EditText"
+                android:hint="Name des Trainings"
+                android:inputType="textCapSentences"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:id="@+id/search_bar_Trainings"
+            android:weightSum="1"
+            android:visibility="visible"
+            >
+            <EditText
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.2"
+                android:id="@+id/search_bar_ExerciseID_editText"
+                android:hint="ID?"
+                />
+            <EditText
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.8"
+                android:id="@+id/search_bar_ExerciseName_editText"
+                android:hint="Übungsname"
+                />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:weightSum="1"
+            android:id="@+id/search_Bar_Notes"
+            android:visibility="visible"
+            android:orientation="horizontal"
+            >
+            <EditText
+                android:id="@+id/searchNotes_EditText"
+                android:hint="Notes durchsuchen"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.8"
+                />
+            <Button
+                android:id="@+id/close_searchViews_btn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.2"
+                android:text="CLOSE"
+                />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view_trainings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/CompleteSearchBar"
+        android:background="@null"
+        tools:listitem="@layout/training_item">
+
+    </androidx.recyclerview.widget.RecyclerView>
+
+</RelativeLayout>

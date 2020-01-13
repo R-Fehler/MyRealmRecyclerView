@@ -6,10 +6,8 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.Menu
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myrealmrecyclerview.model.DataHelper
@@ -18,6 +16,7 @@ import com.example.myrealmrecyclerview.ui.recyclerview.KnownExerciseAdapter
 import com.google.android.material.snackbar.Snackbar
 import io.realm.Realm
 import io.realm.RealmResults
+import io.realm.Sort
 import kotlinx.android.synthetic.main.activity_known_exercise_list.*
 import kotlinx.android.synthetic.main.content_known_exercise_list.*
 
@@ -31,6 +30,7 @@ class KnownExerciseListActivity : AppCompatActivity() {
 
     companion object{
         val CHOOSEKNOWNEXERCISE= 5
+        val CHANGEKNOWNEXERCISE= 1
     }
 
     
@@ -51,7 +51,7 @@ class KnownExerciseListActivity : AppCompatActivity() {
 
         search_KnownEx_Name_editTxt.addTextChangedListener(object : TextWatcher{
             override fun afterTextChanged(s: Editable?) {
-                adapter?.updateData(realm?.where(KnownExercise::class.java)?.contains("name",s.toString().trim())?.findAll()?.sort("doneInExercisesSize"))
+                adapter?.updateData(realm?.where(KnownExercise::class.java)?.contains("name",s.toString().trim())?.findAll()?.sort("doneInExercisesSize",Sort.DESCENDING))
             }
 
 
@@ -61,7 +61,21 @@ class KnownExerciseListActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
             }
         })
+        search_KnownEx_ID_editTxt.addTextChangedListener(object : TextWatcher{
+            override fun afterTextChanged(s: Editable?) {
+                if(!s.isNullOrBlank())
+                adapter?.updateData(realm?.where(KnownExercise::class.java)?.equalTo("user_custom_id",s.toString().trim().toInt())?.findAll())
+                else adapter?.updateData(allKnownExercises!!.sort("doneInExercisesSize", Sort.DESCENDING))
 
+            }
+
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            }
+        })
         add_KnownExercise_btn.setOnClickListener {
             val name=search_KnownEx_Name_editTxt.text.toString().trim().toUpperCase()
             val id=search_KnownEx_ID_editTxt.text.toString().trim().toInt()
@@ -73,7 +87,7 @@ class KnownExerciseListActivity : AppCompatActivity() {
             if(existingName==null)
             {
                 if(existingID==null) {
-                    realm?.let { DataHelper.createKnownExerciseAsync(it, name, id) }
+                    realm?.let { DataHelper.createKnownExercise(it, name, id) }
 
                 }
                 else{
@@ -95,11 +109,6 @@ class KnownExerciseListActivity : AppCompatActivity() {
                     }.show()
             }
         }
-
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
-        }
     }
     override fun onDestroy() {
         super.onDestroy()
@@ -119,7 +128,7 @@ class KnownExerciseListActivity : AppCompatActivity() {
 
     private fun setUpRecyclerView() {
 
-        adapter = KnownExerciseAdapter(allKnownExercises!!.sort("doneInExercisesSize"))
+        adapter = KnownExerciseAdapter(allKnownExercises!!.sort("doneInExercisesSize", Sort.DESCENDING))
         val isViewKnown=intent.getBooleanExtra(EditTrainingActivity.VIEWKNOWNEXERCISES,false)
 
         if(isViewKnown){
@@ -137,6 +146,7 @@ class KnownExerciseListActivity : AppCompatActivity() {
                 override fun onItemClick(knownExercise: KnownExercise) {
                     var returnIntent = Intent()
                     returnIntent.putExtra(EditTrainingActivity.KNOWNEXERCISE_ID, knownExercise.uuid)
+                    returnIntent.putExtra(EditTrainingActivity.EXERCISE_ID,intent.getLongExtra(EditTrainingActivity.EXERCISE_ID,-1))
                     setResult(Activity.RESULT_OK,returnIntent)
                     finish()
                 }
@@ -146,7 +156,6 @@ class KnownExerciseListActivity : AppCompatActivity() {
         recyclerView!!.layoutManager = LinearLayoutManager(this)
         recyclerView!!.adapter = adapter
         recyclerView!!.setHasFixedSize(true)
-        recyclerView!!.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
 
     }
 

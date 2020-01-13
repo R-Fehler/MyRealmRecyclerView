@@ -4,13 +4,13 @@ import io.realm.Realm
 
 class DataHelper {
     companion object{
-        fun addTrainingAsync(realm: Realm){
+        fun addTraining(realm: Realm){
 //            val realm:Realm=Realm.getDefaultInstance()
-            realm.executeTransactionAsync { Training.create(it) }
+            realm.executeTransaction { Training.create(it) }
 //            realm.close()
         }
-        fun deleteTrainingAsync(realm: Realm, uuid:Long){
-            realm.executeTransactionAsync { Training.delete(it,uuid) }
+        fun deleteTraining(realm: Realm, uuid:Long){
+            realm.executeTransaction { Training.delete(it,uuid) }
         }
         fun deleteTrainingsAsync(realm: Realm, uuids: Collection<Long>) {
             realm.executeTransactionAsync {
@@ -18,11 +18,6 @@ class DataHelper {
                     Training.delete(it, uuid)
                 }
             }
-        }
-        fun addExerciseAsync(realm: Realm, trainingUUID:Long) {
-
-            realm.executeTransactionAsync { Exercise.create(it,trainingUUID) }
-
         }
         fun addExercise(realm: Realm,trainingUUID:Long): Long {
             var primary:Long=0
@@ -40,8 +35,8 @@ class DataHelper {
             realm.executeTransaction { ExerciseSet.delete(it,exerciseSetUUID) }
         }
 
-        fun createKnownExerciseAsync(realm: Realm,name:String, customID:Int){
-            realm.executeTransactionAsync { KnownExercise.create(it,name,customID) }
+        fun createKnownExercise(realm: Realm, name:String, customID:Int){
+            realm.executeTransaction{ KnownExercise.create(it,name,customID) }
         }
 
         fun addKnownExToExercise(realm:Realm, knownUUID:Long, exerciseUUID: Long){
@@ -50,6 +45,10 @@ class DataHelper {
 
         fun changeKnownExercise(realm: Realm, knownExerciseUUID: Long, name: String, id: Int) {
         realm.executeTransactionAsync { KnownExercise.changeNameAndID(it,knownExerciseUUID,name,id) }
+        }
+
+        fun setNotesToTraining(realm:Realm, uuid: Long, notes:String){
+            realm.executeTransactionAsync { Training.setNote(it,uuid,notes) }
         }
 
         //TODO delete Exer und Sets

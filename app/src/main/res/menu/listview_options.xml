@@ -6,34 +6,14 @@
         <item
             android:id="@+id/action_KnownExerciseOverView"
             android:title="Übungskatalog"
-            app:showAsAction="ifRoom"
+            app:showAsAction="never"
 
             />
         <item
             android:id="@+id/action_searchTrainings"
             android:title="Suche Training(s)"
+            android:icon="@drawable/ic_search_white_24dp"
             app:showAsAction="ifRoom"
             />
-        <item android:id="@+id/action_add"
-              android:icon="@android:drawable/ic_menu_add"
-              android:title="@string/add"
-              app:showAsAction="ifRoom"/>
-        <item android:id="@+id/action_start_delete_mode"
-              android:icon="@android:drawable/ic_menu_delete"
-              android:title="@string/start_delete"
-              app:showAsAction="ifRoom"/>
-        <item android:id="@+id/action_random"
-              android:title="@string/add_random"
-              app:showAsAction="ifRoom|withText"/>
-    </group>
-    <group android:id="@+id/group_delete_mode">
-        <item android:id="@+id/action_end_delete_mode"
-              android:icon="@android:drawable/ic_menu_save"
-              android:title="@string/delete"
-              app:showAsAction="always"/>
-        <item android:id="@+id/action_cancel_delete_mode"
-              android:icon="@android:drawable/ic_menu_close_clear_cancel"
-              android:title="@string/delete"
-              app:showAsAction="always"/>
     </group>
 </menu>

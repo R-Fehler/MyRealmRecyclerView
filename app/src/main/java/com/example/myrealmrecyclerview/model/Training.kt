@@ -17,6 +17,8 @@ open class Training : RealmObject() {
     var notes: String = ""
     var name: String = ""
     var date: Date = Date()
+    var year: Int = Calendar.getInstance().get(Calendar.YEAR) -1900
+    var month: Int = Calendar.getInstance().get(Calendar.MONTH)
     //duration, location, time, blabla
     var exercises: RealmList<Exercise> = RealmList()
     var duration: Long = 0 // in minutes
@@ -46,6 +48,11 @@ open class Training : RealmObject() {
             }
             training.exercises.deleteAllFromRealm()
             training.deleteFromRealm()
+        }
+
+        fun setNote(realm:Realm, uuid: Long, notes:String){
+            val training=realm.where(Training::class.java).equalTo(FIELD_UUID,uuid).findFirst()
+            training?.notes=notes
         }
 
         private fun increment(): Long {

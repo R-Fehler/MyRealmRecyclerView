@@ -58,14 +58,15 @@
         android:layout_weight="0.15"
         android:hint="ID"
 
+
         />
     <EditText
         android:layout_width="0dp"
         android:layout_height="wrap_content"
 
         android:id="@+id/changeKnownExerciseName_EditText"
-        android:inputType="text"
-        android:maxLines="1"
+        android:inputType="textCapCharacters"
+        android:maxLines="3"
 
 
 

@@ -1,0 +1,18 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".MyActivity">
+    <group android:id="@+id/trainingOptionsGroup">
+        <item
+            android:id="@+id/action_training_addNote"
+            android:title="Notizen bearbeiten"
+            app:showAsAction="never"
+            />
+        <item
+            android:id="@+id/action_training_remove_addNote"
+            android:title="Notizen ausblenden"
+            app:showAsAction="never"
+            />
+
+    </group>
+</menu>

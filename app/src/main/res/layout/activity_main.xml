@@ -1,97 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical">
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/CompleteSearchBar"
-        android:visibility="gone"
-        android:orientation="vertical">
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:weightSum="1"
-        android:id="@+id/search_Bar_TrainingsName"
-        android:orientation="horizontal"
-        >
-        <EditText
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.3"
-            android:id="@+id/search_Date_EditText"
-            android:hint="Datum"
-            />
-        <EditText
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.7"
-            android:id="@+id/search_TrainingName_EditText"
-            android:hint="Name des Trainings"
-            />
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:id="@+id/search_bar_Trainings"
-        android:weightSum="1"
-        android:visibility="visible"
-        >
-        <EditText
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.2"
-            android:id="@+id/search_bar_ExerciseID_editText"
-            android:hint="ID?"
-            />
-        <EditText
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.8"
-            android:id="@+id/search_bar_ExerciseName_editText"
-            android:hint="Übungsname"
-            />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:weightSum="1"
-        android:id="@+id/search_Bar_Notes"
-        android:visibility="visible"
-        android:orientation="horizontal"
-        >
-        <EditText
-            android:id="@+id/searchNotes_EditText"
-            android:hint="Notes durchsuchen"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.8"
-            />
-        <Button
-            android:id="@+id/close_searchViews_btn"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.2"
-            android:text="CLOSE"
-            />
-
-    </LinearLayout>
-    </LinearLayout>
+    tools:context=".MainActivity">
 
 
-    <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_view_trainings"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-        tools:listitem="@layout/training_item"
-            android:background="@null" />
+
+    <include layout="@layout/content_main_activity"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/add_Training_FAB"
@@ -101,4 +19,4 @@
         android:layout_margin="@dimen/fab_margin"
         app:srcCompat="@drawable/ic_add_white_24dp"/>
 
-</LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

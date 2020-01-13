@@ -3,13 +3,13 @@ package com.example.myrealmrecyclerview
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.Menu
-import android.widget.EditText
+import android.view.View
 import android.widget.Toast
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.get
-import androidx.core.view.size
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myrealmrecyclerview.model.DataHelper
@@ -20,6 +20,7 @@ import com.example.myrealmrecyclerview.ui.recyclerview.ExercisesRecyclerViewAdap
 import io.realm.Realm
 
 import kotlinx.android.synthetic.main.activity_edit_training.*
+import kotlinx.android.synthetic.main.content_edit_training.*
 
 /*TODO
 In edit exercise activity noch oben edit Text mit Datum, Notizen dauer usw.
@@ -41,6 +42,7 @@ class EditTrainingActivity : AppCompatActivity() {
         const val KNOWNEXERCISE_ID = "com.example.myrealmrecyclerview.KNOWNEXERCISE_ID"
         const val EXERCISE_ID = "com.example.myrealmrecyclerview.EXERCISE_ID"
         const val VIEWKNOWNEXERCISES = "com.example.myrealmrecyclerview.VIEWKNOWNEXERCISES"
+        const val NOTES = "com.example.myrealmrecyclerview.NOTES"
 
     }
 
@@ -52,6 +54,29 @@ class EditTrainingActivity : AppCompatActivity() {
 
         recyclerView = findViewById(R.id.recycler_view_exercises)
 
+        val training=realm!!.where(Training::class.java).equalTo(
+            "uuid", intent.getLongExtra(
+                TRAINING_ID, 0
+            )
+        )!!.findFirst()
+        nameOfTrainingEditText.text.let { it.clear()
+        it.insert(0,training?.name)}
+
+        nameOfTrainingEditText.addTextChangedListener(object: TextWatcher{
+            override fun afterTextChanged(s: Editable?) {
+                if(!s.isNullOrEmpty()) {
+                    if (s.toString() != training?.name) {
+                        realm?.executeTransaction {
+                            training?.name=s.toString()
+                             }
+                    }
+                }
+            }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+
+
 
 
 
@@ -60,7 +85,7 @@ class EditTrainingActivity : AppCompatActivity() {
             realm?.let {
 
                 val intent= Intent(this@EditTrainingActivity,KnownExerciseListActivity::class.java)
-                startActivityForResult(intent,5)
+                startActivityForResult(intent,KnownExerciseListActivity.CHOOSEKNOWNEXERCISE)
             }
 
 
@@ -82,31 +107,33 @@ class EditTrainingActivity : AppCompatActivity() {
     }
 
     private fun setUpRecyclerView() {
-        adapter = realm!!.where(Training::class.java).equalTo("uuid",intent.getLongExtra(
-            TRAINING_ID,0))!!.findFirst()?.exercises?.let { ExercisesRecyclerViewAdapter(it) }
+        adapter = realm!!.where(Training::class.java).equalTo(
+            "uuid", intent.getLongExtra(
+                TRAINING_ID, 0
+            )
+        )!!.findFirst()?.exercises?.let { ExercisesRecyclerViewAdapter(it) }
         adapter!!.setOnItemClickListener(object : ExercisesRecyclerViewAdapter.OnItemClickListener {
-            override fun onItemClick(exercise:Exercise) {
+            override fun onItemClick(exercise: Exercise) {
 //                var intent = Intent(baseContext, EditTrainingActivity::class.java)
 //                intent.putExtra(EditTrainingActivity.TRAINING_ID, training.uuid)
 //
 //
 //                startActivityForResult(intent,1)
                 // TODO add new Set to Exercise
-                Toast.makeText(this@EditTrainingActivity,"next Activity",Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@EditTrainingActivity, "next Activity", Toast.LENGTH_SHORT).show()
             }
         })
         adapter!!.setAddClickListener(object : ExercisesRecyclerViewAdapter.OnAddClickListener {
             override fun onAddClick(uuid: Long, adapter: ExerciseSetAdapter) {
-                realm?.let { DataHelper.addExerciseSet(it,uuid) }
-                         }
+                realm?.let { DataHelper.addExerciseSet(it, uuid) }
+            }
 
         })
-        adapter!!.setOnNameClickListener(object :ExercisesRecyclerViewAdapter.OnNameClickListener{
+        adapter!!.setOnNameClickListener(object : ExercisesRecyclerViewAdapter.OnNameClickListener {
             override fun onNameClick(exercise: Exercise) {
-                val intent= Intent(this@EditTrainingActivity,KnownExerciseListActivity::class.java)
-                   intent.putExtra(EXERCISE_ID,exercise.uuid)
-                    startActivityForResult(intent,KnownExerciseListActivity.CHOOSEKNOWNEXERCISE)
-
+                val intent = Intent(this@EditTrainingActivity, KnownExerciseListActivity::class.java)
+                intent.putExtra(EXERCISE_ID, exercise.uuid)
+                startActivityForResult(intent, KnownExerciseListActivity.CHANGEKNOWNEXERCISE)
             }
         })
 
@@ -114,7 +141,21 @@ class EditTrainingActivity : AppCompatActivity() {
         recyclerView!!.layoutManager = LinearLayoutManager(this)
         recyclerView!!.adapter = adapter
         recyclerView!!.setHasFixedSize(true)
-        }
+
+        recyclerView!!.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+
+                if (dy > 0) {
+                    nameOfTrainingEditText.visibility = View.GONE
+                } else {
+                    nameOfTrainingEditText.visibility = View.VISIBLE
+                }
+
+            }
+        })
+    }
 
 //        val touchHelperCallback = TouchHelperCallback()
 //        val touchHelper = ItemTouchHelper(touchHelperCallback)
@@ -137,9 +178,29 @@ class EditTrainingActivity : AppCompatActivity() {
 
                     }
                 }
-                adapter?.updateData(adapter?.data)
             }
         }
+        if(requestCode==KnownExerciseListActivity.CHANGEKNOWNEXERCISE){
+            if(resultCode== Activity.RESULT_OK){
+                val knownExID=data?.getLongExtra(KNOWNEXERCISE_ID,0)
+                val exerciseUUID=data?.getLongExtra(EXERCISE_ID,-1)
+
+                realm?.let {
+                    if (knownExID != null) {
+
+                        if (exerciseUUID != null) {
+                            DataHelper.addKnownExToExercise(it,knownExID,exerciseUUID)
+                        }
+                    }
+                }
+            }
+        }
+        adapter?.updateData(adapter?.data)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        adapter?.updateData(adapter?.data)
     }
     }
 

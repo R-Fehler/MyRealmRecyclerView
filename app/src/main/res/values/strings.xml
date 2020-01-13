@@ -12,4 +12,6 @@
     <string name="action_settings">Settings</string>
     <string name="add_set">Add Set</string>
     <string name="title_activity_change_known_exercise">Ändere Namen/ID der Übung</string>
+    <string name="title_activity_EditText">Notizen</string>
+    <string name="notesHeader">Notes:</string>
 </resources>
