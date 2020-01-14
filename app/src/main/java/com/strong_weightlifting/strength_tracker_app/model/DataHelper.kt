@@ -1,4 +1,4 @@
-package com.example.myrealmrecyclerview.model
+package com.strong_weightlifting.strength_tracker_app.model
 
 import io.realm.Realm
 
@@ -8,6 +8,10 @@ class DataHelper {
 //            val realm:Realm=Realm.getDefaultInstance()
             realm.executeTransaction { Training.create(it) }
 //            realm.close()
+        }
+
+        fun copyTraining(realm: Realm,training: Training){
+            realm.executeTransaction { Training.createCopy(it,training) }
         }
         fun deleteTraining(realm: Realm, uuid:Long){
             realm.executeTransaction { Training.delete(it,uuid) }

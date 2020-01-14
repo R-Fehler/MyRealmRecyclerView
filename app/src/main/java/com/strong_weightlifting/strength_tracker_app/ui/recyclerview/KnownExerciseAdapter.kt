@@ -1,19 +1,16 @@
-package com.example.myrealmrecyclerview.ui.recyclerview
+package com.strong_weightlifting.strength_tracker_app.ui.recyclerview
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
-import android.widget.EditText
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.myrealmrecyclerview.R
-import com.example.myrealmrecyclerview.model.KnownExercise
+import com.strong_weightlifting.strength_tracker_app.R
+import com.strong_weightlifting.strength_tracker_app.model.KnownExercise
 import io.realm.OrderedRealmCollection
 import io.realm.RealmRecyclerViewAdapter
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.math.max
 
 
 class KnownExerciseAdapter(data: OrderedRealmCollection<KnownExercise>) :
@@ -52,7 +49,7 @@ class KnownExerciseAdapter(data: OrderedRealmCollection<KnownExercise>) :
         var maxDate: Date = Date()
         for(ex in knownExercise?.doneInExercises!!){
             for(set in ex.sets){
-                if(maxWeight<set.weight){
+                if(maxWeight<set.weight && set.isDone){
                 maxWeight=set.weight
                 maxReps=set.reps
                     maxDate=ex.date

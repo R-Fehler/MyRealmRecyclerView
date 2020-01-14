@@ -1,4 +1,4 @@
-package com.example.myrealmrecyclerview.ui.recyclerview
+package com.strong_weightlifting.strength_tracker_app.ui.recyclerview
 
 import android.text.Editable
 import android.text.TextWatcher
@@ -9,8 +9,8 @@ import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.myrealmrecyclerview.R
-import com.example.myrealmrecyclerview.model.ExerciseSet
+import com.strong_weightlifting.strength_tracker_app.R
+import com.strong_weightlifting.strength_tracker_app.model.ExerciseSet
 import io.realm.OrderedRealmCollection
 import io.realm.Realm
 import io.realm.RealmRecyclerViewAdapter

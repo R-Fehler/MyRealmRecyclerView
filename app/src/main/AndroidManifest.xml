@@ -1,35 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.myrealmrecyclerview">
+    package="com.strong_weightlifting.strength_tracker_app">
 
     <application
-        android:name=".MyApplication"
+        android:name="com.strong_weightlifting.strength_tracker_app.MyApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme.NoActionBar">
 
         <activity
-            android:name=".ChangeKnownExerciseActivity"
+            android:name="com.strong_weightlifting.strength_tracker_app.ChangeKnownExerciseActivity"
             android:label="@string/title_activity_change_known_exercise"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".KnownExerciseListActivity"
+            android:name="com.strong_weightlifting.strength_tracker_app.KnownExerciseListActivity"
             android:label="@string/title_activity_known_exercise_list"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".EditTrainingActivity"
+            android:name="com.strong_weightlifting.strength_tracker_app.EditTrainingActivity"
             android:label="@string/title_activity_edit_training"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
-            android:name=".EditTextActivity"
+            android:name="com.strong_weightlifting.strength_tracker_app.EditTextActivity"
             android:label="@string/title_activity_EditText"
             android:theme="@style/AppTheme"/>
         
-        <activity android:name=".MainActivity">
+        <activity android:name="com.strong_weightlifting.strength_tracker_app.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

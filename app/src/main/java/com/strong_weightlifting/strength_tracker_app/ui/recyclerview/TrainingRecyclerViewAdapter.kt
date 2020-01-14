@@ -1,11 +1,7 @@
-package com.example.myrealmrecyclerview.ui.recyclerview
+package com.strong_weightlifting.strength_tracker_app.ui.recyclerview
 
-import android.app.Activity
-import android.graphics.Color
-import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.Spanned
-import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.util.Log
 import android.view.LayoutInflater
@@ -15,10 +11,9 @@ import android.widget.CheckBox
 import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.myrealmrecyclerview.MainActivity
-import com.example.myrealmrecyclerview.R
-import com.example.myrealmrecyclerview.model.DataHelper
-import com.example.myrealmrecyclerview.model.Training
+import com.strong_weightlifting.strength_tracker_app.R
+import com.strong_weightlifting.strength_tracker_app.model.DataHelper
+import com.strong_weightlifting.strength_tracker_app.model.Training
 import io.realm.OrderedRealmCollection
 import io.realm.Realm
 import io.realm.RealmRecyclerViewAdapter
@@ -33,6 +28,7 @@ class TrainingRecyclerViewAdapter(data: OrderedRealmCollection<Training>) :
     private var listener: OnItemClickListener? = null
     private var onNoteListener: OnNotesEditListener?=null
     private var onDateListener: OnDateClickListener?=null
+    private var onItemLongClickListener: OnItemLongClickListener?=null
     var realm: Realm?=null
 
     init {
@@ -62,6 +58,10 @@ class TrainingRecyclerViewAdapter(data: OrderedRealmCollection<Training>) :
             holder.data?.let { it1 -> onDateListener?.onDateClicked(it1) }
         }
 
+        holder.itemView.setOnLongClickListener {
+            holder.data?.let { it1 -> onItemLongClickListener?.onItemLongClick(it1) }
+            true
+        }
         var text=""
         for(exercise in holder.data?.exercises!!){
             text += exercise.toString() +"\n"
@@ -144,6 +144,14 @@ class TrainingRecyclerViewAdapter(data: OrderedRealmCollection<Training>) :
     
     fun setOnDateClickListener(listener:OnDateClickListener){
         this.onDateListener=listener
+    }
+
+    interface OnItemLongClickListener{
+        fun onItemLongClick(training: Training)
+    }
+
+    fun setOnItemLongClickListener(listener:OnItemLongClickListener){
+        this.onItemLongClickListener=listener
     }
 
         inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

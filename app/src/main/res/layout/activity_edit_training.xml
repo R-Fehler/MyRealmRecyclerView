@@ -5,11 +5,45 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".EditTrainingActivity">
+        tools:context=".EditTrainingActivity"
+    android:focusableInTouchMode="true"
+    android:focusable="true">
 
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/mainAppBarLayout">
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/editTrainingToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:layout_scrollFlags="scroll|enterAlways"
+        />
 
+        <EditText
+            android:id="@+id/nameOfTrainingEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:inputType="textCapSentences"
+            android:imeOptions="actionDone"
+            android:hint="Name des Trainings"
+            app:layout_scrollFlags="scroll|enterAlways"
+ />
 
-    <include layout="@layout/content_edit_training"/>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view_exercises"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@null"
+
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
+        />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab"

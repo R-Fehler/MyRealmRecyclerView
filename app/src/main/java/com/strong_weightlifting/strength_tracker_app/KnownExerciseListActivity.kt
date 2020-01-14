@@ -1,4 +1,4 @@
-package com.example.myrealmrecyclerview
+package com.strong_weightlifting.strength_tracker_app
 
 import android.app.Activity
 import android.content.Intent
@@ -7,18 +7,16 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.myrealmrecyclerview.model.DataHelper
-import com.example.myrealmrecyclerview.model.KnownExercise
-import com.example.myrealmrecyclerview.ui.recyclerview.KnownExerciseAdapter
+import com.strong_weightlifting.strength_tracker_app.model.DataHelper
+import com.strong_weightlifting.strength_tracker_app.model.KnownExercise
+import com.strong_weightlifting.strength_tracker_app.ui.recyclerview.KnownExerciseAdapter
 import com.google.android.material.snackbar.Snackbar
 import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
 import kotlinx.android.synthetic.main.activity_known_exercise_list.*
-import kotlinx.android.synthetic.main.content_known_exercise_list.*
 
 class KnownExerciseListActivity : AppCompatActivity() {
 
@@ -37,6 +35,7 @@ class KnownExerciseListActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_known_exercise_list)
+        setSupportActionBar(knownExerciseListToolbar)
         realm = Realm.getDefaultInstance()
         recyclerView = findViewById(R.id.recycler_view_knownExercises)
         allKnownExercises=realm!!.where(KnownExercise::class.java).findAll()
@@ -79,7 +78,7 @@ class KnownExerciseListActivity : AppCompatActivity() {
         add_KnownExercise_btn.setOnClickListener {
             val name=search_KnownEx_Name_editTxt.text.toString().trim().toUpperCase()
             val idd=search_KnownEx_ID_editTxt.text.toString().trim()
-            if(!name.isNullOrBlank() && idd.isNullOrBlank()) {
+            if(!name.isNullOrBlank() && !idd.isNullOrBlank()) {
                 val id=idd.toInt()
 
                 val existingID = allKnownExercises!!.find { it.user_custom_id == id }

@@ -1,4 +1,4 @@
-package com.example.myrealmrecyclerview.model
+package com.strong_weightlifting.strength_tracker_app.model
 
 import io.realm.RealmList
 import io.realm.RealmObject

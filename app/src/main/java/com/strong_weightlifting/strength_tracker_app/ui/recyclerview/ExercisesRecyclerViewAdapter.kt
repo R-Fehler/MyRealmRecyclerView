@@ -1,33 +1,20 @@
-package com.example.myrealmrecyclerview.ui.recyclerview
+package com.strong_weightlifting.strength_tracker_app.ui.recyclerview
 
-import android.content.Intent
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.PopupMenu
 import android.widget.TextView
-import android.widget.Toast
-import androidx.core.app.ActivityCompat.startActivityForResult
-import androidx.core.view.forEach
-import androidx.core.view.forEachIndexed
-import androidx.core.view.get
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.myrealmrecyclerview.EditTrainingActivity
-import com.example.myrealmrecyclerview.KnownExerciseListActivity
-import com.example.myrealmrecyclerview.R
-import com.example.myrealmrecyclerview.model.DataHelper
-import com.example.myrealmrecyclerview.model.Exercise
-import com.example.myrealmrecyclerview.model.Training
+import com.strong_weightlifting.strength_tracker_app.R
+import com.strong_weightlifting.strength_tracker_app.model.DataHelper
+import com.strong_weightlifting.strength_tracker_app.model.Exercise
 import io.realm.OrderedRealmCollection
 import io.realm.Realm
 import io.realm.RealmRecyclerViewAdapter
-import kotlinx.android.synthetic.main.exercise_item.view.*
-import kotlinx.android.synthetic.main.exercise_set_item.view.*
 import java.util.*
 
 class ExercisesRecyclerViewAdapter(data: OrderedRealmCollection<Exercise>) :

@@ -1,4 +1,4 @@
-package com.example.myrealmrecyclerview
+package com.strong_weightlifting.strength_tracker_app
 
 import androidx.test.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getTargetContext()
-        assertEquals("com.example.myrealmrecyclerview", appContext.packageName)
+        assertEquals("com.strong_weightlifting.strength_tracker_app", appContext.packageName)
     }
 }

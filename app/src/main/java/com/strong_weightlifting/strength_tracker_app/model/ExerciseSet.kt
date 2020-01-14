@@ -1,4 +1,4 @@
-package com.example.myrealmrecyclerview.model
+package com.strong_weightlifting.strength_tracker_app.model
 
 import io.realm.Realm
 import io.realm.RealmObject
@@ -25,7 +25,7 @@ open class ExerciseSet : RealmObject() {
         const val FIELD_UUID="uuid"
         private val INTEGER_COUNTER = AtomicLong(0)
 
-        fun create(realm: Realm, exerciseID: Long){
+        fun create(realm: Realm, exerciseID: Long): ExerciseSet? {
             val exercise=realm.where(Exercise::class.java).equalTo(FIELD_UUID,exerciseID).findFirst()
             val sets = exercise?.sets
             val known=realm.where(KnownExercise::class.java).equalTo(FIELD_UUID,exercise?.knownExercise?.uuid).findFirst()
@@ -57,6 +57,7 @@ open class ExerciseSet : RealmObject() {
             }
 
             sets.add(exerciseSet)
+            return exerciseSet
         }
         fun delete(realm: Realm, uuid: Long){
             val exerciseSet =realm.where(ExerciseSet::class.java).equalTo(FIELD_UUID,uuid).findFirst()

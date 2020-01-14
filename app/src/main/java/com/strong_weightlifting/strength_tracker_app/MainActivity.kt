@@ -1,4 +1,4 @@
-package com.example.myrealmrecyclerview
+package com.strong_weightlifting.strength_tracker_app
 
 import android.app.Activity
 import android.app.DatePickerDialog
@@ -11,17 +11,15 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.myrealmrecyclerview.model.*
-import com.example.myrealmrecyclerview.ui.recyclerview.TrainingRecyclerViewAdapter
+import com.strong_weightlifting.strength_tracker_app.model.*
+import com.strong_weightlifting.strength_tracker_app.ui.recyclerview.TrainingRecyclerViewAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import io.realm.Realm
 import io.realm.RealmList
-import io.realm.RealmResults
 import io.realm.Sort
-import kotlinx.android.synthetic.main.content_main_activity.*
+import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 
 /*TODO
@@ -75,6 +73,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        setSupportActionBar(mainToolBar)
         realm = Realm.getDefaultInstance()
         recyclerView = findViewById(R.id.recycler_view_trainings)
 
@@ -262,6 +261,13 @@ class MainActivity : AppCompatActivity() {
 //                startActivityForResult(intent,1)
                 startActivity(intent)
             }
+        })
+        adapter!!.setOnItemLongClickListener(object:TrainingRecyclerViewAdapter.OnItemLongClickListener{
+            override fun onItemLongClick(training: Training) {
+                DataHelper.copyTraining(realm!!,training)
+                adapter?.updateData(adapter?.data)
+            }
+
         })
 
         adapter!!.setOnNotesEditListener(object : TrainingRecyclerViewAdapter.OnNotesEditListener {

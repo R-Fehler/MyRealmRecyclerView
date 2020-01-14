@@ -1,4 +1,4 @@
-package com.example.myrealmrecyclerview
+package com.strong_weightlifting.strength_tracker_app
 
 import android.app.Activity
 import android.content.Intent

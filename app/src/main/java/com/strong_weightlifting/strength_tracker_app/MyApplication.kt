@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.example.myrealmrecyclerview
+package com.strong_weightlifting.strength_tracker_app
 
 import android.app.Application
-import com.example.myrealmrecyclerview.model.MasterParent
+import com.strong_weightlifting.strength_tracker_app.model.MasterParent
 import io.realm.Realm
 import io.realm.RealmConfiguration
 

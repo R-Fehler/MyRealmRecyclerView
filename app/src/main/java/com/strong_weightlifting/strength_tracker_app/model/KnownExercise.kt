@@ -1,12 +1,10 @@
-package com.example.myrealmrecyclerview.model
+package com.strong_weightlifting.strength_tracker_app.model
 
 import io.realm.Realm
 import io.realm.RealmObject
 import io.realm.RealmResults
 import io.realm.annotations.LinkingObjects
 import io.realm.annotations.PrimaryKey
-import io.realm.kotlin.createObject
-import java.util.*
 import java.util.concurrent.atomic.AtomicLong
 
 open class KnownExercise: RealmObject() {

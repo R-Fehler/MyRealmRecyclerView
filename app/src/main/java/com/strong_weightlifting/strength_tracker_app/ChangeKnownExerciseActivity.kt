@@ -1,4 +1,4 @@
-package com.example.myrealmrecyclerview
+package com.strong_weightlifting.strength_tracker_app
 
 import android.os.Bundle
 import android.text.Editable
@@ -8,15 +8,13 @@ import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.myrealmrecyclerview.model.DataHelper
-import com.example.myrealmrecyclerview.model.KnownExercise
-import com.example.myrealmrecyclerview.ui.recyclerview.KnownExerciseAdapter
+import com.strong_weightlifting.strength_tracker_app.model.DataHelper
+import com.strong_weightlifting.strength_tracker_app.model.KnownExercise
+import com.strong_weightlifting.strength_tracker_app.ui.recyclerview.KnownExerciseAdapter
 import io.realm.Realm
 import io.realm.RealmResults
 
-import kotlinx.android.synthetic.main.activity_change_known_exercise.*
 import kotlinx.android.synthetic.main.content_change_known_exercise.*
-import kotlinx.android.synthetic.main.content_known_exercise_list.*
 
 class ChangeKnownExerciseActivity : AppCompatActivity() {
 

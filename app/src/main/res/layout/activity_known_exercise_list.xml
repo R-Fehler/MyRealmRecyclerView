@@ -9,10 +9,70 @@
 
 
 
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/mainAppBarLayout">
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/knownExerciseListToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:layout_scrollFlags="scroll|enterAlways"
+        />
+        <LinearLayout
+            android:id="@+id/search_fields"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="1"
+            app:layout_scrollFlags="scroll|enterAlways"
 
 
-    <include layout="@layout/content_known_exercise_list" />
+            >
+        <EditText
+            android:id="@+id/search_KnownEx_ID_editTxt"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.15"
+            android:textSize="24sp"
+            android:inputType="number"
+            android:ems="3"
+            android:maxLines="1"
+            android:imeOptions="actionNext"
+            android:hint="ID?" />
+
+        <EditText
+            android:id="@+id/search_KnownEx_Name_editTxt"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.65"
+            android:textSize="24sp"
+            android:maxLines="3"
+            android:hint="Suche Name"
+            android:inputType="textCapCharacters"
+            android:imeOptions="actionDone"
+            />
+        <Button
+            android:id="@+id/add_KnownExercise_btn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.2"
+            android:text="Add"
+            />
+        </LinearLayout>
+
+    </com.google.android.material.appbar.AppBarLayout>
 
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view_knownExercises"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@null"
+        tools:listitem="@layout/known_exercise_item"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
+
+/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

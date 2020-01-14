@@ -1,4 +1,4 @@
-package com.example.myrealmrecyclerview
+package com.strong_weightlifting.strength_tracker_app
 
 import android.app.Activity
 import android.content.Intent
@@ -6,22 +6,17 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.Menu
-import android.view.View
-import android.widget.Toast
-import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.myrealmrecyclerview.model.DataHelper
-import com.example.myrealmrecyclerview.model.Exercise
-import com.example.myrealmrecyclerview.model.Training
-import com.example.myrealmrecyclerview.ui.recyclerview.ExerciseSetAdapter
-import com.example.myrealmrecyclerview.ui.recyclerview.ExercisesRecyclerViewAdapter
-import com.example.myrealmrecyclerview.ui.recyclerview.TrainingRecyclerViewAdapter
+import com.strong_weightlifting.strength_tracker_app.model.DataHelper
+import com.strong_weightlifting.strength_tracker_app.model.Exercise
+import com.strong_weightlifting.strength_tracker_app.model.Training
+import com.strong_weightlifting.strength_tracker_app.ui.recyclerview.ExerciseSetAdapter
+import com.strong_weightlifting.strength_tracker_app.ui.recyclerview.ExercisesRecyclerViewAdapter
 import io.realm.Realm
 
 import kotlinx.android.synthetic.main.activity_edit_training.*
-import kotlinx.android.synthetic.main.content_edit_training.*
 
 /*TODO
 In edit exercise activity noch oben edit Text mit Datum, Notizen dauer usw.
@@ -39,11 +34,11 @@ class EditTrainingActivity : AppCompatActivity() {
     private var adapter: ExercisesRecyclerViewAdapter? = null
 
     companion object {
-        const val TRAINING_ID = "com.example.myrealmrecyclerview.TRAINING_ID"
-        const val KNOWNEXERCISE_ID = "com.example.myrealmrecyclerview.KNOWNEXERCISE_ID"
-        const val EXERCISE_ID = "com.example.myrealmrecyclerview.EXERCISE_ID"
-        const val VIEWKNOWNEXERCISES = "com.example.myrealmrecyclerview.VIEWKNOWNEXERCISES"
-        const val NOTES = "com.example.myrealmrecyclerview.NOTES"
+        const val TRAINING_ID = "com.strong_weightlifting.strength_tracker_app.TRAINING_ID"
+        const val KNOWNEXERCISE_ID = "com.strong_weightlifting.strength_tracker_app.KNOWNEXERCISE_ID"
+        const val EXERCISE_ID = "com.strong_weightlifting.strength_tracker_app.EXERCISE_ID"
+        const val VIEWKNOWNEXERCISES = "com.strong_weightlifting.strength_tracker_app.VIEWKNOWNEXERCISES"
+        const val NOTES = "com.strong_weightlifting.strength_tracker_app.NOTES"
         const val REQUESTCODE_NOTE=2
     }
 
@@ -51,6 +46,7 @@ class EditTrainingActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_training)
         realm = Realm.getDefaultInstance()
+        setSupportActionBar(editTrainingToolbar)
 
 
         recyclerView = findViewById(R.id.recycler_view_exercises)
@@ -142,20 +138,6 @@ class EditTrainingActivity : AppCompatActivity() {
                 startActivityForResult(editIntent, REQUESTCODE_NOTE)
             }
         })
-
-        recyclerView!!.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-
-
-                if (dy >20) {
-                    nameOfTrainingEditText.visibility = View.GONE
-                } else {
-                    nameOfTrainingEditText.visibility = View.VISIBLE
-                }
-
-            }
-        })
     }
 
 //        val touchHelperCallback = TouchHelperCallback()
@@ -175,6 +157,7 @@ class EditTrainingActivity : AppCompatActivity() {
                             val training_uuid=intent.getLongExtra(TRAINING_ID,0)
                             val ExID=DataHelper.addExercise(it, training_uuid)
                             DataHelper.addKnownExToExercise(it,knownExID,ExID)
+                            DataHelper.addExerciseSet(it,ExID)
 
 
                     }
