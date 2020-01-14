@@ -174,9 +174,9 @@ class ExercisesRecyclerViewAdapter(data: OrderedRealmCollection<Exercise>) :
 
                 }
                 R.id.action_exercise_delete-> {
-                    realm?.executeTransaction {
-                        holder.data?.uuid?.let { it1 -> DataHelper.deleteExercise(it, it1) }
-                    }
+
+                        realm?.let{holder.data?.uuid?.let { it1 -> DataHelper.deleteExercise(it, it1) }}
+                    this.updateData(data)
                 }
             }
 

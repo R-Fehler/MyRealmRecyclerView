@@ -78,35 +78,33 @@ class KnownExerciseListActivity : AppCompatActivity() {
         })
         add_KnownExercise_btn.setOnClickListener {
             val name=search_KnownEx_Name_editTxt.text.toString().trim().toUpperCase()
-            val id=search_KnownEx_ID_editTxt.text.toString().trim().toInt()
+            val idd=search_KnownEx_ID_editTxt.text.toString().trim()
+            if(!name.isNullOrBlank() && idd.isNullOrBlank()) {
+                val id=idd.toInt()
 
+                val existingID = allKnownExercises!!.find { it.user_custom_id == id }
+                val existingName = allKnownExercises!!.find { it.name == name }
+                if (existingName == null) {
+                    if (existingID == null) {
+                        realm?.let { DataHelper.createKnownExercise(it, name, id) }
 
+                    } else {
+                        Snackbar.make(findViewById(R.id.search_fields), "ID schon vergeben", Snackbar.LENGTH_LONG)
+                            .setAction("Change") {
+                                var intent = Intent(this, ChangeKnownExerciseActivity::class.java)
+                                intent.putExtra(EditTrainingActivity.KNOWNEXERCISE_ID, existingID.uuid)
+                                startActivity(intent)
+                            }.show()
+                    }
 
-            val existingID=allKnownExercises!!.find{ it.user_custom_id==id }
-            val existingName= allKnownExercises!!.find { it.name==name }
-            if(existingName==null)
-            {
-                if(existingID==null) {
-                    realm?.let { DataHelper.createKnownExercise(it, name, id) }
-
-                }
-                else{
-                    Snackbar.make(findViewById(R.id.search_fields), "ID schon vergeben", Snackbar.LENGTH_LONG)
+                } else {
+                    Snackbar.make(findViewById(R.id.search_fields), "Name schon vergeben", Snackbar.LENGTH_LONG)
                         .setAction("Change") {
-                            var intent=Intent(this,ChangeKnownExerciseActivity::class.java)
-                            intent.putExtra(EditTrainingActivity.KNOWNEXERCISE_ID,existingID.uuid)
+                            var intent = Intent(this, ChangeKnownExerciseActivity::class.java)
+                            intent.putExtra(EditTrainingActivity.KNOWNEXERCISE_ID, existingName.uuid)
                             startActivity(intent)
                         }.show()
                 }
-
-            }
-            else{
-                Snackbar.make(findViewById(R.id.search_fields), "Name schon vergeben", Snackbar.LENGTH_LONG)
-                    .setAction("Change") {
-                        var intent=Intent(this,ChangeKnownExerciseActivity::class.java)
-                        intent.putExtra(EditTrainingActivity.KNOWNEXERCISE_ID,existingName.uuid)
-                        startActivity(intent)
-                    }.show()
             }
         }
     }

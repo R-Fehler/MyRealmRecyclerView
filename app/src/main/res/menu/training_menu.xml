@@ -13,6 +13,10 @@
             android:title="Notizen ausblenden"
             app:showAsAction="never"
             />
-
+        <item
+            android:id="@+id/action_training_delete"
+            android:title="Delete"
+            app:showAsAction="never"
+            />
     </group>
 </menu>

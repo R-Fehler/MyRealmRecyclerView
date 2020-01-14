@@ -68,12 +68,12 @@ open class Exercise : RealmObject() {
             }
             return "[${knownExercise?.user_custom_id}] ${knownExercise?.name} : $text"
         }
-        else {
+        else if(sets.size==1) {
             text += "${sets[0]?.weight}kg:${sets[0]?.reps}"
             return "[${knownExercise?.user_custom_id}] ${knownExercise?.name} : $text"
         }
+        else
 
-
-        return ""
+        return "[${knownExercise?.user_custom_id}] ${knownExercise?.name} :"
     }
 }

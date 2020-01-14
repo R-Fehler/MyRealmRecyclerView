@@ -97,6 +97,7 @@ class ExerciseSetAdapter(data: OrderedRealmCollection<ExerciseSet>) :
 
         holder.checkBox.setOnClickListener {
             realm?.executeTransaction{ holder.data?.isDone = holder.checkBox.isChecked }
+
             if (holder.checkBox.isChecked){
                 holder.weightEditText.isEnabled=false
                 holder.repsEditText.isEnabled=false

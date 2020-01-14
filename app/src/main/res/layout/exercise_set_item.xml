@@ -43,7 +43,14 @@ android:weightSum="1"
             android:textAlignment="center"
             />
 
-        <EditText
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="/"
+        android:textSize="16dp"/>
+
+
+    <EditText
             android:id="@+id/editTextView_reps"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

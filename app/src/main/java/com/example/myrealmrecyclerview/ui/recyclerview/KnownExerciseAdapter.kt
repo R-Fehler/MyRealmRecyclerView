@@ -11,8 +11,9 @@ import com.example.myrealmrecyclerview.R
 import com.example.myrealmrecyclerview.model.KnownExercise
 import io.realm.OrderedRealmCollection
 import io.realm.RealmRecyclerViewAdapter
-import java.util.HashSet
-
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.math.max
 
 
 class KnownExerciseAdapter(data: OrderedRealmCollection<KnownExercise>) :
@@ -46,6 +47,21 @@ class KnownExerciseAdapter(data: OrderedRealmCollection<KnownExercise>) :
         holder.knownExerciseName.text = knownExercise?.name.toString()
         holder.user_custom_id.text = knownExercise?.user_custom_id.toString()
         holder.doneInTextView.text=knownExercise?.doneInExercises?.size.toString()
+        var maxWeight=0
+        var maxReps=0
+        var maxDate: Date = Date()
+        for(ex in knownExercise?.doneInExercises!!){
+            for(set in ex.sets){
+                if(maxWeight<set.weight){
+                maxWeight=set.weight
+                maxReps=set.reps
+                    maxDate=ex.date
+                }
+            }
+        }
+        val dateformatted=SimpleDateFormat("EEE, d MMM yyyy").format(maxDate)
+        val textPR="$dateformatted : $maxWeight kg / $maxReps "
+        holder.prWeightTextVew.text=textPR
     }
 
     interface OnItemClickListener {
@@ -61,6 +77,7 @@ class KnownExerciseAdapter(data: OrderedRealmCollection<KnownExercise>) :
         val knownExerciseName: TextView = itemView.findViewById(R.id.knownExerciseRV_Name)
         var data: KnownExercise? = null
         val doneInTextView: TextView = itemView.findViewById(R.id.doneInNumber_TextView)
+        val prWeightTextVew: TextView =itemView.findViewById(R.id.PRWeightKnown_TextView)
         init {
             itemView.setOnClickListener {
                 val position = adapterPosition

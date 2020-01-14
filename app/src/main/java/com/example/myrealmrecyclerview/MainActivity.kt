@@ -48,32 +48,29 @@ class MainActivity : AppCompatActivity() {
     companion object{
         val REQUESTCSVCODE=0
     }
-
-    inner class TouchHelperCallback internal constructor() :
-        ItemTouchHelper.SimpleCallback(
-            ItemTouchHelper.UP or ItemTouchHelper.DOWN,
-            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
-        ) {
-
-        override fun onMove(
-            recyclerView: RecyclerView,
-            viewHolder: RecyclerView.ViewHolder,
-            target: RecyclerView.ViewHolder
-        ): Boolean {
-            return true
-        }
-
-        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-            Toast.makeText(this@MainActivity, "deleted", Toast.LENGTH_SHORT).show()
-            realm?.let { DataHelper.deleteTraining(it, viewHolder.itemId) }
-            adapter?.updateData(adapter?.data)
-
-        }
-
-        override fun isLongPressDragEnabled(): Boolean {
-            return true
-        }
-    }
+//
+//    inner class TouchHelperCallback internal constructor() :
+//        ItemTouchHelper.SimpleCallback(
+//            ItemTouchHelper.UP or ItemTouchHelper.DOWN,
+//            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+//        ) {
+//
+//        override fun onMove(
+//            recyclerView: RecyclerView,
+//            viewHolder: RecyclerView.ViewHolder,
+//            target: RecyclerView.ViewHolder
+//        ): Boolean {
+//            return true
+//        }
+//
+//        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+//
+//        }
+//
+//        override fun isLongPressDragEnabled(): Boolean {
+//            return true
+//        }
+//    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -311,9 +308,9 @@ class MainActivity : AppCompatActivity() {
         recyclerView!!.setHasFixedSize(false)
 
 
-        val touchHelperCallback = TouchHelperCallback()
-        val touchHelper = ItemTouchHelper(touchHelperCallback)
-        touchHelper.attachToRecyclerView(recyclerView)
+//        val touchHelperCallback = TouchHelperCallback()
+//        val touchHelper = ItemTouchHelper(touchHelperCallback)
+//        touchHelper.attachToRecyclerView(recyclerView)
     }
 
     fun getCSVFileForImport() {

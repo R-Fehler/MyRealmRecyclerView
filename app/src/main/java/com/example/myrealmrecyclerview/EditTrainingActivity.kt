@@ -82,7 +82,6 @@ class EditTrainingActivity : AppCompatActivity() {
 
 
         fab.setOnClickListener { view ->
-            ///TODO SAVE TRAINING
             realm?.let {
 
                 val intent= Intent(this@EditTrainingActivity,KnownExerciseListActivity::class.java)
@@ -91,8 +90,6 @@ class EditTrainingActivity : AppCompatActivity() {
 
 
 
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
         }
         setUpRecyclerView()
     }
@@ -115,13 +112,7 @@ class EditTrainingActivity : AppCompatActivity() {
         )!!.findFirst()?.exercises?.let { ExercisesRecyclerViewAdapter(it) }
         adapter!!.setOnItemClickListener(object : ExercisesRecyclerViewAdapter.OnItemClickListener {
             override fun onItemClick(exercise: Exercise) {
-//                var intent = Intent(baseContext, EditTrainingActivity::class.java)
-//                intent.putExtra(EditTrainingActivity.TRAINING_ID, training.uuid)
-//
-//
-//                startActivityForResult(intent,1)
-                // TODO add new Set to Exercise
-                Toast.makeText(this@EditTrainingActivity, "next Activity", Toast.LENGTH_SHORT).show()
+
             }
         })
         adapter!!.setAddClickListener(object : ExercisesRecyclerViewAdapter.OnAddClickListener {
@@ -157,7 +148,7 @@ class EditTrainingActivity : AppCompatActivity() {
                 super.onScrolled(recyclerView, dx, dy)
 
 
-                if (dy > 0) {
+                if (dy >20) {
                     nameOfTrainingEditText.visibility = View.GONE
                 } else {
                     nameOfTrainingEditText.visibility = View.VISIBLE

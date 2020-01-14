@@ -17,6 +17,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myrealmrecyclerview.MainActivity
 import com.example.myrealmrecyclerview.R
+import com.example.myrealmrecyclerview.model.DataHelper
 import com.example.myrealmrecyclerview.model.Training
 import io.realm.OrderedRealmCollection
 import io.realm.Realm
@@ -107,6 +108,10 @@ class TrainingRecyclerViewAdapter(data: OrderedRealmCollection<Training>) :
                     holder.notes.visibility=View.GONE
                     holder.notesHeader.visibility=View.GONE
 
+                }
+                R.id.action_training_delete ->{
+                    realm?.let { it1 -> holder.data?.uuid?.let { it2 -> DataHelper.deleteTraining(it1, it2) } }
+                    this.updateData(data)
                 }
             }
 
