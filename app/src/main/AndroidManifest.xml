@@ -2,47 +2,44 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.strong_weightlifting.strength_tracker_app">
 
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
     <application
-        android:name="com.strong_weightlifting.strength_tracker_app.MyApplication"
+        android:name=".MyApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
-
+        <activity android:name=".KnownExerciseOverviewActivity"></activity>
         <activity
-            android:name="com.strong_weightlifting.strength_tracker_app.ChangeKnownExerciseActivity"
+            android:name=".ChangeKnownExerciseActivity"
             android:label="@string/title_activity_change_known_exercise"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme" />
         <activity
-            android:name="com.strong_weightlifting.strength_tracker_app.KnownExerciseListActivity"
+            android:name=".KnownExerciseListActivity"
             android:label="@string/title_activity_known_exercise_list"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.strong_weightlifting.strength_tracker_app.EditTrainingActivity"
+            android:name=".EditTrainingActivity"
             android:label="@string/title_activity_edit_training"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
-            android:name="com.strong_weightlifting.strength_tracker_app.EditTextActivity"
+            android:name=".EditTextActivity"
             android:label="@string/title_activity_EditText"
-            android:theme="@style/AppTheme"/>
-        
-        <activity android:name="com.strong_weightlifting.strength_tracker_app.MainActivity">
+            android:theme="@style/AppTheme" />
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
-                <action android:name="android.intent.action.ATTACH_DATA"/>
-
+                <action android:name="android.intent.action.ATTACH_DATA" />
             </intent-filter>
             <intent-filter>
-                <action android:name="android.intent.action.VIEW">
-
-                </action>
+                <action android:name="android.intent.action.VIEW"></action>
             </intent-filter>
         </activity>
     </application>

@@ -23,7 +23,7 @@ class ExercisesRecyclerViewAdapter(data: OrderedRealmCollection<Exercise>) :
 
     inner class TouchHelperCallback internal constructor() :
         ItemTouchHelper.SimpleCallback(
-            ItemTouchHelper.UP or ItemTouchHelper.DOWN,
+            0,
             ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
         ) {
 

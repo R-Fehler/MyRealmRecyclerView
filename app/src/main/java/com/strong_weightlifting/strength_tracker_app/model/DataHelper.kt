@@ -4,9 +4,11 @@ import io.realm.Realm
 
 class DataHelper {
     companion object{
-        fun addTraining(realm: Realm){
-//            val realm:Realm=Realm.getDefaultInstance()
-            realm.executeTransaction { Training.create(it) }
+        fun addTraining(realm: Realm): Training? {
+            var training: Training?=null
+            realm.executeTransaction {training = Training.create(it) }
+            return training
+            // TODO return training for import
 //            realm.close()
         }
 

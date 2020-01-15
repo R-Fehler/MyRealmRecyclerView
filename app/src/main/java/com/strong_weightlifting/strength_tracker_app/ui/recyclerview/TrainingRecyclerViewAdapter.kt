@@ -70,7 +70,6 @@ class TrainingRecyclerViewAdapter(data: OrderedRealmCollection<Training>) :
         val matcher=pattern.matcher(text)
         val str=SpannableStringBuilder(text)
         while(matcher.find()){
-            Log.d("matcher","Test start: ${matcher.start()}")
             str.setSpan(StyleSpan(android.graphics.Typeface.BOLD),matcher.start(),matcher.end(), Spanned.SPAN_INCLUSIVE_INCLUSIVE)
         }
 

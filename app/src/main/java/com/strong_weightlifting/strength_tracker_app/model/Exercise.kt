@@ -35,6 +35,18 @@ open class Exercise : RealmObject() {
             exercises?.add(exercise)
             return primary
         }
+
+        fun createWithReturn(realm: Realm, trainingID: Long): Exercise? {
+            val exercises = realm.where(Training::class.java).equalTo(FIELD_UUID,trainingID).findFirst()?.exercises
+
+            val maxid = realm.where(Exercise::class.java).findAll()?.max(FIELD_UUID)?.toLong()
+            maxid?.let { INTEGER_COUNTER.set(it+1) }
+            val primary= increment()
+            val exercise =realm.createObject(Exercise::class.java, primary)
+            exercises?.add(exercise)
+            return exercise
+        }
+
         fun delete(realm: Realm, uuid: Long){
             val exercise =realm.where(Exercise::class.java).equalTo(FIELD_UUID,uuid).findFirst()
             exercise?.sets?.deleteAllFromRealm()

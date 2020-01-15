@@ -13,7 +13,7 @@ open class Training : RealmObject() {
     var notes: String = ""
     var name: String = ""
     var date: Date = Date()
-    var year: Int = Calendar.getInstance().get(Calendar.YEAR) -1900
+    var year: Int = Calendar.getInstance().get(Calendar.YEAR)
     var month: Int = Calendar.getInstance().get(Calendar.MONTH)
     //duration, location, time, blabla
     var exercises: RealmList<Exercise> = RealmList()

@@ -26,12 +26,13 @@ open class KnownExercise: RealmObject() {
         const val FIELD_UUID="uuid"
         private val INTEGER_COUNTER = AtomicLong(0)
 
-        fun create(realm: Realm,name:String ,user_custom_id: Int){
+        fun create(realm: Realm,name:String ,user_custom_id: Int): KnownExercise? {
             val maxid:Long? =realm.where(KnownExercise::class.java).max(FIELD_UUID)?.toLong()
             maxid?.let { KnownExercise.INTEGER_COUNTER.set(it+1) }
             val knownExercise=realm.createObject(KnownExercise::class.java,increment())
             knownExercise.name=name
             knownExercise.user_custom_id=user_custom_id
+            return knownExercise
         }
         fun addToExercise(realm: Realm, exerciseID : Long, knownExerciseID: Long){
             val exercise = realm.where(Exercise::class.java).equalTo(Exercise.FIELD_UUID,exerciseID).findFirst()
