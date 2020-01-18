@@ -49,7 +49,7 @@ class KnownExerciseAdapter(data: OrderedRealmCollection<KnownExercise>) :
         var maxDate: Date = Date()
         for(ex in knownExercise?.doneInExercises!!){
             for(set in ex.sets){
-                if(maxWeight<set.weight && set.isDone){
+                if(maxWeight<set.weight && set.isDone &&set.reps>0){
                 maxWeight=set.weight
                 maxReps=set.reps
                     maxDate=ex.date

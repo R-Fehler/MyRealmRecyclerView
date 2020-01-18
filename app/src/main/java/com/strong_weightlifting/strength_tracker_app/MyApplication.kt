@@ -28,9 +28,14 @@ class MyApplication : Application() {
         super.onCreate()
         Realm.init(this)
         val realmConfig = RealmConfiguration.Builder()
+            .name("com.strong_weightlifting.strength_tracker_app.default_realm")
             .initialData { realm -> realm.createObject(MasterParent::class.java) }
+            .migration(MyMigration())
+//            .deleteRealmIfMigrationNeeded()
+            .schemaVersion(1)
             .build()
-        Realm.deleteRealm(realmConfig) // Delete Realm between app restarts.
+
+//        Realm.deleteRealm(realmConfig) // Delete Realm between app restarts.
         Realm.setDefaultConfiguration(realmConfig)
     }
 }

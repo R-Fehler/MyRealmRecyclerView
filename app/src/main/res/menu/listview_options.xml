@@ -20,5 +20,10 @@
             android:title="importiere Strong CSV"
             app:showAsAction="never"
             />
+        <item
+            android:id="@+id/action_importOldTrainingCSV"
+            android:title="import Excel CSV File"
+            app:showAsAction="never"
+            />
     </group>
 </menu>

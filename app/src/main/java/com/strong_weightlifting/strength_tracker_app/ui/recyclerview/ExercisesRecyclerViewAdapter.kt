@@ -140,7 +140,10 @@ class ExercisesRecyclerViewAdapter(data: OrderedRealmCollection<Exercise>) :
         holder.user_custom_id.text = idText
 
         holder.notes.text=holder.data?.notes
-
+        if (holder.data?.notes.isNullOrBlank()){
+            holder.notes.visibility=View.GONE
+            holder.notesHeader.visibility=View.GONE
+        }
 
         val popup = PopupMenu(holder.itemView.context, holder.menu)
         popup.inflate(R.menu.exercise_menu)

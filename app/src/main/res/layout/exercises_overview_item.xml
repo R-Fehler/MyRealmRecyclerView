@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_marginStart="4dp"
+    android:layout_marginEnd="4dp"
+    android:layout_marginTop="4dp"
+    android:layout_marginBottom="4dp"
+    android:nestedScrollingEnabled="false">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="8dp">
+
+        <TextView
+            android:id="@+id/exerciseOverViewDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:text="Mon 12.12.2020 18:00"
+            android:textAlignment="viewStart"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorAccent"/>
+
+        <TextView
+            android:id="@+id/exerciseOverViewItemOptions"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:paddingEnd="10dp"
+            android:text="&#8942;"
+            android:textAlignment="textEnd"
+            android:textAppearance="?android:textAppearanceLarge"
+            android:textColor="@color/colorAccent"/>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/notesExerciseOverViewHeader"
+            android:paddingStart="16dp"
+            android:paddingEnd="0dp"
+            android:text="@string/notesHeader"
+            android:visibility="gone"
+            android:layout_below="@+id/exerciseOverViewDate" />
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/ExerciseOverViewNotesTextView"
+            android:layout_below="@+id/exerciseOverViewDate"
+            android:paddingStart="0dp"
+            android:paddingEnd="16dp"
+            android:layout_marginTop="5dp"
+            android:layout_alignBaseline="@+id/notesExerciseOverViewHeader"
+            android:visibility="gone"
+            android:layout_toEndOf="@+id/notesExerciseOverViewHeader" />
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/exerciseOverViewRV"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ExerciseOverViewNotesTextView"
+            tools:listitem="@layout/exercise_overview_set_item"/>
+
+
+
+
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>

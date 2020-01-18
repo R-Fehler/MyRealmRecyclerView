@@ -119,9 +119,11 @@ class EditTrainingActivity : AppCompatActivity() {
         })
         adapter!!.setOnNameClickListener(object : ExercisesRecyclerViewAdapter.OnNameClickListener {
             override fun onNameClick(exercise: Exercise) {
-                val intent = Intent(this@EditTrainingActivity, KnownExerciseListActivity::class.java)
-                intent.putExtra(EXERCISE_ID, exercise.uuid)
-                startActivityForResult(intent, KnownExerciseListActivity.CHANGEKNOWNEXERCISE)
+                val overviewIntent = Intent(this@EditTrainingActivity, KnownExerciseOverviewActivity::class.java)
+                overviewIntent.putExtra(KNOWNEXERCISE_ID, exercise.knownExercise?.uuid)
+                startActivity(overviewIntent)
+//                intent.putExtra(EXERCISE_ID, exercise.uuid)
+//                startActivityForResult(intent, KnownExerciseListActivity.CHANGEKNOWNEXERCISE)
             }
         })
 

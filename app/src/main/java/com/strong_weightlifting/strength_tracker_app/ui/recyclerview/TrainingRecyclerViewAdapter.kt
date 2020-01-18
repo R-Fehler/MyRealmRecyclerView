@@ -90,6 +90,11 @@ class TrainingRecyclerViewAdapter(data: OrderedRealmCollection<Training>) :
                 }
             }
         }
+
+        if (holder.data?.notes.isNullOrBlank()){
+            holder.notes.visibility=View.GONE
+            holder.notesHeader.visibility=View.GONE
+        }
         val popup= PopupMenu(holder.itemView.context,holder.menu)
         popup.inflate(R.menu.training_menu)
         popup.setOnMenuItemClickListener {

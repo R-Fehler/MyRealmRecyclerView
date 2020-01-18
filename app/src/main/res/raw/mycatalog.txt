@@ -1,0 +1,50 @@
+1	:Reißen
+2	:Reißen mit Bänder
+3	:Stoßen
+4	:Umsetzen
+5	:Ausstoßen
+6	:Reißen erhöhte Position
+7	:Standreißen
+8	:Umgruppieren breit
+9	:Umsetzen erhöhte Position
+10	:Standumsetzen
+11	:Umgruppieren eng
+12	:Standstoßen
+13	:Zug breit
+14	:Zug eng
+15	:Lastheben breit
+16	:Lastheben eng
+17	:Anstoßkniebeuge
+18	:Reißkniebeuge
+19	:Kniebeuge vorn
+20	:Kniebeuge hinten
+21	:Halbkniebeuge
+22	:Powerzug breit
+23	:Kraftreißen
+24	:Powerzug eng
+25	:Kraftdrücken
+26	:Schwungdrücken
+27	:Umsetzen + Kniebeuge vorn
+28	:Standumsetzen + Standstoßen
+29	:Kniebeuge v.+ Ausstoßen
+30	:Nackendrücken
+31	:Bankdrücken
+32	:Beugestütz
+33	:Klimmzug
+36	:Zug im Liegen
+37	:Bauchmuskel
+43	:Delta
+59	:Turkish Getup
+60	:Langhantelrudern
+61	:KB Kraftdrücken
+62	:Bizeps Curl LH
+63	:Kurzhantelrudern
+64	:Facepulls
+65	:Rear Delt Fly
+66	:LH Shrugs
+67	:Skullcrusher
+68	:Hyperextension
+69	:Hockesenken
+70	:Plank
+71	:KB Swing
+72	:Good Morning
