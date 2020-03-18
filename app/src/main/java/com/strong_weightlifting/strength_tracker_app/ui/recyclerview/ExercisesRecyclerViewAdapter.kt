@@ -16,6 +16,7 @@ import io.realm.OrderedRealmCollection
 import io.realm.Realm
 import io.realm.RealmRecyclerViewAdapter
 import java.util.*
+import kotlin.math.roundToInt
 
 class ExercisesRecyclerViewAdapter(data: OrderedRealmCollection<Exercise>) :
     RealmRecyclerViewAdapter<Exercise, ExercisesRecyclerViewAdapter.MyViewHolder>(data, false) {
@@ -113,7 +114,11 @@ class ExercisesRecyclerViewAdapter(data: OrderedRealmCollection<Exercise>) :
         val exercise = getItem(position)
         holder.data = exercise
         val itemUUID = exercise?.uuid
-
+        val prWeight=holder.data?.prWeightAtTheMoment
+        val prReps = holder.data?.repsAtPRWeightAtTheMoment
+        val calculatedPR=holder.data?.prCalculatedAtTheMoment
+        var txt="$prWeight kg/$prReps --> ${calculatedPR?.roundToInt()} kg 1RM"
+        holder.prOverView.text=txt
 
         //Child ExerciseSet RV
 
@@ -186,6 +191,7 @@ class ExercisesRecyclerViewAdapter(data: OrderedRealmCollection<Exercise>) :
         val menu: TextView = itemView.findViewById(R.id.exerciseItemOptions)
         val notesHeader: TextView = itemView.findViewById(R.id.notesExerciseHeader)
         val notes: TextView = itemView.findViewById(R.id.ExerciseNotesTextView)
+        val prOverView: TextView = itemView.findViewById(R.id.PRsTextView)
 
         init {
             itemView.setOnClickListener {

@@ -28,9 +28,9 @@
             android:textStyle="normal" />
 
         <TextView
+            android:id="@+id/nameOfTraining_TextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/nameOfTraining_TextView"
             android:textStyle="bold"
             android:layout_below="@+id/date"
             android:textSize="12sp"
@@ -59,35 +59,38 @@
             android:text="&#8942;"
             android:textAlignment="textEnd"
             android:textAppearance="?android:textAppearanceLarge"
-            android:textColor="@color/colorAccent"/>
+            android:textColor="@color/colorAccent" />
 
         <TextView
+            android:id="@+id/notesTrainingHeader"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/notesTrainingHeader"
             android:paddingStart="16dp"
             android:paddingEnd="0dp"
             android:text="@string/notesHeader"
+            android:textSize="10sp"
             android:visibility="gone"
             android:layout_below="@+id/nameOfTraining_TextView" />
 
         <TextView
+            android:id="@+id/trainingNotesTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/trainingNotesTextView"
             android:layout_below="@+id/nameOfTraining_TextView"
-            android:paddingStart="0dp"
+            android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            android:layout_marginTop="5dp"
-            android:visibility="gone"
+            android:layout_marginTop="0dp"
+            android:visibility="visible"
+            android:textSize="10sp"
+            android:text="test"
             android:layout_alignBaseline="@+id/notesTrainingHeader"
             android:layout_toEndOf="@+id/notesTrainingHeader" />
 
 
         <TextView
+            android:id="@+id/description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/description"
             android:gravity="center_vertical"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
@@ -96,7 +99,7 @@
             android:layout_below="@+id/trainingNotesTextView"
             android:text="Squat 100:4/4/4 110:4/4/4/4"
 
-            android:layout_marginTop="10dp" />
+            android:layout_marginTop="0dp" />
 
     </RelativeLayout>
 

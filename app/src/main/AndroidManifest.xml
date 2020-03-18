@@ -3,6 +3,7 @@
     package="com.strong_weightlifting.strength_tracker_app">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:name=".MyApplication"
@@ -35,8 +36,11 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
             <intent-filter>
-                <action android:name="android.intent.action.ATTACH_DATA" />
+                <action android:name="android.intent.action.SEND"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="text/csv"/>
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"></action>

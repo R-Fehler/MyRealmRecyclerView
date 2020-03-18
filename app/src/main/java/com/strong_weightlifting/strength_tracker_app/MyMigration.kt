@@ -2,6 +2,7 @@ package com.strong_weightlifting.strength_tracker_app
 
 import io.realm.DynamicRealm
 import io.realm.RealmMigration
+import java.util.*
 
 
 class MyMigration : RealmMigration {
@@ -49,5 +50,34 @@ class MyMigration : RealmMigration {
 ////                .addRealmListField("dogs", schema.get("Dog"))
 //            oldVersion++
 //        }
+
+        if(oldVersion==1L){
+            schema.get("KnownExercise")!!
+                .addField("temp_key", Double::class.javaPrimitiveType)
+                .transform{
+                    apply {
+                        it.setDouble("temp_key",it.getInt("prCalculated").toDouble())
+                    }
+                }
+                .removeField("prCalculated")
+                .renameField("temp_key","prCalculated")
+
+        }
+
+        if(oldVersion==2L){
+            schema.get("KnownExercise")!!
+                .addField("dateOfPR", Date::class.java)
+
+//            var prWeightAtTheMoment: Int = 0 //true max Weight lifted
+//            var repsAtPRWeightAtTheMoment: Int = 0 // No of Reps at max Weight lifted
+//            var prCalculatedAtTheMoment: Double= 0.0 // calculated 1RM for Training Programming and Progress metric
+
+            schema.get("Exercise")!!
+                .addField("prWeightAtTheMoment",Int::class.javaPrimitiveType)
+                .addField("repsAtPRWeightAtTheMoment",Int::class.javaPrimitiveType)
+                .addField("prCalculatedAtTheMoment",Double::class.javaPrimitiveType)
+                oldVersion++
+        }
+
     }
 }

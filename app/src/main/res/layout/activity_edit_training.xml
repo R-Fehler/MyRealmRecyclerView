@@ -33,6 +33,18 @@
             android:hint="Name des Trainings"
             app:layout_scrollFlags="scroll|enterAlways"
  />
+        <EditText
+            android:id="@+id/notesOfTrainingEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:inputType="textCapSentences"
+            android:imeOptions="actionDone"
+            android:hint="Notizen"
+            app:layout_scrollFlags="scroll|enterAlways"
+            />
 
     </com.google.android.material.appbar.AppBarLayout>
 

@@ -15,14 +15,29 @@
             android:icon="@drawable/ic_search_white_24dp"
             app:showAsAction="ifRoom"
             />
+<!--        <item-->
+<!--            android:id="@+id/action_importCSV"-->
+<!--            android:title="importiere Strong CSV"-->
+<!--            app:showAsAction="never"-->
+<!--            />-->
+<!--        <item-->
+<!--            android:id="@+id/action_importOldTrainingCSV"-->
+<!--            android:title="import Excel CSV File"-->
+<!--            app:showAsAction="never"-->
+<!--            />-->
         <item
-            android:id="@+id/action_importCSV"
-            android:title="importiere Strong CSV"
+            android:id="@+id/action_delete_all_realm_data"
+            android:title="delete all Data"
             app:showAsAction="never"
             />
         <item
-            android:id="@+id/action_importOldTrainingCSV"
-            android:title="import Excel CSV File"
+            android:id="@+id/action_backup_realm_file"
+            android:title="Backup Realm Database"
+            app:showAsAction="never"
+            />
+        <item
+            android:id="@+id/action_import_realm_file"
+            android:title="Import Backup Realm DB"
             app:showAsAction="never"
             />
     </group>

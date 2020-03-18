@@ -14,6 +14,7 @@ import com.strong_weightlifting.strength_tracker_app.model.ExerciseSet
 import io.realm.OrderedRealmCollection
 import io.realm.Realm
 import io.realm.RealmRecyclerViewAdapter
+import kotlin.math.roundToInt
 
 class ExerciseSetAdapter(data: OrderedRealmCollection<ExerciseSet>) :
     RealmRecyclerViewAdapter<ExerciseSet, ExerciseSetAdapter.MyViewHolder>(data, false) {
@@ -62,6 +63,13 @@ class ExerciseSetAdapter(data: OrderedRealmCollection<ExerciseSet>) :
         val prevtxt="$prevWeight kg / $prevReps "
         holder.prev.text=prevtxt
 
+      updateEpley(holder)
+
+//            (holder.data?.doneInExercises?.first()?.knownExercise?.prCalculated?.let {
+//            holder.data?.weight?.toDouble()?.div(
+//                it
+//            )
+//        }).roundToInt().toString()
         val weightString = holder.data?.weight.toString()
         val repsString = holder.data?.reps.toString()
 
@@ -73,7 +81,8 @@ class ExerciseSetAdapter(data: OrderedRealmCollection<ExerciseSet>) :
             override fun afterTextChanged(s: Editable?) {
                 if(!s.isNullOrEmpty()) {
                     if (s.toString() != holder.data?.weight.toString()) {
-                        realm?.executeTransaction { holder.data?.weight = holder.weightEditText.text.toString().trim().toInt() }
+                        realm?.executeTransaction { holder.data?.weight = holder.weightEditText.text.toString().trim().toInt()}
+                       updateEpley(holder)
                     }
                 }
             }
@@ -85,6 +94,7 @@ class ExerciseSetAdapter(data: OrderedRealmCollection<ExerciseSet>) :
                 if(!s.isNullOrEmpty()) {
                     if (s.toString() != holder.data?.reps.toString()) {
                         realm?.executeTransaction { holder.data?.reps = holder.repsEditText.text.toString().trim().toInt() }
+                        updateEpley(holder)
                     }
                 }
             }
@@ -111,12 +121,20 @@ class ExerciseSetAdapter(data: OrderedRealmCollection<ExerciseSet>) :
 
     }
 
+    private fun updateEpley(holder: MyViewHolder) {
+        val prCalculated=holder.data?.doneInExercises?.first()?.prCalculatedAtTheMoment
+        val epley=ExerciseSet.epleyValue(holder.data!!)
+        val percentage= (epley.times(100.0)).div(prCalculated!!)
+        holder.percentageOfRM.text= percentage.roundToInt().toString().plus(" %")
+    }
+
     inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val repsEditText: EditText = itemView.findViewById(R.id.editTextView_reps)
         val weightEditText: EditText = itemView.findViewById(R.id.editTextView_weight)
         var data: ExerciseSet? = null
         val checkBox: CheckBox=itemView.findViewById(R.id.set_done_checkbox)
         val prev: TextView=itemView.findViewById(R.id.previousSet_TextView)
+        val percentageOfRM: TextView=itemView.findViewById(R.id.percentage_of_EpleyRM)
         fun save(set:ExerciseSet){
             realm?.executeTransaction { set.weight = weightEditText.text.toString().toInt() }
             realm?.executeTransaction { set.reps = repsEditText.text.toString().toInt() }

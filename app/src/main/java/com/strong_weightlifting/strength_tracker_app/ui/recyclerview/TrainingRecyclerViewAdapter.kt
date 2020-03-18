@@ -91,18 +91,19 @@ class TrainingRecyclerViewAdapter(data: OrderedRealmCollection<Training>) :
             }
         }
 
-        if (holder.data?.notes.isNullOrBlank()){
-            holder.notes.visibility=View.GONE
-            holder.notesHeader.visibility=View.GONE
-        }
+//        if (holder.notes.text.isNullOrBlank()){
+//            holder.notes.visibility=View.GONE
+//            holder.notesHeader.visibility=View.GONE
+//        }
+
         val popup= PopupMenu(holder.itemView.context,holder.menu)
         popup.inflate(R.menu.training_menu)
         popup.setOnMenuItemClickListener {
             val id=it.itemId
             when(id) {
                 R.id.action_training_addNote -> {
-                    holder.notes.visibility=View.VISIBLE
-                    holder.notesHeader.visibility=View.VISIBLE
+//                    holder.notes.visibility=View.VISIBLE
+//                    holder.notesHeader.visibility=View.VISIBLE
 
                     onNoteListener?.onNotesEdit(holder.data!!)
 
@@ -110,7 +111,7 @@ class TrainingRecyclerViewAdapter(data: OrderedRealmCollection<Training>) :
                 }
                 R.id.action_training_remove_addNote ->{
                     holder.notes.visibility=View.GONE
-                    holder.notesHeader.visibility=View.GONE
+//                    holder.notesHeader.visibility=View.GONE
 
                 }
                 R.id.action_training_delete ->{

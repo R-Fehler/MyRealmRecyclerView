@@ -121,7 +121,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
+        android:visibility="visible"
         android:layout_margin="@dimen/fab_margin"
         app:srcCompat="@drawable/ic_add_white_24dp"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/resume_Training_FAB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        android:backgroundTint="@android:color/holo_orange_dark"
+        app:srcCompat="@drawable/ic_arrow_forward_white_24dp"
+        android:visibility="gone"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

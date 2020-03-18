@@ -52,6 +52,9 @@ class DataHelper {
         fun changeKnownExercise(realm: Realm, knownExerciseUUID: Long, name: String, id: Int) {
         realm.executeTransaction { KnownExercise.changeNameAndID(it,knownExerciseUUID,name,id) }
         }
+        fun deleteKnownExerciseSafely(realm: Realm,knownExerciseUUID: Long){
+            realm.executeTransaction{KnownExercise.deleteSafely(realm,knownExerciseUUID)}
+        }
 
         fun setNotesToTraining(realm:Realm, uuid: Long, notes:String){
             realm.executeTransaction { Training.setNote(it,uuid,notes) }
@@ -59,6 +62,14 @@ class DataHelper {
 
         fun setNotesToExercise(realm: Realm,uuid: Long,notes:String){
             realm.executeTransaction {  Exercise.setNote(it,uuid,notes)}
+        }
+        fun deleteAllData(realm: Realm) {
+            realm.executeTransaction {
+                realm.deleteAll()
+            }
+            realm.executeTransaction {
+            realm.createObject(MasterParent::class.java)
+        }
         }
 
         //TODO delete Exer und Sets

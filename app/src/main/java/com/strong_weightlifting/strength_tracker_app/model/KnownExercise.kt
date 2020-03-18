@@ -5,6 +5,7 @@ import io.realm.RealmObject
 import io.realm.RealmResults
 import io.realm.annotations.LinkingObjects
 import io.realm.annotations.PrimaryKey
+import java.util.*
 import java.util.concurrent.atomic.AtomicLong
 
 open class KnownExercise: RealmObject() {
@@ -13,11 +14,12 @@ open class KnownExercise: RealmObject() {
     var name: String = ""
     var user_custom_id: Int = 0
     var category: String=""
-    var prWeight: Int = 0
-    var repsAtPRWeight: Int = 0
-    var prCalculated: Int= 0
+    var prWeight: Int = 1 //true max Weight lifted
+    var repsAtPRWeight: Int = 1 // No of Reps at max Weight lifted
+    var prCalculated: Double= 1.0 // calculated 1RM for Training Programming and Progress metric
+    var dateOfPR: Date? = null
     @LinkingObjects("knownExercise")
-    val doneInExercises: RealmResults<Exercise>?=null
+    val doneInExercises: RealmResults<Exercise>? = null
     var doneInExercisesSize:Int=0
 
 
@@ -38,11 +40,11 @@ open class KnownExercise: RealmObject() {
             val exercise = realm.where(Exercise::class.java).equalTo(Exercise.FIELD_UUID,exerciseID).findFirst()
             exercise?.knownExercise= realm.where(KnownExercise::class.java).equalTo(FIELD_UUID,knownExerciseID).findFirst()
             exercise?.knownExercise?.doneInExercisesSize=exercise?.knownExercise?.doneInExercises?.size!!
+            exercise.prWeightAtTheMoment= exercise.knownExercise!!.prWeight
+            exercise.repsAtPRWeightAtTheMoment=exercise.knownExercise!!.repsAtPRWeight
+            exercise.prCalculatedAtTheMoment=exercise.knownExercise!!.prCalculated
+
         }
-//        fun delete(realm: Realm, uuid: Long){
-//            val knownExercise =realm.where(KnownExercise::class.java).equalTo(FIELD_UUID,uuid).findFirst()
-//            knownExercise?.deleteFromRealm()
-//        }
         private fun increment(): Long {
             return INTEGER_COUNTER.getAndIncrement()
         }
@@ -51,6 +53,11 @@ open class KnownExercise: RealmObject() {
             val knownExercise=realm.where(KnownExercise::class.java).equalTo(FIELD_UUID,knownExerciseUUID).findFirst()
             knownExercise?.name=name
             knownExercise?.user_custom_id=id
+        }
+        fun deleteSafely(realm: Realm,knownExerciseUUID: Long){
+            val knownExercise=realm.where(KnownExercise::class.java).equalTo(FIELD_UUID,knownExerciseUUID).findFirst()
+            if(knownExercise?.doneInExercisesSize==0)
+                knownExercise.deleteFromRealm()
         }
     }
 }

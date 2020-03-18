@@ -17,6 +17,7 @@ import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
 import kotlinx.android.synthetic.main.activity_known_exercise_list.*
+import java.util.*
 
 class KnownExerciseListActivity : AppCompatActivity() {
 
@@ -76,10 +77,20 @@ class KnownExerciseListActivity : AppCompatActivity() {
             }
         })
         add_KnownExercise_btn.setOnClickListener {
-            val name=search_KnownEx_Name_editTxt.text.toString().trim().toUpperCase()
+            val name=search_KnownEx_Name_editTxt.text.toString().trim().toUpperCase(Locale.getDefault())
             val idd=search_KnownEx_ID_editTxt.text.toString().trim()
-            if(!name.isNullOrBlank() && !idd.isNullOrBlank()) {
-                val id=idd.toInt()
+            var id=0
+            val nextID = allKnownExercises!!.max("user_custom_id")?.toInt()?.plus(1)
+            if(!name.isBlank()) {
+
+                if(idd.isBlank()){
+
+                    nextID?.let {
+                        id=it
+                    }
+                }
+
+                 else id= idd.toInt()
 
                 val existingID = allKnownExercises!!.find { it.user_custom_id == id }
                 val existingName = allKnownExercises!!.find { it.name == name }
@@ -89,16 +100,26 @@ class KnownExerciseListActivity : AppCompatActivity() {
 
                     } else {
                         Snackbar.make(findViewById(R.id.search_fields), "ID schon vergeben", Snackbar.LENGTH_LONG)
-                            .setAction("Change") {
+                            .setAction("Change ID") {
+                                //TODO Replace by Longclick
                                 var intent = Intent(this, ChangeKnownExerciseActivity::class.java)
                                 intent.putExtra(EditTrainingActivity.KNOWNEXERCISE_ID, existingID.uuid)
                                 startActivity(intent)
-                            }.show()
+                            }.setAction("Auto ID: $nextID"){
+                                nextID?.let {
+                                    id=it.toInt()+1
+                                    search_KnownEx_ID_editTxt.text.clear()
+                                    search_KnownEx_ID_editTxt.text.append(id.toString())
+                                    realm?.let { DataHelper.createKnownExercise(it, name, id) }
+                                }
+                            }
+                            .show()
+
                     }
 
                 } else {
                     Snackbar.make(findViewById(R.id.search_fields), "Name schon vergeben", Snackbar.LENGTH_LONG)
-                        .setAction("Change") {
+                        .setAction("Change Name") {
                             var intent = Intent(this, ChangeKnownExerciseActivity::class.java)
                             intent.putExtra(EditTrainingActivity.KNOWNEXERCISE_ID, existingName.uuid)
                             startActivity(intent)
@@ -131,9 +152,13 @@ class KnownExerciseListActivity : AppCompatActivity() {
         if(isViewKnown){
             adapter!!.setOnItemClickListener(object: KnownExerciseAdapter.OnItemClickListener{
                 override fun onItemClick(knownExercise: KnownExercise) {
-                    var chooseIntent=Intent(this@KnownExerciseListActivity,ChangeKnownExerciseActivity::class.java)
-                    chooseIntent.putExtra(EditTrainingActivity.KNOWNEXERCISE_ID,knownExercise.uuid)
-                    startActivity(chooseIntent)
+//                    var chooseIntent=Intent(this@KnownExerciseListActivity,ChangeKnownExerciseActivity::class.java)
+//                    chooseIntent.putExtra(EditTrainingActivity.KNOWNEXERCISE_ID,knownExercise.uuid)
+//                    startActivity(chooseIntent)
+
+                    val overviewIntent = Intent(this@KnownExerciseListActivity, KnownExerciseOverviewActivity::class.java)
+                    overviewIntent.putExtra(EditTrainingActivity.KNOWNEXERCISE_ID, knownExercise.uuid)
+                    startActivity(overviewIntent)
                 }
             })
         }

@@ -8,5 +8,8 @@
     <string name="add_set">Add Set</string>
     <string name="title_activity_change_known_exercise">Change Name/ID of Exercise</string>
     <string name="title_activity_EditText">Notes</string>
-    <string name="notesHeader">Notes:</string>
+    <string name="notesHeader">Notes:&#160; </string>
+    <string name="KEY_PREFERENCE_FILE">com.strong_weightlifting.strength_tracker_app.PREFERENCE_FILE </string>
+    <string name="KEY_ACTIVE_TRAINING">com.strong_weightlifting.strength_tracker_app.KEY_ACTIVE_TRAINING </string>
+
 </resources>

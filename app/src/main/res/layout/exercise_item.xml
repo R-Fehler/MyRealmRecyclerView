@@ -82,12 +82,19 @@
             android:visibility="gone"
             android:layout_toEndOf="@+id/notesExerciseHeader" />
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/PRsTextView"
+                android:layout_below="@+id/exerciseName"
+                android:text="PRs:"
+                />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/exerciseSetRV"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/ExerciseNotesTextView" />
+            android:layout_below="@+id/PRsTextView" />
 
         <Button
             android:id="@+id/add_set_btn"

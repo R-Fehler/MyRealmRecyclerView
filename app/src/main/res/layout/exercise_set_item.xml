@@ -5,67 +5,69 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:gravity="end"
-android:weightSum="1"
-    >
+    android:weightSum="1">
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/btn_orderNumber_Warmup_DropSet"
         android:visibility="gone"
+        android:layout_weight="0.1" />
+
+
+    <TextView
+        android:id="@+id/previousSet_TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.3"
+        android:text="100 kg x 12 @ 9.5" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/percentage_of_EpleyRM"
         android:layout_weight="0.1"
-        />
+        android:text="80%" />
 
-
-
-
-        <TextView
-            android:id="@+id/previousSet_TextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.3"
-            android:text="100 kg x 12 @ 9.5" />
-
-        <EditText
-            android:id="@+id/editTextView_weight"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="6dp"
-            android:layout_marginTop="4dp"
-            android:layout_marginEnd="6dp"
-            android:layout_weight="0.25"
-            android:ems="3"
-            android:hint="kg"
-            android:imeOptions="actionNext"
-            android:inputType="number"
-            android:maxLines="1"
-            android:selectAllOnFocus="true"
-            android:textAlignment="center"
-            />
+    <EditText
+        android:id="@+id/editTextView_weight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="6dp"
+        android:layout_weight="0.25"
+        android:ems="3"
+        android:hint="kg"
+        android:imeOptions="actionNext"
+        android:inputType="number"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:textAlignment="center" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="/"
-        android:textSize="16dp"/>
+        android:textSize="16dp" />
 
 
     <EditText
-            android:id="@+id/editTextView_reps"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="6dp"
-            android:layout_marginTop="4dp"
-            android:layout_marginEnd="6dp"
-            android:layout_weight="0.25"
-            android:hint="rps"
-            android:imeOptions="actionNext"
-            android:inputType="number"
-            android:maxEms="3"
-            android:maxLines="1"
-            android:minEms="2"
-            android:selectAllOnFocus="true"
-            android:textAlignment="center" />
+        android:id="@+id/editTextView_reps"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="6dp"
+        android:layout_weight="0.25"
+        android:hint="rps"
+        android:imeOptions="actionNext"
+        android:inputType="number"
+        android:maxEms="3"
+        android:maxLines="1"
+        android:minEms="2"
+        android:selectAllOnFocus="true"
+        android:textAlignment="center" />
 
     <CheckBox
         android:id="@+id/set_done_checkbox"

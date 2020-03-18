@@ -2,6 +2,8 @@ package com.strong_weightlifting.strength_tracker_app.model
 
 import io.realm.Realm
 import io.realm.RealmObject
+import io.realm.RealmResults
+import io.realm.annotations.LinkingObjects
 import io.realm.annotations.PrimaryKey
 import java.util.concurrent.atomic.AtomicLong
 
@@ -19,7 +21,9 @@ open class ExerciseSet : RealmObject() {
     var isDropSet: Boolean = false
     var isCompetition: Boolean = false
     var unit: String = "kg"
-//reps, time, duration, ...
+    @LinkingObjects("sets")
+    val doneInExercises: RealmResults<Exercise>? = null
+    //reps, time, duration, ...
 
     companion object{
         const val FIELD_UUID="uuid"
@@ -30,7 +34,7 @@ open class ExerciseSet : RealmObject() {
             val sets = exercise?.sets
             val known=realm.where(KnownExercise::class.java).equalTo(FIELD_UUID,exercise?.knownExercise?.uuid).findFirst()
             val prevExercise=known?.doneInExercises?.dropLast(1)?.maxBy { it.date }
-
+            val prevExerciseRecord = known?.doneInExercises?.dropLast(1)?.maxBy { it.date }
             val maxid = realm.where(ExerciseSet::class.java).findAll()?.max(ExerciseSet.FIELD_UUID)?.toLong()
             maxid?.let { INTEGER_COUNTER.set(it+1) }
 
@@ -97,6 +101,13 @@ open class ExerciseSet : RealmObject() {
         fun delete(realm: Realm, uuid: Long){
             val exerciseSet =realm.where(ExerciseSet::class.java).equalTo(FIELD_UUID,uuid).findFirst()
             exerciseSet?.deleteFromRealm()
+        }
+
+        fun epleyValue(exerciseSet: ExerciseSet): Double {
+            if(exerciseSet.reps==1){
+                return exerciseSet.weight.toDouble()
+            }
+            return exerciseSet.weight.toDouble() * (1.0 + (exerciseSet.reps.toDouble() / 30.0))
         }
 
 

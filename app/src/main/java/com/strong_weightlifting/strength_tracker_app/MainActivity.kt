@@ -1,9 +1,15 @@
 package com.strong_weightlifting.strength_tracker_app
 
+import android.Manifest
 import android.app.Activity
+import android.app.AlertDialog
 import android.app.DatePickerDialog
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.os.ParcelFileDescriptor
 import android.text.Editable
 import android.text.TextWatcher
@@ -13,6 +19,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -40,21 +47,23 @@ Training als geplant in Traininglist activity markieren.. Dient später als Plan
 
 
 class MainActivity : AppCompatActivity() {
-
-
+    private val TAG: String = MainActivity::class.java.name
     private var realm: Realm? = null
     private var recyclerView: RecyclerView? = null
     private var menu: Menu? = null
     private var adapter: TrainingRecyclerViewAdapter? = null
     private var fabAddTraining: FloatingActionButton? = null
+    private var fabResumeTraining: FloatingActionButton? = null
     private var dateSetListener: DatePickerDialog.OnDateSetListener? = null
+    private var activeTrainingUUID: Long = -1
     private lateinit var inputPFD: ParcelFileDescriptor
 
 
     companion object {
         val REQUEST_STRONG_CSV_CODE = 0
-        val REQUESTCODENOTES= 1
-        val REQUEST_OLD_CSV_CODE=2
+        val REQUESTCODENOTES = 1
+        val REQUEST_OLD_CSV_CODE = 2
+        val REQUEST_TRAINING = 3
 //        val MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1
     }
 //
@@ -86,12 +95,33 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(mainToolBar)
         realm = Realm.getDefaultInstance()
+
+        when {
+            intent?.action == Intent.ACTION_SEND -> {
+                if ("text/csv" == intent.type) {
+                    readStrongCSV(intent) // Handle text being sent
+                }
+            }
+        }
+
+        val sharedPref = this.getSharedPreferences(getString(R.string.KEY_PREFERENCE_FILE), Context.MODE_PRIVATE)
+        activeTrainingUUID = sharedPref.getLong(getString(R.string.KEY_ACTIVE_TRAINING), -1)
+        if (activeTrainingUUID > 0)
+            resume_Training_FAB.show()
+        else
+            resume_Training_FAB.hide()
+
+
         recyclerView = findViewById(R.id.recycler_view_trainings)
 
-        readCatalogFile("mycatalog")
+
+        // TODO catalogfile erst auf action einlesen
+        //
+//        readCatalogFile("mycatalog")
 
 
         fabAddTraining = findViewById(R.id.add_Training_FAB)
+        fabResumeTraining = findViewById(R.id.resume_Training_FAB)
 
 
         fabAddTraining?.setOnClickListener {
@@ -99,6 +129,12 @@ class MainActivity : AppCompatActivity() {
             adapter?.updateData(adapter?.data)
             val llm: LinearLayoutManager = recyclerView?.layoutManager as LinearLayoutManager
             llm.scrollToPositionWithOffset(0, 0)
+        }
+        fabResumeTraining?.setOnClickListener {
+            var intent = Intent(baseContext, EditTrainingActivity::class.java)
+            intent.putExtra(EditTrainingActivity.TRAINING_ID, activeTrainingUUID) //TODO LongExtra?
+
+            startActivityForResult(intent, REQUEST_TRAINING)
         }
 
         setUpRecyclerView()
@@ -196,6 +232,8 @@ class MainActivity : AppCompatActivity() {
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+
         })
 
         search_bar_ExerciseID_editText.addTextChangedListener(object : TextWatcher {
@@ -237,6 +275,7 @@ class MainActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
 
+
     }
 
     /*
@@ -272,12 +311,25 @@ class MainActivity : AppCompatActivity() {
                 startActivity(knownExIntent)
                 return true
             }
-            R.id.action_importCSV -> {
-                getCSVFileForImport()
+//            R.id.action_importCSV -> {
+//                getCSVFileForImport()
+//                return true
+//            }
+//            R.id.action_importOldTrainingCSV -> {
+//                getOldTrainingCSVFileForImport()
+//                return true
+//            }
+            R.id.action_delete_all_realm_data -> {
+                deleteAllRealmData()
                 return true
             }
-            R.id.action_importOldTrainingCSV -> {
-                getOldTrainingCSVFileForImport()
+
+            R.id.action_backup_realm_file -> {
+                backupRealmFile()
+                return true
+            }
+            R.id.action_import_realm_file ->{
+                importRealm()
                 return true
             }
 
@@ -294,11 +346,12 @@ class MainActivity : AppCompatActivity() {
         )
         adapter!!.setOnItemClickListener(object : TrainingRecyclerViewAdapter.OnItemClickListener {
             override fun onItemClick(training: Training) {
-                var intent = Intent(baseContext, EditTrainingActivity::class.java)
-                intent.putExtra(EditTrainingActivity.TRAINING_ID, training.uuid) //TODO LongExtra?
+                if (activeTrainingUUID < 0) {
+                    var intent = Intent(baseContext, EditTrainingActivity::class.java)
+                    intent.putExtra(EditTrainingActivity.TRAINING_ID, training.uuid) //TODO LongExtra?
 
-//                startActivityForResult(intent,1)
-                startActivity(intent)
+                    startActivityForResult(intent, REQUEST_TRAINING)
+                }
             }
         })
         adapter!!.setOnItemLongClickListener(object : TrainingRecyclerViewAdapter.OnItemLongClickListener {
@@ -358,21 +411,139 @@ class MainActivity : AppCompatActivity() {
 //        touchHelper.attachToRecyclerView(recyclerView)
     }
 
-    fun getCSVFileForImport() {
+    private fun getCSVFileForImport() {
         val getFileIntent = Intent(Intent.ACTION_GET_CONTENT)
         getFileIntent.type = "text/comma-separated-values"
         startActivityForResult(getFileIntent, REQUEST_STRONG_CSV_CODE)
     }
-    fun getOldTrainingCSVFileForImport() {
+
+    private fun getOldTrainingCSVFileForImport() {
         val getFileIntent = Intent(Intent.ACTION_GET_CONTENT)
         getFileIntent.type = "text/comma-separated-values"
         startActivityForResult(getFileIntent, REQUEST_OLD_CSV_CODE)
     }
 
+    private fun deleteAllRealmData() {
+        if(this.activeTrainingUUID ==-1L) {
+
+            AlertDialog.Builder(this)
+                .setTitle("WARNING: Delete all Data?")
+                .setMessage("Are you sure you want to delete Everything? There is no way to restore it. it deletes your Exercise Catalog too!")
+                .setPositiveButton(android.R.string.yes) { dialog, which ->
+                    realm?.let {
+                        DataHelper.deleteAllData(it)
+                        adapter?.updateData(
+                            it.where(MasterParent::class.java).findFirst()!!.trainingList.sort(
+                                "date",
+                                Sort.DESCENDING
+                            )
+                        )
+                    }
+                }
+                .setNegativeButton(android.R.string.no, null)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show()
+        }
+        else{
+            Toast.makeText(this,"Finish Training before deleting all Data",Toast.LENGTH_LONG).show()
+        }
+
+    }
+
+
+    fun isReadStoragePermissionGranted(): Boolean {
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED
+            ) {
+                Log.v(TAG, "Permission is granted1")
+                return true
+            } else {
+
+                Log.v(TAG, "Permission is revoked1");
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 3);
+                return false;
+            }
+
+
+        } else { //permission is automatically granted on sdk<23 upon installation
+            Log.v(TAG, "Permission is granted1");
+            return true;
+        }
+    }
+
+    fun isWriteStoragePermissionGranted(): Boolean {
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED
+            ) {
+                Log.v(TAG, "Permission is granted2");
+                return true;
+            } else {
+
+                Log.v(TAG, "Permission is revoked2");
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 2);
+                return false;
+            }
+        } else { //permission is automatically granted on sdk<23 upon installation
+            Log.v(TAG, "Permission is granted2");
+            return true;
+        }
+    }
+
+    private fun backupRealmFile() {
+        isWriteStoragePermissionGranted()
+        if (isWriteStoragePermissionGranted()) {
+
+            try {
+                val file =
+                    File(Environment.getExternalStorageDirectory().path.toString() + "/com.strong_weightlifting.strength_tracker_app.default_realm")
+                if (file.exists()) {
+                    file.delete()
+                }
+
+                realm?.writeCopyTo(file)
+                Toast.makeText(this, "Success backing up realm file", Toast.LENGTH_LONG)
+                    .show()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    private fun importRealm() {
+        isReadStoragePermissionGranted()
+        if (isReadStoragePermissionGranted()) {
+            try {
+                realm!!.close()
+                val file =
+                    File(Environment.getExternalStorageDirectory().path.toString() + "/com.strong_weightlifting.strength_tracker_app.default_realm")
+                if (file.exists()) {
+                    realm?.configuration?.path.let {
+                        val oldFile = File(it!!)
+                        file.copyTo(oldFile, true)
+                    }
+
+
+                    Toast.makeText(this, "Success importing database file, COMPLETELY RESTART APP NOW!", Toast.LENGTH_LONG).show()
+                    realm= Realm.getDefaultInstance()
+                    setUpRecyclerView()
+                }
+
+
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         val trainingID = data?.getLongExtra(EditTrainingActivity.TRAINING_ID, -1)
         val notes = data?.getStringExtra(EditTrainingActivity.NOTES)
+        val sharedPref = this.getSharedPreferences(getString(R.string.KEY_PREFERENCE_FILE), Context.MODE_PRIVATE)
+
         if (resultCode != Activity.RESULT_OK) {
             return
         }
@@ -395,16 +566,29 @@ class MainActivity : AppCompatActivity() {
             readStrongCSV(data)
         }
 
-        if(requestCode == REQUEST_OLD_CSV_CODE){
+        if (requestCode == REQUEST_OLD_CSV_CODE) {
             readOldTraining(data)
+        }
+        if (requestCode == REQUEST_TRAINING) {
+            if (trainingID != null) {
+                activeTrainingUUID = trainingID
+                with(sharedPref.edit()) {
+                    putLong(getString(R.string.KEY_ACTIVE_TRAINING), activeTrainingUUID)
+                    commit()
+                }
+            }
+            if (activeTrainingUUID > 0) {
+                resume_Training_FAB.show()
+            } else
+                resume_Training_FAB.hide()
         }
 
 
-
     }
-    fun readStrongCSV(data: Intent?){
+
+    private fun readStrongCSV(data: Intent?) {
         // Get the file's content URI from the incoming Intent
-        data?.data.also { returnUri ->
+        data?.clipData?.getItemAt(0)?.uri.also { returnUri ->
             /*
              * Try to open the file for "read" access using the
              * returned URI. If the file isn't found, write to the
@@ -445,12 +629,13 @@ class MainActivity : AppCompatActivity() {
                 var prevtraining: Training?
                 var exercise: Exercise? = training?.uuid?.let { Exercise.createWithReturn(realm, it) }
                 var prevExercise: Exercise?
-                var i = 1
-                loop@ for (line in lines) {
-                    if (i == 1) {
-                        val field = line.split(";")
+                loop@ for (i in 0 until lines.size) {
+
+                    if (i == 0) {
+                        val field = lines[i].split(";")
                         if (field.size != StrongCSV.values().size) continue@loop
                         training?.notes = field[StrongCSV.WorkoutNotes.ordinal].trim('"')
+                        training?.isDone=true
                         val dateString = field[StrongCSV.Date.ordinal].trim()
                         val format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
                         val parsedDate = format.parse(dateString)
@@ -458,7 +643,11 @@ class MainActivity : AppCompatActivity() {
                         training?.year = parsedDate.year + 1900
                         training?.month = parsedDate.month
                         exercise?.date = training?.date!!
-                        val knownName = field[StrongCSV.ExerciseName.ordinal].trim('"').trim().toUpperCase()
+                        val knownName = field[StrongCSV.ExerciseName.ordinal].trim('"').trim()
+                            .replace("Barbell","BB",true)
+                            .replace("Machine","M",true)
+                            .replace("Dumbbell","DB",true)
+                            .toUpperCase()
                         val allKnownExercises = realm.where(KnownExercise::class.java).findAll()
                         var newKnown = allKnownExercises.find { it.name == knownName }
                         val maxKnownID: Int = allKnownExercises.max("user_custom_id")?.toInt() ?: 1
@@ -479,7 +668,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     ///////////////////////////////////////// alle weitere lines
                     if (i > 1) {
-                        val field = line.split(";")
+                        val field = lines[i].split(";")
                         val prevField = lines[i - 1].split(";")
                         if (field.size != StrongCSV.values().size) continue@loop
                         prevtraining = training
@@ -488,6 +677,7 @@ class MainActivity : AppCompatActivity() {
                         ) {
                             training = Training.create(realm)
                             training?.notes = field[StrongCSV.WorkoutNotes.ordinal].trim('"')
+                            training?.isDone=true
                             val dateString = field[StrongCSV.Date.ordinal].trim()
                             try {
                                 val format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
@@ -507,6 +697,21 @@ class MainActivity : AppCompatActivity() {
 
                         }
                         if (field[StrongCSV.ExerciseName.ordinal] != prevField[StrongCSV.ExerciseName.ordinal]) {
+                            val rmSetEpley = exercise?.sets?.maxBy { ExerciseSet.epleyValue(it) }
+                            rmSetEpley?.let {
+
+                                val epValue = it.let { it1 -> ExerciseSet.epleyValue(it1) }
+                                val epWeight = it.weight
+                                val epReps = it.reps
+                                if (exercise?.knownExercise?.prCalculated!! < epValue) {
+                                    exercise!!.knownExercise!!.prCalculated = epValue
+                                    exercise!!.knownExercise!!.prWeight = epWeight
+                                    exercise!!.knownExercise!!.repsAtPRWeight = epReps
+                                    exercise!!.knownExercise!!.dateOfPR = exercise!!.doneInTrainings?.first()?.date!!
+
+                                }
+                            }
+
                             exercise = training?.uuid?.let { trainingUUID ->
                                 Exercise.createWithReturn(
                                     realm,
@@ -515,7 +720,11 @@ class MainActivity : AppCompatActivity() {
                             }
                             exercise?.date = training?.date!!
 
-                            val knownName = field[StrongCSV.ExerciseName.ordinal].trim('"').trim().toUpperCase()
+                            val knownName = field[StrongCSV.ExerciseName.ordinal].trim('"').trim()
+                                .replace("Barbell","BB",true)
+                                .replace("Machine","M",true)
+                                .replace("Dumbbell","DB",true)
+                                .toUpperCase()
                             val allKnownExercises = realm.where(KnownExercise::class.java).findAll()
                             var newKnown = allKnownExercises.find { it.name == knownName }
                             val maxKnownID: Int = allKnownExercises.max("user_custom_id")?.toInt() ?: 1
@@ -540,7 +749,7 @@ class MainActivity : AppCompatActivity() {
                         set?.orderNumber = field[StrongCSV.SetOrder.ordinal].trim().toIntOrNull() ?: set?.orderNumber!!
                         exercise?.sets?.add(0, set)
                     }
-                    i++
+
                 }
             }, Realm.Transaction.OnSuccess { adapter?.updateData(adapter?.data) })
 
@@ -548,7 +757,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun readOldTraining(data:Intent?){
+    private fun readOldTraining(data: Intent?) {
 //Datum;Woche;Wochentag;Ort;ID;Notizen;Gewicht;WDH;Gewicht2;WDH2;Gewicht3;WDH3;Gewicht4;WDH4;Gewicht5;WDH5;Gewicht6;WDH6;Gewicht7;WDH7;Gewicht8;WDH8;Gewicht9;WDH9;Gewicht10;WDH10;Gewicht11;WDH11;"Durschnittliches Gewicht";"Maximal Gewicht";reps_max;Summe WDH;AVG*WDH(Arbeit);Boolean Training;1RM Epley
         data?.data.also { returnUri ->
             /*
@@ -592,7 +801,9 @@ class MainActivity : AppCompatActivity() {
                 loop@ for (line in lines) {
                     if (i == 1) {
                         val field = line.split(";")
-                        if (field.size != CSV.values().size || field[CSV.Datum.ordinal].trim().let{it.isNullOrEmpty().or(it.isBlank())} ) continue@loop
+                        if (field.size != CSV.values().size || field[CSV.Datum.ordinal].trim().let {
+                                it.isNullOrEmpty().or(it.isBlank())
+                            }) continue@loop
                         val dateString = field[CSV.Datum.ordinal].trim()
                         val format = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
                         val parsedDate = format.parse(dateString)
@@ -602,7 +813,8 @@ class MainActivity : AppCompatActivity() {
                         exercise?.date = training?.date!!
                         exercise?.notes = field[CSV.Notizen.ordinal].trim('"')
                         val knownName = field[CSV.Name.ordinal].trim('"').trim().toUpperCase()
-                        var userCustomID= field[CSV.ID.ordinal].trim().let { if(it.isNullOrBlank()) 0 else it.toInt() }
+                        var userCustomID =
+                            field[CSV.ID.ordinal].trim().let { if (it.isNullOrBlank()) 0 else it.toInt() }
                         val allKnownExercises = realm.where(KnownExercise::class.java).findAll()
                         var newKnown = allKnownExercises.find { it.name == knownName }
                         if (newKnown == null) {
@@ -615,13 +827,14 @@ class MainActivity : AppCompatActivity() {
                         }
                         for (index in 0..10) {
                             val set = exercise?.uuid?.let { it1 -> ExerciseSet.createWithoutAdd(realm, it1) }
-                            val weightstr = field[CSV.Gewicht.ordinal+2*index].trim('"',' ').replace(',', '.')
-                            val repsStr = field[CSV.WDH.ordinal+2*index].trim()
-                            if (weightstr.isNotEmpty() && weightstr.isNotBlank()){
-                                set?.weight =if (weightstr.isNotEmpty() && weightstr.isNotBlank()) weightstr.toFloat().roundToInt() else 0
+                            val weightstr = field[CSV.Gewicht.ordinal + 2 * index].trim('"', ' ').replace(',', '.')
+                            val repsStr = field[CSV.WDH.ordinal + 2 * index].trim()
+                            if (weightstr.isNotEmpty() && weightstr.isNotBlank()) {
+                                set?.weight =
+                                    if (weightstr.isNotEmpty() && weightstr.isNotBlank()) weightstr.toFloat().roundToInt() else 0
                                 set?.reps = if (repsStr.isNotEmpty() && repsStr.isNotBlank()) repsStr.toInt() else 0
                                 set?.isDone = true
-                                set?.orderNumber=index+1
+                                set?.orderNumber = index + 1
                                 exercise?.sets?.add(set)
                             }
                         }
@@ -635,14 +848,15 @@ class MainActivity : AppCompatActivity() {
                         if (field[CSV.Datum.ordinal] != prevField[CSV.Datum.ordinal]
                         ) {
                             training = Training.create(realm)
-                            if(training?.notes?.contains(field[CSV.Notizen.ordinal].trim('"'))==false) training.notes+=field[CSV.Notizen.ordinal].trim('"')
+                            if (training?.notes?.contains(field[CSV.Notizen.ordinal].trim('"')) == false) training.notes += field[CSV.Notizen.ordinal].trim(
+                                '"'
+                            )
                             val dateString = field[CSV.Datum.ordinal].trim()
-                                val format = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                                val parsedDate = format.parse(dateString)
-                                training?.date = parsedDate
-                                training?.year = parsedDate.year + 1900
-                                training?.month = parsedDate.month
-
+                            val format = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                            val parsedDate = format.parse(dateString)
+                            training?.date = parsedDate
+                            training?.year = parsedDate.year + 1900
+                            training?.month = parsedDate.month
 
 
                         }
@@ -654,10 +868,11 @@ class MainActivity : AppCompatActivity() {
                                 )
                             }
                             exercise?.date = training?.date!!
-                            exercise?.notes=field[CSV.Notizen.ordinal].trim()
+                            exercise?.notes = field[CSV.Notizen.ordinal].trim()
 
                             val knownName = field[CSV.Name.ordinal].trim('"').trim().toUpperCase()
-                            var userCustomID= field[CSV.ID.ordinal].trim().let { if(it.isNullOrBlank()) 0 else it.toInt() }
+                            var userCustomID =
+                                field[CSV.ID.ordinal].trim().let { if (it.isNullOrBlank()) 0 else it.toInt() }
                             val allKnownExercises = realm.where(KnownExercise::class.java).findAll()
                             var newKnown = allKnownExercises.find { it.name == knownName }
                             if (newKnown == null) {
@@ -671,13 +886,14 @@ class MainActivity : AppCompatActivity() {
                         }
                         for (index in 0..10) {
                             val set = exercise?.uuid?.let { it1 -> ExerciseSet.createWithoutAdd(realm, it1) }
-                            val weightstr = field[CSV.Gewicht.ordinal+2*index].trim('"',' ').replace(',', '.')
-                            val repsStr = field[CSV.WDH.ordinal+2*index].trim()
-                            if (weightstr.isNotEmpty() && weightstr.isNotBlank()){
-                                set?.weight =if (weightstr.isNotEmpty() && weightstr.isNotBlank()) weightstr.toFloat().roundToInt() else 0
+                            val weightstr = field[CSV.Gewicht.ordinal + 2 * index].trim('"', ' ').replace(',', '.')
+                            val repsStr = field[CSV.WDH.ordinal + 2 * index].trim()
+                            if (weightstr.isNotEmpty() && weightstr.isNotBlank()) {
+                                set?.weight =
+                                    if (weightstr.isNotEmpty() && weightstr.isNotBlank()) weightstr.toFloat().roundToInt() else 0
                                 set?.reps = if (repsStr.isNotEmpty() && repsStr.isNotBlank()) repsStr.toInt() else 0
                                 set?.isDone = true
-                                set?.orderNumber=index+1
+                                set?.orderNumber = index + 1
                                 exercise?.sets?.add(set)
                             }
                         }
@@ -690,9 +906,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    enum class CSV{Datum,Woche,Wochentag,Ort,ID,Notizen,Name,Gewicht,WDH,Gewicht2,WDH2,Gewicht3,
-        WDH3,Gewicht4,WDH4,Gewicht5,WDH5,Gewicht6,WDH6,Gewicht7,WDH7,Gewicht8,WDH8,Gewicht9,
-        WDH9,Gewicht10,WDH10,Gewicht11,WDH11
+    enum class CSV {
+        Datum, Woche, Wochentag, Ort, ID, Notizen, Name, Gewicht, WDH, Gewicht2, WDH2, Gewicht3,
+        WDH3, Gewicht4, WDH4, Gewicht5, WDH5, Gewicht6, WDH6, Gewicht7, WDH7, Gewicht8, WDH8, Gewicht9,
+        WDH9, Gewicht10, WDH10, Gewicht11, WDH11
     }
 
     fun readCatalogFile(name: String) {
@@ -710,12 +927,13 @@ class MainActivity : AppCompatActivity() {
                 for (i in 0..lines.size - 1) {
                     val args = lines[i].split(Regex(":"))
                     if (args.size == 2) {
-                        val name = args[1].trim('\t',' ').toUpperCase()
-                        val id = args[0].trim('\t',' ').toInt()
-                        if (realm.where(KnownExercise::class.java).equalTo("name", name).equalTo("user_custom_id",id)
-                            .findFirst()==null)
-
-                        {KnownExercise.create(realm, name, id)}
+                        val name = args[1].trim('\t', ' ').toUpperCase()
+                        val id = args[0].trim('\t', ' ').toInt()
+                        if (realm.where(KnownExercise::class.java).equalTo("name", name).equalTo("user_custom_id", id)
+                                .findFirst() == null
+                        ) {
+                            KnownExercise.create(realm, name, id)
+                        }
                     }
                 }
             }
@@ -723,6 +941,7 @@ class MainActivity : AppCompatActivity() {
         }
             , Realm.Transaction.OnSuccess { adapter?.updateData(adapter?.data) })
     }
+
 
     override fun onResume() {
         super.onResume()

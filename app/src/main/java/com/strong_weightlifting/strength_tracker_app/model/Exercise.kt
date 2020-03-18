@@ -14,9 +14,11 @@ open class Exercise : RealmObject() {
     var uuid: Long=0
     var notes: String=""
     var date: Date = Date()
+    var prWeightAtTheMoment: Int = 0 //true max Weight lifted
+    var repsAtPRWeightAtTheMoment: Int = 0 // No of Reps at max Weight lifted
+    var prCalculatedAtTheMoment: Double= 0.0 // calculated 1RM for Training Programming and Progress metric
 
     var knownExercise: KnownExercise? = null
-
     var sets: RealmList<ExerciseSet> = RealmList()
     @LinkingObjects("exercises")
     val doneInTrainings: RealmResults<Training>?=null
