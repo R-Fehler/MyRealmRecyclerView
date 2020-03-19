@@ -104,6 +104,9 @@ open class ExerciseSet : RealmObject() {
         }
 
         fun epleyValue(exerciseSet: ExerciseSet): Double {
+            if(exerciseSet.reps<1){
+                return 0.0
+            }
             if(exerciseSet.reps==1){
                 return exerciseSet.weight.toDouble()
             }
