@@ -315,10 +315,10 @@ class MainActivity : AppCompatActivity() {
 //                getCSVFileForImport()
 //                return true
 //            }
-//            R.id.action_importOldTrainingCSV -> {
-//                getOldTrainingCSVFileForImport()
-//                return true
-//            }
+            R.id.action_importOldTrainingCSV -> {
+                getOldTrainingCSVFileForImport()
+                return true
+            }
             R.id.action_delete_all_realm_data -> {
                 deleteAllRealmData()
                 return true
@@ -635,6 +635,7 @@ class MainActivity : AppCompatActivity() {
                         val field = lines[i].split(";")
                         if (field.size != StrongCSV.values().size) continue@loop
                         training?.notes = field[StrongCSV.WorkoutNotes.ordinal].trim('"')
+                        training?.name=field[StrongCSV.WorkoutName.ordinal].trim('"')
                         training?.isDone=true
                         val dateString = field[StrongCSV.Date.ordinal].trim()
                         val format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
@@ -677,6 +678,7 @@ class MainActivity : AppCompatActivity() {
                         ) {
                             training = Training.create(realm)
                             training?.notes = field[StrongCSV.WorkoutNotes.ordinal].trim('"')
+                            training?.name=field[StrongCSV.WorkoutName.ordinal].trim('"')
                             training?.isDone=true
                             val dateString = field[StrongCSV.Date.ordinal].trim()
                             try {
