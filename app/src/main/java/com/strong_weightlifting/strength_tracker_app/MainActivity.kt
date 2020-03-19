@@ -315,10 +315,10 @@ class MainActivity : AppCompatActivity() {
 //                getCSVFileForImport()
 //                return true
 //            }
-            R.id.action_importOldTrainingCSV -> {
-                getOldTrainingCSVFileForImport()
-                return true
-            }
+//            R.id.action_importOldTrainingCSV -> {
+//                getOldTrainingCSVFileForImport()
+//                return true
+//            }
             R.id.action_delete_all_realm_data -> {
                 deleteAllRealmData()
                 return true
