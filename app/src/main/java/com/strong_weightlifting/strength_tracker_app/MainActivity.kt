@@ -797,10 +797,9 @@ class MainActivity : AppCompatActivity() {
                 var prevtraining: Training?
                 var exercise: Exercise? = training?.uuid?.let { Exercise.createWithReturn(realm, it) }
                 var prevExercise: Exercise?
-                var i = 1
-                loop@ for (line in lines) {
-                    if (i == 1) {
-                        val field = line.split(";")
+                loop@ for (i in 0 until lines.size) {
+                    if (i == 0) {
+                        val field = lines[i].split(";")
                         if (field.size != CSV.values().size || field[CSV.Datum.ordinal].trim().let {
                                 it.isNullOrEmpty().or(it.isBlank())
                             }) continue@loop
@@ -812,6 +811,8 @@ class MainActivity : AppCompatActivity() {
                         training?.month = parsedDate.month
                         exercise?.date = training?.date!!
                         exercise?.notes = field[CSV.Notizen.ordinal].trim('"')
+                        training?.isDone=true
+
                         val knownName = field[CSV.Name.ordinal].trim('"').trim().toUpperCase()
                         var userCustomID =
                             field[CSV.ID.ordinal].trim().let { if (it.isNullOrBlank()) 0 else it.toInt() }
@@ -840,8 +841,8 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                     ///////////////////////////////////////// alle weitere lines
-                    if (i > 1) {
-                        val field = line.split(";")
+                    if (i > 0) {
+                        val field = lines[i].split(";")
                         val prevField = lines[i - 1].split(";")
                         if (field.size != CSV.values().size) continue@loop
                         prevtraining = training
@@ -857,6 +858,8 @@ class MainActivity : AppCompatActivity() {
                             training?.date = parsedDate
                             training?.year = parsedDate.year + 1900
                             training?.month = parsedDate.month
+                            training?.isDone=true
+
 
 
                         }
@@ -897,8 +900,24 @@ class MainActivity : AppCompatActivity() {
                                 exercise?.sets?.add(set)
                             }
                         }
+                        val rmSetEpley = exercise?.sets?.maxBy { ExerciseSet.epleyValue(it) }
+                        rmSetEpley?.let {
+
+                            val epValue = it.let { it1 -> ExerciseSet.epleyValue(it1) }
+                            val epWeight = it.weight
+                            val epReps = it.reps
+                            if (exercise?.knownExercise?.prCalculated!! < epValue) {
+                                exercise.knownExercise!!.prCalculated = epValue
+                                exercise.knownExercise!!.prWeight = epWeight
+                                exercise.knownExercise!!.repsAtPRWeight = epReps
+                                exercise.knownExercise!!.dateOfPR = exercise.doneInTrainings?.first()?.date!!
+                            }
+                            exercise.prWeightAtTheMoment= exercise.knownExercise!!.prWeight
+                            exercise.repsAtPRWeightAtTheMoment=exercise.knownExercise!!.repsAtPRWeight
+                            exercise.prCalculatedAtTheMoment=exercise.knownExercise!!.prCalculated
+                        }
                     }
-                    i++
+
                 }
             }, Realm.Transaction.OnSuccess { adapter?.updateData(adapter?.data) })
 
