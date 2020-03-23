@@ -17,6 +17,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.CheckBox
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -56,6 +57,7 @@ class MainActivity : AppCompatActivity() {
     private var fabResumeTraining: FloatingActionButton? = null
     private var dateSetListener: DatePickerDialog.OnDateSetListener? = null
     private var activeTrainingUUID: Long = -1
+    private var showRoutines= false
     private lateinit var inputPFD: ParcelFileDescriptor
 
 
@@ -305,6 +307,16 @@ class MainActivity : AppCompatActivity() {
                 return true
             }
 
+            R.id.action_showRoutines ->{
+                item.isChecked=item.isChecked.not()
+                showRoutines=item.isChecked
+                if(showRoutines){
+                    adapter?.updateData(realm?.where(MasterParent::class.java)?.findFirst()?.routineList?.sort("date",Sort.DESCENDING))
+                }
+                else
+                    adapter?.updateData(realm?.where(MasterParent::class.java)?.findFirst()?.trainingList?.sort("date",Sort.DESCENDING))
+                return true
+            }
             R.id.action_KnownExerciseOverView -> {
                 val knownExIntent = Intent(this, KnownExerciseListActivity::class.java)
                 knownExIntent.putExtra(EditTrainingActivity.VIEWKNOWNEXERCISES, true)
@@ -369,6 +381,12 @@ class MainActivity : AppCompatActivity() {
                 editIntent.putExtra(EditTrainingActivity.NOTES, training.notes)
 
                 startActivityForResult(editIntent, REQUESTCODENOTES)
+            }
+        })
+
+        adapter?.setOnCreateRoutineListener(object : TrainingRecyclerViewAdapter.OnCreateRoutineListener{
+            override fun onCreateRoutineFailed(training: Training) {
+                Toast.makeText(this@MainActivity,"Training name missing!",Toast.LENGTH_LONG).show()
             }
         })
 
@@ -700,17 +718,17 @@ class MainActivity : AppCompatActivity() {
                         }
                         if (field[StrongCSV.ExerciseName.ordinal] != prevField[StrongCSV.ExerciseName.ordinal]) {
                             val rmSetEpley = exercise?.sets?.maxBy { ExerciseSet.epleyValue(it) }
-                            rmSetEpley?.let {
+                            rmSetEpley?.let {set ->
 
-                                val epValue = it.let { it1 -> ExerciseSet.epleyValue(it1) }
-                                val epWeight = it.weight
-                                val epReps = it.reps
-                                if (exercise?.knownExercise?.prCalculated!! < epValue) {
+                                val epValue = set.let { it1 -> ExerciseSet.epleyValue(it1) }
+                                val epWeight = set.weight
+                                val epReps = set.reps
+                                if (exercise!!.knownExercise?.prCalculated!! < epValue) {
                                     exercise!!.knownExercise!!.prCalculated = epValue
                                     exercise!!.knownExercise!!.prWeight = epWeight
                                     exercise!!.knownExercise!!.repsAtPRWeight = epReps
-                                    exercise!!.knownExercise!!.dateOfPR = exercise!!.doneInTrainings?.first()?.date!!
-
+                                    exercise!!.knownExercise!!.dateOfPR= exercise!!.doneInTrainings?.first()?.date!!
+                                    set.isPR=true
                                 }
                             }
 

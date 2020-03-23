@@ -16,6 +16,7 @@ open class ExerciseSet : RealmObject() {
     var weightPlanned: Int=0
     var repsPlanned: Int=0
     var duration: Long = 0
+    var isPR: Boolean =false
     var isDone: Boolean = false
     var isWarmUp: Boolean = false
     var isDropSet: Boolean = false
@@ -104,13 +105,19 @@ open class ExerciseSet : RealmObject() {
         }
 
         fun epleyValue(exerciseSet: ExerciseSet): Double {
+            var fixedWeight=0.0
             if(exerciseSet.reps<1){
                 return 0.0
             }
             if(exerciseSet.reps==1){
                 return exerciseSet.weight.toDouble()
             }
-            return exerciseSet.weight.toDouble() * (1.0 + (exerciseSet.reps.toDouble() / 30.0))
+            if(exerciseSet.weight==0)
+                fixedWeight=1.0
+            else
+                fixedWeight=exerciseSet.weight.toDouble()
+
+            return  fixedWeight * (1.0 + (exerciseSet.reps.toDouble() / 30.0))
         }
 
 

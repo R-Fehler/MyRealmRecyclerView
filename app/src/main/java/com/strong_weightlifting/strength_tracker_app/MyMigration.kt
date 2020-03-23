@@ -1,5 +1,6 @@
 package com.strong_weightlifting.strength_tracker_app
 
+import com.strong_weightlifting.strength_tracker_app.model.Training
 import io.realm.DynamicRealm
 import io.realm.RealmMigration
 import java.util.*
@@ -77,6 +78,17 @@ class MyMigration : RealmMigration {
                 .addField("repsAtPRWeightAtTheMoment",Int::class.javaPrimitiveType)
                 .addField("prCalculatedAtTheMoment",Double::class.javaPrimitiveType)
                 oldVersion++
+        }
+        if(oldVersion==3L){
+            schema.get("ExerciseSet")!!
+                .addField("isPR",Boolean::class.javaPrimitiveType)
+            oldVersion++
+        }
+        if(oldVersion==4L)
+        {
+            schema.get("MasterParent")!!
+                .addRealmListField("routineList",schema.get("Training"))
+
         }
 
     }

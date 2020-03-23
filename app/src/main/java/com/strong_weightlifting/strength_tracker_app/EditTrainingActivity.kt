@@ -239,16 +239,17 @@ class EditTrainingActivity : AppCompatActivity() {
                     it.executeTransaction {
                         adapter?.data?.forEach { exercise ->
                             val rmSetEpley = exercise.sets.maxBy { ExerciseSet.epleyValue(it) }
-                            rmSetEpley?.let {
+                            rmSetEpley?.let {set ->
 
-                                val epValue = it.let { it1 -> ExerciseSet.epleyValue(it1) }
-                                val epWeight = it.weight
-                                val epReps = it.reps
+                                val epValue = set.let { it1 -> ExerciseSet.epleyValue(it1) }
+                                val epWeight = set.weight
+                                val epReps = set.reps
                                 if (exercise.knownExercise?.prCalculated!! < epValue) {
                                     exercise.knownExercise!!.prCalculated = epValue
                                     exercise.knownExercise!!.prWeight = epWeight
                                     exercise.knownExercise!!.repsAtPRWeight = epReps
                                     exercise.knownExercise!!.dateOfPR= exercise.doneInTrainings?.first()?.date!!
+                                    set.isPR=true
                                 }
 
                             }

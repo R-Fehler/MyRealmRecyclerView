@@ -64,17 +64,25 @@ open class Exercise : RealmObject() {
             exercise?.notes=notes
         }
     }
+    fun prToString(set: ExerciseSet?): String {
+        set?.let {
+            if(set.isPR)
+                return "(PR)"
+            else return "" }
+        return ""
+    }
 
     override fun toString(): String {
         var text = ""
         if (sets.size>1) {
-            for (n in 0..sets.size - 1) {
+            for (n in 0 until sets.size) {
                 text += if (n <= sets.size - 1) {
 
                     when {
-                        n == 0 -> "${sets[n]?.weight}kg:${sets[n]?.reps}"
-                        sets[n]?.weight == sets[n - 1]?.weight -> "/${sets[n]?.reps}"
-                        else -> "  ${sets[n]?.weight}kg:${sets[n]?.reps}"
+
+                        n == 0 -> "${sets[n]?.weight}kg:${sets[n]?.reps}${prToString(sets[n])}"
+                        sets[n]?.weight == sets[n - 1]?.weight -> "/${sets[n]?.reps}${prToString(sets[n])}"
+                        else -> "  ${sets[n]?.weight}kg:${sets[n]?.reps}${prToString(sets[n])}"
                     }
                 }
                 else ""

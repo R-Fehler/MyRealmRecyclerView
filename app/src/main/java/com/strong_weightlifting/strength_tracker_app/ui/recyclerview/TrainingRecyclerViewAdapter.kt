@@ -3,14 +3,15 @@ package com.strong_weightlifting.strength_tracker_app.ui.recyclerview
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.StyleSpan
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.PopupMenu
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
+import com.strong_weightlifting.strength_tracker_app.MainActivity
 import com.strong_weightlifting.strength_tracker_app.R
 import com.strong_weightlifting.strength_tracker_app.model.DataHelper
 import com.strong_weightlifting.strength_tracker_app.model.Training
@@ -29,6 +30,10 @@ class TrainingRecyclerViewAdapter(data: OrderedRealmCollection<Training>) :
     private var onNoteListener: OnNotesEditListener?=null
     private var onDateListener: OnDateClickListener?=null
     private var onItemLongClickListener: OnItemLongClickListener?=null
+    private var onCreateRoutineFailedListener: OnCreateRoutineListener?=null
+
+
+
     var realm: Realm?=null
 
     init {
@@ -66,11 +71,16 @@ class TrainingRecyclerViewAdapter(data: OrderedRealmCollection<Training>) :
         for(exercise in holder.data?.exercises!!){
             text += exercise.toString() +"\n"
         }
-        val pattern= Pattern.compile("\\[\\d*][^:]*")
-        val matcher=pattern.matcher(text)
+        val namePattern= Pattern.compile("\\[\\d*][^:]*")
+        val nameMatcher=namePattern.matcher(text)
+        val prPattern=Pattern.compile("\\(PR\\)")
+        val prMatcher=prPattern.matcher(text)
         val str=SpannableStringBuilder(text)
-        while(matcher.find()){
-            str.setSpan(StyleSpan(android.graphics.Typeface.BOLD),matcher.start(),matcher.end(), Spanned.SPAN_INCLUSIVE_INCLUSIVE)
+        while(nameMatcher.find()){
+            str.setSpan(StyleSpan(android.graphics.Typeface.BOLD),nameMatcher.start(),nameMatcher.end(), Spanned.SPAN_INCLUSIVE_INCLUSIVE)
+        }
+        while (prMatcher.find()){
+            str.setSpan(StyleSpan(android.graphics.Typeface.BOLD),prMatcher.start(),prMatcher.end(),Spanned.SPAN_INCLUSIVE_INCLUSIVE)
         }
 
 
@@ -98,8 +108,8 @@ class TrainingRecyclerViewAdapter(data: OrderedRealmCollection<Training>) :
 
         val popup= PopupMenu(holder.itemView.context,holder.menu)
         popup.inflate(R.menu.training_menu)
-        popup.setOnMenuItemClickListener {
-            val id=it.itemId
+        popup.setOnMenuItemClickListener { item ->
+            val id=item.itemId
             when(id) {
                 R.id.action_training_addNote -> {
 //                    holder.notes.visibility=View.VISIBLE
@@ -117,6 +127,18 @@ class TrainingRecyclerViewAdapter(data: OrderedRealmCollection<Training>) :
                 R.id.action_training_delete ->{
                     realm?.let { it1 -> holder.data?.uuid?.let { it2 -> DataHelper.deleteTraining(it1, it2) } }
                     this.updateData(data)
+                }
+
+                R.id.action_copy_training ->{
+                    DataHelper.copyTraining(realm!!, holder.data!!)
+                    this.updateData(this.data)
+                }
+                R.id.action_star -> {
+                   var createdSuccess=false
+                    realm?.executeTransaction {  createdSuccess=Training.createAsRoutine(it, holder.data!!) }
+                    if(!createdSuccess){
+                        onCreateRoutineFailedListener?.onCreateRoutineFailed(holder.data!!)
+                    }
                 }
             }
 
@@ -157,6 +179,13 @@ class TrainingRecyclerViewAdapter(data: OrderedRealmCollection<Training>) :
 
     fun setOnItemLongClickListener(listener:OnItemLongClickListener){
         this.onItemLongClickListener=listener
+    }
+
+    interface OnCreateRoutineListener{
+        fun onCreateRoutineFailed(training: Training)
+    }
+    fun setOnCreateRoutineListener(listener: OnCreateRoutineListener){
+        this.onCreateRoutineFailedListener=listener
     }
 
         inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

@@ -4,6 +4,11 @@
     tools:context=".MyActivity">
     <group android:id="@+id/trainingOptionsGroup">
         <item
+            android:id="@+id/action_star"
+            android:title="use as Routine"
+            app:showAsAction="ifRoom"
+            />
+        <item
             android:id="@+id/action_training_addNote"
             android:title="Notizen bearbeiten"
             app:showAsAction="never"
@@ -18,5 +23,11 @@
             android:title="Delete"
             app:showAsAction="never"
             />
+        <item
+            android:id="@+id/action_copy_training"
+            android:title="copy as new"
+            app:showAsAction="never"
+            />
+
     </group>
 </menu>

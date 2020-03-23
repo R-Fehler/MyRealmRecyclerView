@@ -1,13 +1,18 @@
 package com.strong_weightlifting.strength_tracker_app.ui.recyclerview
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.TextView
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.recyclerview.widget.RecyclerView
 import com.strong_weightlifting.strength_tracker_app.R
 import com.strong_weightlifting.strength_tracker_app.model.ExerciseSet
@@ -15,6 +20,7 @@ import io.realm.OrderedRealmCollection
 import io.realm.Realm
 import io.realm.RealmRecyclerViewAdapter
 import kotlin.math.roundToInt
+
 
 class ExerciseSetAdapter(data: OrderedRealmCollection<ExerciseSet>) :
     RealmRecyclerViewAdapter<ExerciseSet, ExerciseSetAdapter.MyViewHolder>(data, false) {
@@ -42,6 +48,7 @@ class ExerciseSetAdapter(data: OrderedRealmCollection<ExerciseSet>) :
         return getItem(index)!!.uuid
     }
 
+    @SuppressLint("ServiceCast")
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         holder.itemView.parent
         val exerciseSet = getItem(position)

@@ -25,6 +25,7 @@ class DataHelper {
                 }
             }
         }
+
         fun addExercise(realm: Realm,trainingUUID:Long): Long {
             var primary:Long=0
             realm.executeTransaction {primary= Exercise.create(it,trainingUUID) }

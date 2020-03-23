@@ -5,7 +5,7 @@ import io.realm.RealmObject
 
 open class MasterParent(
     @SuppressWarnings("unused")
-    var trainingList: RealmList<Training> = RealmList()
-
+    var trainingList: RealmList<Training> = RealmList(),
+    var routineList: RealmList<Training> = RealmList()
 ) : RealmObject() {
 }

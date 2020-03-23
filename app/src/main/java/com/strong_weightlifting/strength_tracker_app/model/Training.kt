@@ -37,24 +37,103 @@ open class Training : RealmObject() {
             return training
 
         }
+        fun createRoutine(realm: Realm):Training?{
+            val masterParent = realm.where(MasterParent::class.java).findFirst()
+            val routines: RealmList<Training>? = masterParent?.routineList
+            val maxid = realm.where(Training::class.java).findAll()?.max(FIELD_UUID)?.toLong()
 
-        fun createCopy(realm: Realm,training: Training){
-            val newTraining=create(realm)
-            newTraining?.name=training.name
-            for (exercise in training.exercises){
+            maxid?.let { INTEGER_COUNTER.set(it+1) }
 
-            }
-            training.exercises.forEachIndexed { index, exercise ->
-                var exID:Long=0
-                newTraining?.uuid?.let { exID=Exercise.create(realm, it) }
-                newTraining?.exercises?.get(index)?.knownExercise=exercise.knownExercise
-                exercise.sets.forEachIndexed { index, exerciseSet ->
-                    val newSet=ExerciseSet.create(realm,exID)
-                    newSet?.weight=exerciseSet.weight
-                    newSet?.reps=exerciseSet.reps
+            val training =realm.createObject(Training::class.java, increment())
+            return training
+        }
+
+        /**
+         * Returns true if Routine was created or updated, if name =="" ot returns false -->error msg. "no name"
+         */
+        fun createAsRoutine(realm:Realm,training: Training):Boolean{
+            val masterParent = realm.where(MasterParent::class.java).findFirst()
+            val routines: RealmList<Training>? = masterParent?.routineList
+            val routine = masterParent?.routineList?.find { it.name==training.name}
+            if(routine!=null) {
+                updateRoutine(realm,training)
+                return true
                 }
+            else {
+                if (training.name != "") {
+                    val newRoutine = createRoutine(realm)
+                    newRoutine?.name = training.name
+                    training.exercises.forEachIndexed { index, exercise ->
+                        createAndCopyFields(realm,index, exercise, newRoutine)
+
+                    }
+
+                    routines?.add(newRoutine)
+                    return true
+                }
+                return false
             }
         }
+
+        fun createCopy(realm: Realm,training: Training) {
+            val newTraining = create(realm)
+            newTraining?.name = training.name
+            training.exercises.forEachIndexed { index, exercise ->
+                createAndCopyFields(realm,index, exercise, newTraining)
+
+            }
+        }
+
+
+        fun createCopyOfRoutine(realm: Realm, routine: Training){
+            val newTraining=create(realm)
+            newTraining?.name=routine.name
+            routine.exercises.forEachIndexed { index, exercise ->
+                createAndCopyFields(realm,index, exercise, newTraining)
+            }
+        }
+
+        private fun createAndCopyFields(realm: Realm, index: Int, exercise: Exercise, newTraining: Training?) {
+            var exID:Long=0
+            newTraining?.uuid?.let { exID=Exercise.create(realm, it) }
+            newTraining?.exercises?.get(index)?.knownExercise=exercise.knownExercise
+            newTraining?.exercises?.get(index)?.prCalculatedAtTheMoment= exercise.knownExercise?.prCalculated!!
+            newTraining?.exercises?.get(index)?.prWeightAtTheMoment=exercise.knownExercise?.prWeight!!
+            newTraining?.exercises?.get(index)?.repsAtPRWeightAtTheMoment=exercise.knownExercise?.repsAtPRWeight!!
+            exercise.sets.forEachIndexed { index, exerciseSet ->
+                val newSet=ExerciseSet.create(realm,exID)
+                newSet?.weight=exerciseSet.weight
+                newSet?.reps=exerciseSet.reps
+            }
+        }
+
+        /**
+         * Returns true if Routine with same name was found and was updated
+         */
+        fun updateRoutine(realm:Realm,training: Training):Boolean{
+            val masterParent = realm.where(MasterParent::class.java).findFirst()
+            val routine = masterParent?.routineList?.find { it.name==training.name }
+            if(routine!=null) {
+                for (exercise in routine.exercises) {
+                    exercise.sets.deleteAllFromRealm()
+                }
+                routine.exercises.deleteAllFromRealm()
+
+                training.exercises.forEachIndexed { index, exercise ->
+                    var exID: Long = 0L
+                    routine.uuid.let { exID = Exercise.create(realm, it) }
+                    routine.exercises.get(index)?.knownExercise = exercise.knownExercise
+                    exercise.sets.forEachIndexed { index, exerciseSet ->
+                        val newSet = ExerciseSet.create(realm, exID)
+                        newSet?.weight = exerciseSet.weight
+                        newSet?.reps = exerciseSet.reps
+                    }
+                }
+                return true
+            }
+            return false
+        }
+
         fun delete(realm: Realm, uuid: Long){
             val training=realm.where(Training::class.java).equalTo(FIELD_UUID,uuid).findFirst()
             for(exercise in training?.exercises!!){
