@@ -25,13 +25,12 @@ import java.util.regex.Pattern
 
 class TrainingRecyclerViewAdapter(data: OrderedRealmCollection<Training>) :
     RealmRecyclerViewAdapter<Training, TrainingRecyclerViewAdapter.MyViewHolder>(data, false) {
-    val uuidsToDelete: MutableSet<Long> = HashSet()
     private var listener: OnItemClickListener? = null
     private var onNoteListener: OnNotesEditListener?=null
     private var onDateListener: OnDateClickListener?=null
     private var onItemLongClickListener: OnItemLongClickListener?=null
     private var onCreateRoutineFailedListener: OnCreateRoutineListener?=null
-
+    var showRoutines=false
 
 
     var realm: Realm?=null
@@ -119,11 +118,6 @@ class TrainingRecyclerViewAdapter(data: OrderedRealmCollection<Training>) :
 
 
                 }
-                R.id.action_training_remove_addNote ->{
-                    holder.notes.visibility=View.GONE
-//                    holder.notesHeader.visibility=View.GONE
-
-                }
                 R.id.action_training_delete ->{
                     realm?.let { it1 -> holder.data?.uuid?.let { it2 -> DataHelper.deleteTraining(it1, it2) } }
                     this.updateData(data)
@@ -147,6 +141,9 @@ class TrainingRecyclerViewAdapter(data: OrderedRealmCollection<Training>) :
     holder.menu.setOnClickListener {
         popup.show()
     }
+
+        popup.menu.findItem(R.id.action_star).isVisible = showRoutines.not()
+
     }
 
 

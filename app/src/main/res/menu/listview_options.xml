@@ -3,6 +3,7 @@
       xmlns:app="http://schemas.android.com/apk/res-auto"
       tools:context=".MyActivity">
     <group android:id="@+id/group_normal_mode">
+
         <item
             android:id="@+id/action_KnownExerciseOverView"
             android:title="Übungskatalog"
@@ -14,10 +15,12 @@
             android:title="Suche Training(s)"
             android:icon="@drawable/ic_search_white_24dp"
             app:showAsAction="ifRoom"
+            android:checkable="true"
+            android:checked="false"
             />
         <item
             android:id="@+id/action_showRoutines"
-            android:title="show Routines"
+            android:title="@string/show_routines"
             android:icon="@drawable/ic_star_yellow_24dp"
             app:showAsAction="never"
             android:checkable="true"

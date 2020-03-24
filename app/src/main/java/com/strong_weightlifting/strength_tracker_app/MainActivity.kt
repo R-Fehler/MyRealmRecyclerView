@@ -17,6 +17,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.ArrayAdapter
 import android.widget.CheckBox
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -29,6 +30,8 @@ import com.strong_weightlifting.strength_tracker_app.ui.recyclerview.TrainingRec
 import io.realm.Realm
 import io.realm.RealmList
 import io.realm.Sort
+import io.realm.kotlin.oneOf
+import kotlinx.android.synthetic.main.activity_edit_training.*
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.*
 import java.text.ParseException
@@ -127,10 +130,22 @@ class MainActivity : AppCompatActivity() {
 
 
         fabAddTraining?.setOnClickListener {
-            realm?.let { DataHelper.addTraining(it) }
+            if(showRoutines.not())
+            menu?.performIdentifierAction(R.id.action_showRoutines,0)
+            else{
+
+
+
+            var newTraining: Training?=null
+            realm?.let {newTraining= DataHelper.addTraining(it) }
             adapter?.updateData(adapter?.data)
             val llm: LinearLayoutManager = recyclerView?.layoutManager as LinearLayoutManager
             llm.scrollToPositionWithOffset(0, 0)
+            var intent =Intent(baseContext,EditTrainingActivity::class.java)
+            intent.putExtra(EditTrainingActivity.TRAINING_ID,newTraining?.uuid)
+            startActivityForResult(intent, REQUEST_TRAINING)
+            }
+
         }
         fabResumeTraining?.setOnClickListener {
             var intent = Intent(baseContext, EditTrainingActivity::class.java)
@@ -141,10 +156,16 @@ class MainActivity : AppCompatActivity() {
 
         setUpRecyclerView()
 
-        close_searchViews_btn.setOnClickListener {
-            CompleteSearchBar.visibility = View.GONE
-        }
 
+
+        val distinctTrainings=realm?.where(Training::class.java)?.distinct("name")?.findAll()
+        val nameArray= Array(distinctTrainings?.size!!){i -> distinctTrainings[i]?.name}
+        val nameAdaper: ArrayAdapter<String> = ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,nameArray)
+        search_TrainingName_EditText.setAdapter(nameAdaper)
+        search_TrainingName_EditText.setOnTouchListener { v, event ->
+            search_TrainingName_EditText.showDropDown()
+            return@setOnTouchListener false
+        }
         search_TrainingName_EditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 adapter?.updateData(
@@ -303,18 +324,38 @@ class MainActivity : AppCompatActivity() {
         when (id) {
 
             R.id.action_searchTrainings -> {
-                CompleteSearchBar.visibility = View.VISIBLE
+                item.isChecked=item.isChecked.not()
+                if(item.isChecked) {
+                    CompleteSearchBar.visibility = View.VISIBLE
+                }
+                else{
+                    CompleteSearchBar.visibility=View.GONE
+                    adapter?.updateData( realm!!.where(MasterParent::class.java).findFirst()!!.trainingList.sort(
+                        "date",
+                        Sort.DESCENDING
+                    ))
+                }
                 return true
             }
 
             R.id.action_showRoutines ->{
                 item.isChecked=item.isChecked.not()
                 showRoutines=item.isChecked
+                adapter?.showRoutines=item.isChecked
                 if(showRoutines){
+                    setTitle(R.string.title_showRoutines)
+
                     adapter?.updateData(realm?.where(MasterParent::class.java)?.findFirst()?.routineList?.sort("date",Sort.DESCENDING))
                 }
-                else
-                    adapter?.updateData(realm?.where(MasterParent::class.java)?.findFirst()?.trainingList?.sort("date",Sort.DESCENDING))
+                else {
+                    setTitle(R.string.app_name)
+                    adapter?.updateData(
+                        realm?.where(MasterParent::class.java)?.findFirst()?.trainingList?.sort(
+                            "date",
+                            Sort.DESCENDING
+                        )
+                    )
+                }
                 return true
             }
             R.id.action_KnownExerciseOverView -> {
@@ -358,12 +399,25 @@ class MainActivity : AppCompatActivity() {
         )
         adapter!!.setOnItemClickListener(object : TrainingRecyclerViewAdapter.OnItemClickListener {
             override fun onItemClick(training: Training) {
-                if (activeTrainingUUID < 0) {
-                    var intent = Intent(baseContext, EditTrainingActivity::class.java)
-                    intent.putExtra(EditTrainingActivity.TRAINING_ID, training.uuid) //TODO LongExtra?
+                if (activeTrainingUUID < 0) { // TODO andere Trotzdem ansehen können
+                    if(showRoutines){
+                        var newTraining:Training?=null
+                        realm?.executeTransaction { newTraining=Training.createCopyOfRoutine(it,training) }
+                        var intent = Intent(baseContext, EditTrainingActivity::class.java)
+                        intent.putExtra(EditTrainingActivity.TRAINING_ID, newTraining?.uuid) //TODO LongExtra?
 
-                    startActivityForResult(intent, REQUEST_TRAINING)
+                        startActivityForResult(intent, REQUEST_TRAINING)
+                    }
+                    else {
+
+                        var intent = Intent(baseContext, EditTrainingActivity::class.java)
+                        intent.putExtra(EditTrainingActivity.TRAINING_ID, training.uuid) //TODO LongExtra?
+
+                        startActivityForResult(intent, REQUEST_TRAINING)
+                    }
                 }
+
+
             }
         })
         adapter!!.setOnItemLongClickListener(object : TrainingRecyclerViewAdapter.OnItemLongClickListener {
@@ -985,6 +1039,19 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         adapter?.updateData(adapter?.data)
+        if(showRoutines) {
+            menu?.performIdentifierAction(R.id.action_showRoutines, 0)
+        }
+    }
+
+    override fun onBackPressed() {
+        if(showRoutines){
+            menu?.performIdentifierAction(R.id.action_showRoutines, 0)
+        }
+        else {
+            super.onBackPressed()
+        }
+
     }
 }
 

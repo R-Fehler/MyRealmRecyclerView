@@ -76,13 +76,6 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0.8"
                 />
-            <Button
-                android:id="@+id/close_searchViews_btn"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.2"
-                android:text="CLOSE"
-                />
 
         </LinearLayout>
 

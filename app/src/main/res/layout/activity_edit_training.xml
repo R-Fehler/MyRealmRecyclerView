@@ -21,7 +21,7 @@
         app:layout_scrollFlags="scroll|enterAlways"
         />
 
-        <EditText
+        <AutoCompleteTextView
             android:id="@+id/nameOfTrainingEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -30,9 +30,11 @@
             android:layout_marginEnd="8dp"
             android:inputType="textCapSentences"
             android:imeOptions="actionDone"
-            android:hint="Name des Trainings"
+            android:hint="@string/name_of_training_hint"
             app:layout_scrollFlags="scroll|enterAlways"
+            android:completionThreshold="0"
  />
+
         <EditText
             android:id="@+id/notesOfTrainingEditText"
             android:layout_width="match_parent"
@@ -42,8 +44,9 @@
             android:layout_marginEnd="8dp"
             android:inputType="textCapSentences"
             android:imeOptions="actionDone"
-            android:hint="Notizen"
+            android:hint="@string/notes_hint"
             app:layout_scrollFlags="scroll|enterAlways"
+
             />
 
     </com.google.android.material.appbar.AppBarLayout>

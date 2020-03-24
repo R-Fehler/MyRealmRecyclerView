@@ -39,16 +39,17 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="0.3"
                     android:id="@+id/search_Date_EditText"
-                    android:hint="Monat"
+                    android:hint="@string/month_hint"
                     android:inputType="number"
                     />
-                <EditText
+                <AutoCompleteTextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.7"
                     android:id="@+id/search_TrainingName_EditText"
-                    android:hint="Name des Trainings"
+                    android:hint="@string/name_of_training_hint"
                     android:inputType="textCapSentences"
+                    android:completionThreshold="0"
                     />
             </LinearLayout>
             <LinearLayout
@@ -89,13 +90,6 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.8"
-                    />
-                <Button
-                    android:id="@+id/close_searchViews_btn"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.2"
-                    android:text="CLOSE"
                     />
 
             </LinearLayout>

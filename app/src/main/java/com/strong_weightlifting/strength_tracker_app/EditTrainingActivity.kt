@@ -8,6 +8,9 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,6 +21,7 @@ import io.realm.Realm
 import io.realm.Sort
 
 import kotlinx.android.synthetic.main.activity_edit_training.*
+import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 
 /*TODO
@@ -59,10 +63,24 @@ class EditTrainingActivity : AppCompatActivity() {
                 TRAINING_ID, 0
             )
         )!!.findFirst()
+
+        if(training?.isDone!!.not()){
+            setTitle(R.string.title_activity_edit_training_newTraining)
+        }
         nameOfTrainingEditText.text.let {
             it.clear()
             it.insert(0, training?.name)
         }
+
+        val distinctTrainings=realm?.where(Training::class.java)?.distinct("name")?.findAll()
+        val nameArray= Array(distinctTrainings?.size!!){i -> distinctTrainings[i]?.name}
+        val nameAdaper: ArrayAdapter<String> = ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,nameArray)
+         nameOfTrainingEditText.setAdapter(nameAdaper)
+        nameOfTrainingEditText.setOnTouchListener { v, event ->
+            nameOfTrainingEditText.showDropDown()
+            return@setOnTouchListener false
+        }
+
         notesOfTrainingEditText.text.insert(0,training?.notes)
 
         nameOfTrainingEditText.addTextChangedListener(object : TextWatcher {
@@ -218,6 +236,66 @@ class EditTrainingActivity : AppCompatActivity() {
         adapter?.updateData(adapter?.data)
     }
 
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        this.menu = menu
+        menuInflater.inflate(R.menu.edit_training_menu, menu)
+        menu.setGroupVisible(R.id.group_normal_mode, true)
+        if(training?.isDone?.not()!!){
+            menu.findItem(R.id.action_editTraining).isVisible=false
+        }
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
+        val returnIntent= Intent()
+        when (id) {
+            R.id.action_editTraining ->{
+                realm?.executeTransaction {  training?.isDone=false
+                adapter?.data?.forEach{ exercise ->
+                    exercise.sets.forEach { it.isDone=false }
+                }
+                }
+                title = "Edit Training Session"
+                adapter?.updateData(adapter?.data)
+
+                return true
+            }
+
+            R.id.action_done -> {
+                realm?.executeTransaction {
+                        adapter?.data?.forEach { exercise ->
+                            val rmSetEpley = exercise.sets.maxBy { ExerciseSet.epleyValue(it) }
+                            rmSetEpley?.let {set ->
+
+                                val epValue = set.let { it1 -> ExerciseSet.epleyValue(it1) }
+                                val epWeight = set.weight
+                                val epReps = set.reps
+                                if (exercise.knownExercise?.prCalculated!! < epValue) {
+                                    exercise.knownExercise!!.prCalculated = epValue
+                                    exercise.knownExercise!!.prWeight = epWeight
+                                    exercise.knownExercise!!.repsAtPRWeight = epReps
+                                    exercise.knownExercise!!.dateOfPR=training?.date
+                                    set.isPR=true
+                                }
+
+                                exercise.sets.forEach { it.isDone=true }
+                            }
+                        }
+
+                    }
+
+                realm?.executeTransaction {  training?.isDone=true}
+                returnIntent.putExtra(TRAINING_ID,-1)
+                setResult(Activity.RESULT_OK,returnIntent)
+                super.onBackPressed()
+                return true
+            }
+
+            else -> return super.onOptionsItemSelected(item)
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         adapter?.updateData(adapter?.data)
@@ -230,47 +308,9 @@ class EditTrainingActivity : AppCompatActivity() {
                 return}
         }
         val returnIntent= Intent()
-
-        AlertDialog.Builder(this)
-            .setTitle("Mit dem Training fertig?")
-            .setMessage("PRs werden upgedated")
-            .setPositiveButton("Ja", DialogInterface.OnClickListener { dialog, which ->
-                realm?.let {
-                    it.executeTransaction {
-                        adapter?.data?.forEach { exercise ->
-                            val rmSetEpley = exercise.sets.maxBy { ExerciseSet.epleyValue(it) }
-                            rmSetEpley?.let {set ->
-
-                                val epValue = set.let { it1 -> ExerciseSet.epleyValue(it1) }
-                                val epWeight = set.weight
-                                val epReps = set.reps
-                                if (exercise.knownExercise?.prCalculated!! < epValue) {
-                                    exercise.knownExercise!!.prCalculated = epValue
-                                    exercise.knownExercise!!.prWeight = epWeight
-                                    exercise.knownExercise!!.repsAtPRWeight = epReps
-                                    exercise.knownExercise!!.dateOfPR= exercise.doneInTrainings?.first()?.date!!
-                                    set.isPR=true
-                                }
-
-                            }
-                        }
-
-                    }
-                }
-                realm?.executeTransaction {  training?.isDone=true}
-                returnIntent.putExtra(TRAINING_ID,-1)
-                setResult(Activity.RESULT_OK,returnIntent)
-                super.onBackPressed()
-
-            })
-            .setNegativeButton("Nein", DialogInterface.OnClickListener { dialog, which ->
-                returnIntent.putExtra(TRAINING_ID,intent.getLongExtra(TRAINING_ID, 0))
-                setResult(Activity.RESULT_OK,returnIntent)
-                super.onBackPressed()
-
-            })
-            .setIcon(android.R.drawable.ic_dialog_alert)
-            .show()
+        returnIntent.putExtra(TRAINING_ID,intent.getLongExtra(TRAINING_ID, 0))
+        setResult(Activity.RESULT_OK,returnIntent)
+        super.onBackPressed()
     }
 
 

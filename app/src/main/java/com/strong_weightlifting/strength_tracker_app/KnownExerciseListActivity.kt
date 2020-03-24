@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.Menu
+import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -13,10 +14,12 @@ import com.strong_weightlifting.strength_tracker_app.model.DataHelper
 import com.strong_weightlifting.strength_tracker_app.model.KnownExercise
 import com.strong_weightlifting.strength_tracker_app.ui.recyclerview.KnownExerciseAdapter
 import com.google.android.material.snackbar.Snackbar
+import com.strong_weightlifting.strength_tracker_app.model.Training
 import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
 import kotlinx.android.synthetic.main.activity_known_exercise_list.*
+import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 
 class KnownExerciseListActivity : AppCompatActivity() {

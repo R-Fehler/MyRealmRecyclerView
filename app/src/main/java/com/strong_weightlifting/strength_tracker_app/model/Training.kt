@@ -85,12 +85,13 @@ open class Training : RealmObject() {
         }
 
 
-        fun createCopyOfRoutine(realm: Realm, routine: Training){
+        fun createCopyOfRoutine(realm: Realm, routine: Training): Training? {
             val newTraining=create(realm)
             newTraining?.name=routine.name
             routine.exercises.forEachIndexed { index, exercise ->
                 createAndCopyFields(realm,index, exercise, newTraining)
             }
+            return newTraining
         }
 
         private fun createAndCopyFields(realm: Realm, index: Int, exercise: Exercise, newTraining: Training?) {

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Strong Weightlifting</string>
-    <string name="delete">Delete</string>
     <string name="title_activity_edit_training">Training Overview</string>
+    <string name="title_activity_edit_training_newTraining">New Training Session</string>
     <string name="title_activity_known_exercise_list">Catalog of Exercises</string>
+    <string name="title_showRoutines">Routines</string>
     <string name="action_settings">Settings</string>
     <string name="add_set">Add Set</string>
     <string name="title_activity_change_known_exercise">Change Name/ID of Exercise</string>
@@ -11,5 +12,18 @@
     <string name="notesHeader">Notes:&#160; </string>
     <string name="KEY_PREFERENCE_FILE">com.strong_weightlifting.strength_tracker_app.PREFERENCE_FILE </string>
     <string name="KEY_ACTIVE_TRAINING">com.strong_weightlifting.strength_tracker_app.KEY_ACTIVE_TRAINING </string>
+    <string name="done">Done</string>
+    <string name="edit">Edit</string>
+    <string name="use_as_routine">as / update Routine</string>
+    <string name="edit_note">Edit Notes Only</string>
+    <string name="hide_note">Hide Note</string>
+    <string name="delete">Delete</string>
+    <string name="copy_as_new_training">As New Training</string>
+    <string name="notes_hint">Notizen</string>
+    <string name="name_of_training_hint">Name of Training</string>
+    <string name="month_hint">Monat</string>
+    <string name="show_routines">show Routines</string>
+    <string name="search_name">Search Exercise Name</string>
+    <string name="search_id">ID?</string>
 
 </resources>

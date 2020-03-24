@@ -182,6 +182,7 @@ class ExercisesRecyclerViewAdapter(data: OrderedRealmCollection<Exercise>) :
         }
     }
 
+
     inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val name: TextView = itemView.findViewById(R.id.exerciseName)
         val user_custom_id: TextView = itemView.findViewById(R.id.exerciseName_ID)

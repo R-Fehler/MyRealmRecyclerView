@@ -5,27 +5,22 @@
     <group android:id="@+id/trainingOptionsGroup">
         <item
             android:id="@+id/action_star"
-            android:title="use as Routine"
+            android:title="@string/use_as_routine"
             app:showAsAction="ifRoom"
             />
         <item
-            android:id="@+id/action_training_addNote"
-            android:title="Notizen bearbeiten"
-            app:showAsAction="never"
-            />
+            android:id="@+id/action_copy_training"
+            android:title="@string/copy_as_new_training"
+            app:showAsAction="never" />
         <item
-            android:id="@+id/action_training_remove_addNote"
-            android:title="Notizen ausblenden"
+            android:id="@+id/action_training_addNote"
+            android:title="@string/edit_note"
             app:showAsAction="never"
             />
+
         <item
             android:id="@+id/action_training_delete"
-            android:title="Delete"
-            app:showAsAction="never"
-            />
-        <item
-            android:id="@+id/action_copy_training"
-            android:title="copy as new"
+            android:title="@string/delete"
             app:showAsAction="never"
             />
 
