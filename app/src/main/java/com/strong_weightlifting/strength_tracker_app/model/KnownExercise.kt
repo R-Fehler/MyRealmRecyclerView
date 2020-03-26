@@ -1,5 +1,6 @@
 package com.strong_weightlifting.strength_tracker_app.model
 
+import com.strong_weightlifting.strength_tracker_app.EditTrainingActivity
 import io.realm.Realm
 import io.realm.RealmObject
 import io.realm.RealmResults
@@ -17,7 +18,7 @@ open class KnownExercise: RealmObject() {
     var prWeight: Int = 1 //true max Weight lifted
     var repsAtPRWeight: Int = 1 // No of Reps at max Weight lifted
     var prCalculated: Double= 1.0 // calculated 1RM for Training Programming and Progress metric
-    var dateOfPR: Date? = null
+    var dateOfPR: Date = Date()
     @LinkingObjects("knownExercise")
     val doneInExercises: RealmResults<Exercise>? = null
     var doneInExercisesSize:Int=0
@@ -59,5 +60,6 @@ open class KnownExercise: RealmObject() {
             if(knownExercise?.doneInExercisesSize==0)
                 knownExercise.deleteFromRealm()
         }
+
     }
 }

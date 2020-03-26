@@ -6,13 +6,13 @@
 
         <item
             android:id="@+id/action_KnownExerciseOverView"
-            android:title="Übungskatalog"
+            android:title="@string/catalog_of_exercises"
             app:showAsAction="never"
 
             />
         <item
             android:id="@+id/action_searchTrainings"
-            android:title="Suche Training(s)"
+            android:title="@string/search"
             android:icon="@drawable/ic_search_white_24dp"
             app:showAsAction="ifRoom"
             android:checkable="true"
@@ -39,17 +39,17 @@
 <!--            />-->
         <item
             android:id="@+id/action_delete_all_realm_data"
-            android:title="delete all Data"
+            android:title="@string/delete_all_data"
             app:showAsAction="never"
             />
         <item
             android:id="@+id/action_backup_realm_file"
-            android:title="Backup Realm Database"
+            android:title="@string/backup_database"
             app:showAsAction="never"
             />
         <item
             android:id="@+id/action_import_realm_file"
-            android:title="Import Backup Realm DB"
+            android:title="@string/import_backup_db"
             app:showAsAction="never"
             />
     </group>

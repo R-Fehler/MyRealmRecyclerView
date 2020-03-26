@@ -12,6 +12,7 @@ open class ExerciseSet : RealmObject() {
     var uuid: Long=0
     var orderNumber=1
     var weight: Int = 0 // done
+    var weightPercentOf1RM: Int =0
     var reps: Int = 0 // done
     var weightPlanned: Int=0
     var repsPlanned: Int=0
@@ -118,6 +119,21 @@ open class ExerciseSet : RealmObject() {
                 fixedWeight=exerciseSet.weight.toDouble()
 
             return  fixedWeight * (1.0 + (exerciseSet.reps.toDouble() / 30.0))
+        }
+        fun epleyValue(weight:Int, reps:Int): Double {
+            var fixedWeight=0.0
+            if(reps<1){
+                return 0.0
+            }
+            if(reps==1){
+                return weight.toDouble()
+            }
+            if(weight==0)
+                fixedWeight=1.0
+            else
+                fixedWeight=weight.toDouble()
+
+            return  fixedWeight * (1.0 + (reps.toDouble() / 30.0))
         }
 
 

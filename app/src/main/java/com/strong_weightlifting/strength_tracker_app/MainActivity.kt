@@ -18,7 +18,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ArrayAdapter
-import android.widget.CheckBox
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -29,14 +28,14 @@ import com.strong_weightlifting.strength_tracker_app.model.*
 import com.strong_weightlifting.strength_tracker_app.ui.recyclerview.TrainingRecyclerViewAdapter
 import io.realm.Realm
 import io.realm.RealmList
+import io.realm.RealmResults
 import io.realm.Sort
-import io.realm.kotlin.oneOf
-import kotlinx.android.synthetic.main.activity_edit_training.*
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.*
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.function.Predicate
 import kotlin.math.roundToInt
 
 /*TODO
@@ -148,7 +147,7 @@ class MainActivity : AppCompatActivity() {
 
         }
         fabResumeTraining?.setOnClickListener {
-            var intent = Intent(baseContext, EditTrainingActivity::class.java)
+            val intent = Intent(baseContext, EditTrainingActivity::class.java)
             intent.putExtra(EditTrainingActivity.TRAINING_ID, activeTrainingUUID) //TODO LongExtra?
 
             startActivityForResult(intent, REQUEST_TRAINING)
@@ -172,7 +171,7 @@ class MainActivity : AppCompatActivity() {
                     realm?.where(Training::class.java)?.contains(
                         "name",
                         s.toString().trim()
-                    )?.findAll()?.sort("date", Sort.DESCENDING)
+                    )?.equalTo("isRoutine",false)?.findAll()?.sort("date", Sort.DESCENDING)
                 )
             }
 
@@ -186,7 +185,7 @@ class MainActivity : AppCompatActivity() {
                     realm?.where(Training::class.java)?.contains(
                         "notes",
                         s.toString().trim()
-                    )?.findAll()?.sort("date", Sort.DESCENDING)
+                    )?.equalTo("isRoutine",false)?.findAll()?.sort("date", Sort.DESCENDING)
                 )
             }
 
@@ -200,7 +199,7 @@ class MainActivity : AppCompatActivity() {
                         realm?.where(Training::class.java)?.equalTo(
                             "month",
                             s.toString().trim().toInt() - 1
-                        )?.findAll()?.sort("date", Sort.DESCENDING)
+                        )?.equalTo("isRoutine",false)?.findAll()?.sort("date", Sort.DESCENDING)
                     )
                 } else {
                     adapter?.updateData(
@@ -242,13 +241,12 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                     trainingsToDisplay.sortByDescending { it.date }
+                    trainingsToDisplay.removeAll {it.isRoutine}
                     adapter?.updateData(trainingsToDisplay)
                 } else {
                     adapter?.updateData(
-                        realm!!.where(MasterParent::class.java).findFirst()!!.trainingList.sort(
-                            "date",
-                            Sort.DESCENDING
-                        )
+                        returnTrainings(realm)
+
                     )
                 }
             }
@@ -286,10 +284,7 @@ class MainActivity : AppCompatActivity() {
                     adapter?.updateData(trainingsToDisplay)
                 } else {
                     adapter?.updateData(
-                        realm!!.where(MasterParent::class.java).findFirst()!!.trainingList.sort(
-                            "date",
-                            Sort.DESCENDING
-                        )
+                        returnTrainings(realm)
                     )
                 }
             }
@@ -298,6 +293,14 @@ class MainActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
 
+
+    }
+
+    private fun returnTrainings(realm: Realm?): RealmResults<Training>? {
+        return realm!!.where(Training::class.java).equalTo("isRoutine",false).sort(
+            "date",
+            Sort.DESCENDING
+        ).findAll()
 
     }
 
@@ -330,10 +333,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 else{
                     CompleteSearchBar.visibility=View.GONE
-                    adapter?.updateData( realm!!.where(MasterParent::class.java).findFirst()!!.trainingList.sort(
-                        "date",
-                        Sort.DESCENDING
-                    ))
+                    adapter?.updateData( returnTrainings(realm))
                 }
                 return true
             }
@@ -345,16 +345,13 @@ class MainActivity : AppCompatActivity() {
                 if(showRoutines){
                     setTitle(R.string.title_showRoutines)
 
-                    adapter?.updateData(realm?.where(MasterParent::class.java)?.findFirst()?.routineList?.sort("date",Sort.DESCENDING))
+                    adapter?.updateData(returnRoutines(realm))
                 }
                 else {
                     setTitle(R.string.app_name)
                     adapter?.updateData(
-                        realm?.where(MasterParent::class.java)?.findFirst()?.trainingList?.sort(
-                            "date",
-                            Sort.DESCENDING
+                        returnTrainings(realm)
                         )
-                    )
                 }
                 return true
             }
@@ -390,27 +387,28 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun returnRoutines(realm: Realm?): RealmResults<Training>? {
+       return realm?.where(Training::class.java)?.equalTo("isRoutine",true)?.findAll()?.sort("date",Sort.DESCENDING)
+
+    }
+
     private fun setUpRecyclerView() {
-        adapter = TrainingRecyclerViewAdapter(
-            realm!!.where(MasterParent::class.java).findFirst()!!.trainingList.sort(
-                "date",
-                Sort.DESCENDING
-            )
-        )
+        val trainingResults=returnTrainings(realm!!)
+        if(trainingResults!=null) adapter = TrainingRecyclerViewAdapter( trainingResults )
         adapter!!.setOnItemClickListener(object : TrainingRecyclerViewAdapter.OnItemClickListener {
             override fun onItemClick(training: Training) {
                 if (activeTrainingUUID < 0) { // TODO andere Trotzdem ansehen können
                     if(showRoutines){
                         var newTraining:Training?=null
-                        realm?.executeTransaction { newTraining=Training.createCopyOfRoutine(it,training) }
-                        var intent = Intent(baseContext, EditTrainingActivity::class.java)
+                        realm?.executeTransaction { newTraining=Training.createCopy(it,training) }
+                        val intent = Intent(baseContext, EditTrainingActivity::class.java)
                         intent.putExtra(EditTrainingActivity.TRAINING_ID, newTraining?.uuid) //TODO LongExtra?
 
                         startActivityForResult(intent, REQUEST_TRAINING)
                     }
                     else {
 
-                        var intent = Intent(baseContext, EditTrainingActivity::class.java)
+                        val intent = Intent(baseContext, EditTrainingActivity::class.java)
                         intent.putExtra(EditTrainingActivity.TRAINING_ID, training.uuid) //TODO LongExtra?
 
                         startActivityForResult(intent, REQUEST_TRAINING)
@@ -505,11 +503,9 @@ class MainActivity : AppCompatActivity() {
                     realm?.let {
                         DataHelper.deleteAllData(it)
                         adapter?.updateData(
-                            it.where(MasterParent::class.java).findFirst()!!.trainingList.sort(
-                                "date",
-                                Sort.DESCENDING
+                          returnTrainings(it)
                             )
-                        )
+
                     }
                 }
                 .setNegativeButton(android.R.string.no, null)
@@ -532,34 +528,34 @@ class MainActivity : AppCompatActivity() {
                 return true
             } else {
 
-                Log.v(TAG, "Permission is revoked1");
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 3);
-                return false;
+                Log.v(TAG, "Permission is revoked1")
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 3)
+                return false
             }
 
 
         } else { //permission is automatically granted on sdk<23 upon installation
-            Log.v(TAG, "Permission is granted1");
-            return true;
+            Log.v(TAG, "Permission is granted1")
+            return true
         }
     }
 
     fun isWriteStoragePermissionGranted(): Boolean {
         if (Build.VERSION.SDK_INT >= 23) {
-            if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_GRANTED
             ) {
-                Log.v(TAG, "Permission is granted2");
+                Log.v(TAG, "Permission is granted2")
                 return true;
             } else {
 
-                Log.v(TAG, "Permission is revoked2");
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 2);
-                return false;
+                Log.v(TAG, "Permission is revoked2")
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 2)
+                return false
             }
         } else { //permission is automatically granted on sdk<23 upon installation
-            Log.v(TAG, "Permission is granted2");
-            return true;
+            Log.v(TAG, "Permission is granted2")
+            return true
         }
     }
 
@@ -682,7 +678,6 @@ class MainActivity : AppCompatActivity() {
             val fd = inputPFD.fileDescriptor
             val fis = FileInputStream(fd)
             val scanner = Scanner(fis)
-            var i = 0
             val lines: MutableList<String> = mutableListOf()
             while (scanner.hasNextLine()) {
                 lines.add(scanner.nextLine())
@@ -700,7 +695,6 @@ class MainActivity : AppCompatActivity() {
                 var training: Training? = Training.create(realm)
                 var prevtraining: Training?
                 var exercise: Exercise? = training?.uuid?.let { Exercise.createWithReturn(realm, it) }
-                var prevExercise: Exercise?
                 loop@ for (i in 0 until lines.size) {
 
                     if (i == 0) {
@@ -855,7 +849,6 @@ class MainActivity : AppCompatActivity() {
             val fd = inputPFD.fileDescriptor
             val fis = FileInputStream(fd)
             val scanner = Scanner(fis)
-            var i = 0
             val lines: MutableList<String> = mutableListOf()
             while (scanner.hasNextLine()) {
                 lines.add(scanner.nextLine())
@@ -868,14 +861,12 @@ class MainActivity : AppCompatActivity() {
 
             realm?.executeTransactionAsync(Realm.Transaction { realm ->
                 var training: Training? = Training.create(realm)
-                var prevtraining: Training?
                 var exercise: Exercise? = training?.uuid?.let { Exercise.createWithReturn(realm, it) }
-                var prevExercise: Exercise?
                 loop@ for (i in 0 until lines.size) {
                     if (i == 0) {
                         val field = lines[i].split(";")
                         if (field.size != CSV.values().size || field[CSV.Datum.ordinal].trim().let {
-                                it.isNullOrEmpty().or(it.isBlank())
+                                it.isEmpty().or(it.isBlank())
                             }) continue@loop
                         val dateString = field[CSV.Datum.ordinal].trim()
                         val format = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -888,8 +879,8 @@ class MainActivity : AppCompatActivity() {
                         training?.isDone=true
 
                         val knownName = field[CSV.Name.ordinal].trim('"').trim().toUpperCase()
-                        var userCustomID =
-                            field[CSV.ID.ordinal].trim().let { if (it.isNullOrBlank()) 0 else it.toInt() }
+                        val userCustomID =
+                            field[CSV.ID.ordinal].trim().let { if (it.isBlank()) 0 else it.toInt() }
                         val allKnownExercises = realm.where(KnownExercise::class.java).findAll()
                         var newKnown = allKnownExercises.find { it.name == knownName }
                         if (newKnown == null) {
@@ -919,7 +910,6 @@ class MainActivity : AppCompatActivity() {
                         val field = lines[i].split(";")
                         val prevField = lines[i - 1].split(";")
                         if (field.size != CSV.values().size) continue@loop
-                        prevtraining = training
                         if (field[CSV.Datum.ordinal] != prevField[CSV.Datum.ordinal]
                         ) {
                             training = Training.create(realm)
@@ -948,8 +938,8 @@ class MainActivity : AppCompatActivity() {
                             exercise?.notes = field[CSV.Notizen.ordinal].trim()
 
                             val knownName = field[CSV.Name.ordinal].trim('"').trim().toUpperCase()
-                            var userCustomID =
-                                field[CSV.ID.ordinal].trim().let { if (it.isNullOrBlank()) 0 else it.toInt() }
+                            val userCustomID =
+                                field[CSV.ID.ordinal].trim().let { if (it.isBlank()) 0 else it.toInt() }
                             val allKnownExercises = realm.where(KnownExercise::class.java).findAll()
                             var newKnown = allKnownExercises.find { it.name == knownName }
                             if (newKnown == null) {
@@ -1013,7 +1003,6 @@ class MainActivity : AppCompatActivity() {
             )
         )
         val bufferedReader = BufferedReader(InputStreamReader(ins))
-        var line = ""
         val lines = bufferedReader.readLines().toMutableList()
         realm?.executeTransactionAsync(object : Realm.Transaction {
             override fun execute(realm: Realm) {

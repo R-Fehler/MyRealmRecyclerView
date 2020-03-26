@@ -57,7 +57,7 @@ class TrainingRecyclerViewAdapter(data: OrderedRealmCollection<Training>) :
         holder.data = training
         val itemUUID = training?.uuid
 
-        holder.date.text =SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss").format(training?.date)
+        holder.date.text = SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss").format(training?.date)
         holder.date.setOnClickListener {
             holder.data?.let { it1 -> onDateListener?.onDateClicked(it1) }
         }
@@ -86,6 +86,14 @@ class TrainingRecyclerViewAdapter(data: OrderedRealmCollection<Training>) :
         holder.description.text =str
         holder.notes.text= holder.data?.notes
         holder.nameOfTraining.text=holder.data?.name
+        if(holder.data?.isRoutine==true){
+            holder.nameOfTraining.textSize=20F
+            holder.date.date.textSize=0F
+        }
+        else{
+            holder.nameOfTraining.textSize=12F
+            holder.date.date.textSize=16F
+        }
         holder.isDoneCheckBox.isChecked= holder.data?.isDone!!
 
         holder.isDoneCheckBox.setOnClickListener {

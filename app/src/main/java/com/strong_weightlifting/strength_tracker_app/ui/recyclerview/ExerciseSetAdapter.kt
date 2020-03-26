@@ -1,18 +1,14 @@
 package com.strong_weightlifting.strength_tracker_app.ui.recyclerview
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.TextView
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.recyclerview.widget.RecyclerView
 import com.strong_weightlifting.strength_tracker_app.R
 import com.strong_weightlifting.strength_tracker_app.model.ExerciseSet
@@ -50,8 +46,8 @@ class ExerciseSetAdapter(data: OrderedRealmCollection<ExerciseSet>) :
 
     @SuppressLint("ServiceCast")
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        holder.itemView.parent
         val exerciseSet = getItem(position)
+        val exercise=exerciseSet?.doneInExercises?.first()
         holder.data = exerciseSet
         val itemUUID = exerciseSet?.uuid
         val bool = holder.data?.isDone
@@ -60,10 +56,12 @@ class ExerciseSetAdapter(data: OrderedRealmCollection<ExerciseSet>) :
         if (holder.checkBox.isChecked){
             holder.weightEditText.isEnabled=false
             holder.repsEditText.isEnabled=false
+            holder.percentageWeight.isEnabled=false
         }
         else{
             holder.weightEditText.isEnabled=true
             holder.repsEditText.isEnabled=true
+            holder.percentageWeight.isEnabled=true
         }
         val prevWeight= holder.data?.weightPlanned
         val prevReps= holder.data?.repsPlanned
@@ -79,16 +77,40 @@ class ExerciseSetAdapter(data: OrderedRealmCollection<ExerciseSet>) :
 //        }).roundToInt().toString()
         val weightString = holder.data?.weight.toString()
         val repsString = holder.data?.reps.toString()
+        fun percentOfOneRepMaxWeight(): Int= (holder.data?.weight?.times(100))?.div((exercise?.prCalculatedAtTheMoment!!))!!.roundToInt()
+        holder.percentageWeight.text.clear()
+        holder.percentageWeight.text.append(percentOfOneRepMaxWeight().toString())
+        holder.percentageWeight.addTextChangedListener(object: TextWatcher{
+            override fun afterTextChanged(s: Editable?) {
+                if(!s.isNullOrEmpty()) {
+                    if (s.toString() != "0") {
+                        val newWeight=holder.percentageWeight.text.toString().trim().toDouble()*0.01* exercise?.prCalculatedAtTheMoment!!
+                        realm?.executeTransaction { holder.data?.weightPercentOf1RM=newWeight.roundToInt() }
+                        if (holder.percentageWeight.hasFocus()){
+                            holder.weightEditText.text.clear()
+                            holder.weightEditText.text.append(newWeight.roundToInt().toString())
+                        }
 
-
+                        updateEpley(holder)
+                    }
+                }
+            }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
 
         holder.weightEditText.text.clear()
-        holder.weightEditText.text.insert(0, weightString)
+        holder.weightEditText.text.append(weightString)
         holder.weightEditText.addTextChangedListener(object: TextWatcher{
             override fun afterTextChanged(s: Editable?) {
                 if(!s.isNullOrEmpty()) {
                     if (s.toString() != holder.data?.weight.toString()) {
                         realm?.executeTransaction { holder.data?.weight = holder.weightEditText.text.toString().trim().toInt()}
+                        val percentOfOneRepMW= percentOfOneRepMaxWeight()
+                        if(holder.weightEditText.hasFocus()) {
+                            holder.percentageWeight.text.clear()
+                            holder.percentageWeight.text.append(percentOfOneRepMW.toString())
+                        }
                        updateEpley(holder)
                     }
                 }
@@ -109,7 +131,7 @@ class ExerciseSetAdapter(data: OrderedRealmCollection<ExerciseSet>) :
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
         holder.repsEditText.text.clear()
-        holder.repsEditText.text.insert(0, repsString)
+        holder.repsEditText.text.append(repsString)
 
 
         holder.checkBox.setOnClickListener {
@@ -118,10 +140,12 @@ class ExerciseSetAdapter(data: OrderedRealmCollection<ExerciseSet>) :
             if (holder.checkBox.isChecked){
                 holder.weightEditText.isEnabled=false
                 holder.repsEditText.isEnabled=false
+                holder.percentageWeight.isEnabled=false
             }
             else{
                 holder.weightEditText.isEnabled=true
                 holder.repsEditText.isEnabled=true
+                holder.percentageWeight.isEnabled=true
             }
         }
 
@@ -141,6 +165,7 @@ class ExerciseSetAdapter(data: OrderedRealmCollection<ExerciseSet>) :
         var data: ExerciseSet? = null
         val checkBox: CheckBox=itemView.findViewById(R.id.set_done_checkbox)
         val prev: TextView=itemView.findViewById(R.id.previousSet_TextView)
+        val percentageWeight: EditText=itemView.findViewById(R.id.weightPercentOf1RM)
         val percentageOfRM: TextView=itemView.findViewById(R.id.percentage_of_EpleyRM)
         fun save(set:ExerciseSet){
             realm?.executeTransaction { set.weight = weightEditText.text.toString().toInt() }

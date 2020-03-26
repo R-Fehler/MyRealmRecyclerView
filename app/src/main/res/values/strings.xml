@@ -17,13 +17,20 @@
     <string name="use_as_routine">as / update Routine</string>
     <string name="edit_note">Edit Notes Only</string>
     <string name="hide_note">Hide Note</string>
-    <string name="delete">Delete</string>
     <string name="copy_as_new_training">As New Training</string>
-    <string name="notes_hint">Notizen</string>
+    <string name="notes_hint">Notes</string>
     <string name="name_of_training_hint">Name of Training</string>
     <string name="month_hint">Monat</string>
     <string name="show_routines">show Routines</string>
     <string name="search_name">Search Exercise Name</string>
     <string name="search_id">ID?</string>
+    <string name="delete">Delete</string>
+    <string name="edit_pr">Edit PR</string>
+    <string name="title_edit_1rm_prs">Edit 1RM PRs</string>
+    <string name="catalog_of_exercises">Catalog of Exercises</string>
+    <string name="search">Search</string>
+    <string name="delete_all_data">delete all Data</string>
+    <string name="backup_database">Backup Database</string>
+    <string name="import_backup_db">Import Backup DB</string>
 
 </resources>

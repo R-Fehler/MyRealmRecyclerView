@@ -39,6 +39,9 @@ class ChangeKnownExerciseActivity : AppCompatActivity() {
                 ?.findFirst()
         KnownExerciseToChange_Name.text = knownExerciseToChange?.name
         KnownExerciseToChange_ID.text = knownExerciseToChange?.user_custom_id.toString()
+        changeKnownExerciseName_EditText.text.append(knownExerciseToChange?.name)
+        changeKnownExerciseID_EditText.text.append(knownExerciseToChange?.user_custom_id.toString())
+
         allKnownExercises = realm!!.where(KnownExercise::class.java).findAll()
 
         changeKnownExerciseName_EditText.addTextChangedListener(object : TextWatcher {
@@ -70,6 +73,7 @@ class ChangeKnownExerciseActivity : AppCompatActivity() {
                     .setAction("!!!", null).show()
 
             }
+            adapter?.updateData(adapter?.data)
         }
 
 
@@ -84,6 +88,10 @@ class ChangeKnownExerciseActivity : AppCompatActivity() {
                     ?.equalTo(KnownExercise.FIELD_UUID, knownExerciseToChangeUUID)?.findFirst()
                 KnownExerciseToChange_Name.text = knownExerciseToChange?.name
                 KnownExerciseToChange_ID.text = knownExerciseToChange?.user_custom_id.toString()
+                changeKnownExerciseName_EditText.text.clear()
+                changeKnownExerciseName_EditText.text.append(knownExerciseToChange?.name)
+                changeKnownExerciseID_EditText.text.clear()
+                changeKnownExerciseID_EditText.text.append(knownExerciseToChange?.user_custom_id.toString())
 
             }
         })

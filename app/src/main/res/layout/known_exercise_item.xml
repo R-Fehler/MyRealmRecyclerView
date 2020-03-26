@@ -32,38 +32,99 @@
         android:id="@+id/knownExerciseRV_Name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="0.65"
+        android:layout_weight="0.62"
         android:text="Name der Exercise"
-        android:textSize="24sp"
+        android:textSize="20sp"
         />
 
-
-    <TextView
+    <EditText
+        android:id="@+id/PR_Weight_EditText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:id="@+id/doneInNumber_TextView"
-        android:textSize="24sp"
-        android:layout_weight="0.2"
+        android:layout_weight="0.1"
+        android:ems="3"
+        android:hint="kg"
+        android:imeOptions="actionNext"
+        android:inputType="number"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:textAlignment="center"
+        android:textSize="16sp"
         />
+
+    <EditText
+        android:id="@+id/PR_Reps_EditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.1"
+        android:ems="3"
+        android:hint="rps"
+        android:imeOptions="actionNext"
+        android:inputType="number"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:textAlignment="center"
+        android:textSize="16sp"
+        />
+
+
 </LinearLayout>
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <TextView
-            android:layout_marginStart="20dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="PR:  "/>
+        android:orientation="horizontal"
+        android:paddingStart="6dp"
+        android:paddingEnd="6dp"
+        >
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/PRWeightKnown_TextView"
-            android:textSize="12sp"
-
+            android:id="@+id/doneText"
+            android:text=" x "
+            android:textSize="16sp"
             />
 
-    </LinearLayout>
+        <TextView
+            android:id="@+id/doneInNumber_TextView"
+            android:layout_toRightOf="@+id/doneText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="30sp"
+            android:textSize="16sp" />
+        <TextView
+            android:id="@+id/times_Textview"
+            android:layout_toRightOf="@+id/doneInNumber_TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:text=""
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/PR_TagTextView"
+            android:layout_toRightOf="@id/times_Textview"
+            android:textSize="16sp"
+            android:text=""
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/prDateTextView"
+            android:textSize="16sp"
+            android:layout_toRightOf="@id/PR_TagTextView"
+            android:text="Mon 12.02.2002 1RM: 140kg"
+            />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:paddingEnd="20sp"
+            android:text="Best Set" />
+
+    </RelativeLayout>
 
 </LinearLayout>
 </androidx.cardview.widget.CardView>

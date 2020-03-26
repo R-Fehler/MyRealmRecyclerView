@@ -1,15 +1,12 @@
 package com.strong_weightlifting.strength_tracker_app
 
 import android.app.Activity
-import android.app.AlertDialog
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,11 +15,8 @@ import com.strong_weightlifting.strength_tracker_app.model.*
 import com.strong_weightlifting.strength_tracker_app.ui.recyclerview.ExerciseSetAdapter
 import com.strong_weightlifting.strength_tracker_app.ui.recyclerview.ExercisesRecyclerViewAdapter
 import io.realm.Realm
-import io.realm.Sort
 
 import kotlinx.android.synthetic.main.activity_edit_training.*
-import kotlinx.android.synthetic.main.activity_main.*
-import java.util.*
 
 /*TODO
 In edit exercise activity noch oben edit Text mit Datum, Notizen dauer usw.
@@ -85,7 +79,7 @@ class EditTrainingActivity : AppCompatActivity() {
 
         nameOfTrainingEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                if (!s.isNullOrEmpty()) {
+                if (s!=null) {
                     if (s.toString() != training?.name) {
                         realm?.executeTransaction {
                             training?.name = s.toString()
@@ -100,7 +94,7 @@ class EditTrainingActivity : AppCompatActivity() {
 
         notesOfTrainingEditText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                if (!s.isNullOrEmpty()) {
+                if (s!=null) {
                     if (s.toString() != training?.notes) {
                         realm?.executeTransaction {
                             training?.notes = s.toString()
@@ -241,7 +235,7 @@ class EditTrainingActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.edit_training_menu, menu)
         menu.setGroupVisible(R.id.group_normal_mode, true)
         if(training?.isDone?.not()!!){
-            menu.findItem(R.id.action_editTraining).isVisible=false
+            menu.findItem(R.id.action_editItems).isVisible=false
         }
         return true
     }
@@ -250,7 +244,7 @@ class EditTrainingActivity : AppCompatActivity() {
         val id = item.itemId
         val returnIntent= Intent()
         when (id) {
-            R.id.action_editTraining ->{
+            R.id.action_editItems ->{
                 realm?.executeTransaction {  training?.isDone=false
                 adapter?.data?.forEach{ exercise ->
                     exercise.sets.forEach { it.isDone=false }
@@ -275,7 +269,7 @@ class EditTrainingActivity : AppCompatActivity() {
                                     exercise.knownExercise!!.prCalculated = epValue
                                     exercise.knownExercise!!.prWeight = epWeight
                                     exercise.knownExercise!!.repsAtPRWeight = epReps
-                                    exercise.knownExercise!!.dateOfPR=training?.date
+                                    exercise.knownExercise!!.dateOfPR= training?.date!!
                                     set.isPR=true
                                 }
 

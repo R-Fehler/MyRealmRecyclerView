@@ -3,13 +3,15 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/action_editItems"
+        android:id="@+id/action_editKnownExercises"
         android:title="@string/edit"
         android:checkable="true"
         android:checked="false"
         app:showAsAction="always" />
     <item
-        android:id="@+id/action_done"
-        android:title="@string/done"
-        app:showAsAction="always" />
+        android:id="@+id/action_delete_KnownExercise"
+        android:title="@string/delete"
+        app:showAsAction="never"
+        />
+
 </menu>

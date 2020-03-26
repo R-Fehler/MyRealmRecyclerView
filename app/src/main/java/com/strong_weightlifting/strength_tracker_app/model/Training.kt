@@ -20,7 +20,7 @@ open class Training : RealmObject() {
     var duration: Long = 0 // in minutes
     var tonnage=0.0
     var isDone:Boolean=false
-
+    var isRoutine: Boolean=false
     companion object{
          const val FIELD_UUID="uuid"
         private val INTEGER_COUNTER = AtomicLong(0)
@@ -38,13 +38,8 @@ open class Training : RealmObject() {
 
         }
         fun createRoutine(realm: Realm):Training?{
-            val masterParent = realm.where(MasterParent::class.java).findFirst()
-            val routines: RealmList<Training>? = masterParent?.routineList
-            val maxid = realm.where(Training::class.java).findAll()?.max(FIELD_UUID)?.toLong()
-
-            maxid?.let { INTEGER_COUNTER.set(it+1) }
-
-            val training =realm.createObject(Training::class.java, increment())
+            val training=create(realm)
+            training?.isRoutine=true
             return training
         }
 
@@ -53,46 +48,38 @@ open class Training : RealmObject() {
          */
         fun createAsRoutine(realm:Realm,training: Training):Boolean{
             val masterParent = realm.where(MasterParent::class.java).findFirst()
-            val routines: RealmList<Training>? = masterParent?.routineList
-            val routine = masterParent?.routineList?.find { it.name==training.name}
+            val allRoutines= realm.where(Training::class.java).equalTo("isRoutine",true).findAll()
+            val routine = allRoutines.find { it.name==training.name}
             if(routine!=null) {
                 updateRoutine(realm,training)
                 return true
                 }
             else {
                 if (training.name != "") {
-                    val newRoutine = createRoutine(realm)
-                    newRoutine?.name = training.name
+                    val newRoutineTraining = createRoutine(realm)
+                    newRoutineTraining?.name = training.name
                     training.exercises.forEachIndexed { index, exercise ->
-                        createAndCopyFields(realm,index, exercise, newRoutine)
+                        createAndCopyFields(realm,index, exercise, newRoutineTraining)
 
                     }
 
-                    routines?.add(newRoutine)
                     return true
                 }
                 return false
             }
         }
 
-        fun createCopy(realm: Realm,training: Training) {
+        fun createCopy(realm: Realm,training: Training): Training? {
             val newTraining = create(realm)
             newTraining?.name = training.name
             training.exercises.forEachIndexed { index, exercise ->
                 createAndCopyFields(realm,index, exercise, newTraining)
 
             }
-        }
-
-
-        fun createCopyOfRoutine(realm: Realm, routine: Training): Training? {
-            val newTraining=create(realm)
-            newTraining?.name=routine.name
-            routine.exercises.forEachIndexed { index, exercise ->
-                createAndCopyFields(realm,index, exercise, newTraining)
-            }
             return newTraining
         }
+
+
 
         private fun createAndCopyFields(realm: Realm, index: Int, exercise: Exercise, newTraining: Training?) {
             var exID:Long=0
@@ -113,7 +100,8 @@ open class Training : RealmObject() {
          */
         fun updateRoutine(realm:Realm,training: Training):Boolean{
             val masterParent = realm.where(MasterParent::class.java).findFirst()
-            val routine = masterParent?.routineList?.find { it.name==training.name }
+            val allRoutines= realm.where(Training::class.java).equalTo("isRoutine",true).findAll()
+            val routine =allRoutines.find { it.name==training.name }
             if(routine!=null) {
                 for (exercise in routine.exercises) {
                     exercise.sets.deleteAllFromRealm()

@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.Menu
-import android.widget.ArrayAdapter
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -14,12 +14,10 @@ import com.strong_weightlifting.strength_tracker_app.model.DataHelper
 import com.strong_weightlifting.strength_tracker_app.model.KnownExercise
 import com.strong_weightlifting.strength_tracker_app.ui.recyclerview.KnownExerciseAdapter
 import com.google.android.material.snackbar.Snackbar
-import com.strong_weightlifting.strength_tracker_app.model.Training
 import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.Sort
 import kotlinx.android.synthetic.main.activity_known_exercise_list.*
-import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 
 class KnownExerciseListActivity : AppCompatActivity() {
@@ -29,6 +27,7 @@ class KnownExerciseListActivity : AppCompatActivity() {
     private var menu: Menu? = null
     private var adapter: KnownExerciseAdapter? = null
     private var allKnownExercises: RealmResults<KnownExercise>?= null
+    private var isSelectKnownExMode: Boolean=false
 
     companion object{
         val CHOOSEKNOWNEXERCISE= 5
@@ -42,6 +41,8 @@ class KnownExerciseListActivity : AppCompatActivity() {
         setSupportActionBar(knownExerciseListToolbar)
         realm = Realm.getDefaultInstance()
         recyclerView = findViewById(R.id.recycler_view_knownExercises)
+        isSelectKnownExMode=intent.getBooleanExtra(EditTrainingActivity.VIEWKNOWNEXERCISES,false)
+
         allKnownExercises=realm!!.where(KnownExercise::class.java).findAll()
         for (known in allKnownExercises!!){
             realm?.executeTransaction {
@@ -83,7 +84,7 @@ class KnownExerciseListActivity : AppCompatActivity() {
             val name=search_KnownEx_Name_editTxt.text.toString().trim().toUpperCase(Locale.getDefault())
             val idd=search_KnownEx_ID_editTxt.text.toString().trim()
             var id=0
-            val nextID = allKnownExercises!!.max("user_custom_id")?.toInt()?.plus(1)
+            val nextID = allKnownExercises!!.max("user_custom_id")?.toInt()?.plus(1) ?: 1
             if(!name.isBlank()) {
 
                 if(idd.isBlank()){
@@ -129,6 +130,7 @@ class KnownExerciseListActivity : AppCompatActivity() {
                         }.show()
                 }
             }
+            adapter?.updateData(adapter?.data)
         }
     }
     override fun onDestroy() {
@@ -150,9 +152,8 @@ class KnownExerciseListActivity : AppCompatActivity() {
     private fun setUpRecyclerView() {
 
         adapter = KnownExerciseAdapter(allKnownExercises!!.sort("doneInExercisesSize", Sort.DESCENDING))
-        val isViewKnown=intent.getBooleanExtra(EditTrainingActivity.VIEWKNOWNEXERCISES,false)
 
-        if(isViewKnown){
+        if(isSelectKnownExMode){
             adapter!!.setOnItemClickListener(object: KnownExerciseAdapter.OnItemClickListener{
                 override fun onItemClick(knownExercise: KnownExercise) {
 //                    var chooseIntent=Intent(this@KnownExerciseListActivity,ChangeKnownExerciseActivity::class.java)
@@ -183,8 +184,42 @@ class KnownExerciseListActivity : AppCompatActivity() {
         recyclerView!!.setHasFixedSize(true)
 
     }
-
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        this.menu = menu
+        menuInflater.inflate(R.menu.edit_training_menu, menu)
+        menu.setGroupVisible(R.id.group_normal_mode, true)
+        menu.findItem(R.id.action_done).isVisible = adapter?.isEditMode!!
+        menu.findItem(R.id.action_editItems).title=getString(R.string.edit_pr)
+        return true
     }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
+        when (id) {
+            R.id.action_editItems ->{
+                title = getString(R.string.title_edit_1rm_prs)
+                adapter?.isEditMode=true
+                adapter?.updateData(adapter?.data)
+                menu?.findItem(R.id.action_done)?.isVisible = adapter?.isEditMode!!
+                menu?.findItem(R.id.action_editItems)?.isVisible = adapter?.isEditMode!!.not()
+
+
+                return true
+            }
+
+            R.id.action_done -> {
+                title= getString(R.string.title_activity_known_exercise_list)
+                adapter?.isEditMode=false
+                adapter?.updateData(adapter?.data)
+                menu?.findItem(R.id.action_done)?.isVisible = adapter?.isEditMode!!
+                menu?.findItem(R.id.action_editItems)?.isVisible = adapter?.isEditMode!!.not()
+                return true
+            }
+            else -> return super.onOptionsItemSelected(item)
+        }
+    }
+
+
+}
 
 
 

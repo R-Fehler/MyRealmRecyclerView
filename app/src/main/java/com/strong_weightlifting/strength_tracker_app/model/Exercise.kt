@@ -83,9 +83,11 @@ open class Exercise : RealmObject() {
                         n == 0 -> "${sets[n]?.weight}kg:${sets[n]?.reps}${prToString(sets[n])}"
                         sets[n]?.weight == sets[n - 1]?.weight -> "/${sets[n]?.reps}${prToString(sets[n])}"
                         else -> "  ${sets[n]?.weight}kg:${sets[n]?.reps}${prToString(sets[n])}"
+
                     }
                 }
                 else ""
+
             }
             return "[${knownExercise?.user_custom_id}] ${knownExercise?.name} : $text"
         }

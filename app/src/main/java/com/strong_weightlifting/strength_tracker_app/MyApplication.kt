@@ -32,7 +32,7 @@ class MyApplication : Application() {
             .initialData { realm -> realm.createObject(MasterParent::class.java) }
             .migration(MyMigration())
 //            .deleteRealmIfMigrationNeeded()
-            .schemaVersion(5)
+            .schemaVersion(9)
             .build()
 
 //        Realm.deleteRealm(realmConfig) // Delete Realm between app restarts.

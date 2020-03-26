@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.strong_weightlifting.strength_tracker_app.R
 import com.strong_weightlifting.strength_tracker_app.model.DataHelper
 import com.strong_weightlifting.strength_tracker_app.model.Exercise
+import com.strong_weightlifting.strength_tracker_app.model.Training
 import io.realm.OrderedRealmCollection
 import io.realm.Realm
 import io.realm.RealmRecyclerViewAdapter
@@ -51,6 +52,7 @@ class ExercisesRecyclerViewAdapter(data: OrderedRealmCollection<Exercise>) :
     val uuidsToDelete: MutableSet<Long> = HashSet()
 
     var realm: Realm? = null
+
 
     private var listener: OnItemClickListener? = null
     private var addSetListener: OnAddClickListener? = null
@@ -119,7 +121,6 @@ class ExercisesRecyclerViewAdapter(data: OrderedRealmCollection<Exercise>) :
         val calculatedPR=holder.data?.prCalculatedAtTheMoment
         var txt="$prWeight kg/$prReps --> ${calculatedPR?.roundToInt()} kg 1RM"
         holder.prOverView.text=txt
-
         //Child ExerciseSet RV
 
         val childManager = LinearLayoutManager(holder.recyclerView.context)
@@ -135,10 +136,12 @@ class ExercisesRecyclerViewAdapter(data: OrderedRealmCollection<Exercise>) :
             holder.data?.uuid?.let { it1 -> childAdapter?.let { it2 -> addSetListener?.onAddClick(it1, it2) } }
             updateData(data)
         }
-
-        val touchHelperCallback = TouchHelperCallback()
-        val touchHelper = ItemTouchHelper(touchHelperCallback)
-        touchHelper.attachToRecyclerView(holder.recyclerView)
+        val trainingIsDone=exercise?.doneInTrainings?.first()?.isDone
+        if(trainingIsDone?.not()!!){
+            val touchHelperCallback = TouchHelperCallback()
+            val touchHelper = ItemTouchHelper(touchHelperCallback)
+            touchHelper.attachToRecyclerView(holder.recyclerView)
+        }
 
         holder.name.text = exercise?.knownExercise?.name ?: "DefaultName"
         val idText="[${exercise?.knownExercise?.user_custom_id.toString()}]"
@@ -152,6 +155,9 @@ class ExercisesRecyclerViewAdapter(data: OrderedRealmCollection<Exercise>) :
 
         val popup = PopupMenu(holder.itemView.context, holder.menu)
         popup.inflate(R.menu.exercise_menu)
+        if(trainingIsDone){
+            popup.menu.findItem(R.id.action_exercise_delete).isVisible=false
+        }
         popup.setOnMenuItemClickListener {
             val id = it.itemId
             when (id) {

@@ -90,6 +90,28 @@ class MyMigration : RealmMigration {
                 .addRealmListField("routineList",schema.get("Training"))
 
         }
+        if (oldVersion==5L)
+        {
+            schema.get("Training")!!
+                .setNullable("date",true)
+        }
+        if(oldVersion==6L)
+        {
+            schema.get("Training")!!
+                .setNullable("date",false)
+                .addField("isRoutine",Boolean::class.javaPrimitiveType)
+            schema.get("MasterParent")!!
+                .removeField("routineList")
+        }
+        if(oldVersion==7L)
+        {
+            schema.get("KnownExercise")!!
+                .setNullable("dateOfPR",false)
+        }
+        if (oldVersion==8L) {
+            schema.get("ExerciseSet")!!
+                .addField("weightPercentOf1RM", Int::class.javaPrimitiveType)
+        }
 
     }
 }
