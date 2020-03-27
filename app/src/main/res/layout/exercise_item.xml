@@ -108,20 +108,27 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/header_prev"
                     android:text="prev."
+                    android:textSize="10sp"
                     android:layout_weight="0.14"
+                    android:maxLines="1"
                     />
+
                 <TextView
+                    android:id="@+id/header_percent"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:id="@+id/header_percent"
-                    android:text="of 1RM"
                     android:layout_weight="0.2"
+                    android:maxLines="1"
+                    android:text="%of 1RM wt"
+                    android:textSize="10sp"
+
                     />
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:id="@+id/header_weight"
                     android:text="kg"
+                    android:textSize="10sp"
                     android:textAlignment="center"
                     android:layout_weight="0.18"
                     />
@@ -130,22 +137,31 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/header_reps"
                     android:text=" reps"
-                    android:layout_weight="0.18"
+                    android:textSize="10sp"
+                    android:layout_weight="0.2"
                     android:textAlignment="center"
+                    android:maxLines="1"
+
                     />
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:id="@+id/header_resulting_percent_of1RM"
                     android:text="-->%1RM"
+                    android:textSize="10sp"
                     android:layout_weight="0.2"
+                    android:maxLines="1"
+
                     />
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:id="@+id/header_done"
                     android:text="done"
+                    android:textSize="10sp"
                     android:layout_weight="0.1"
+                    android:maxLines="1"
+
                     />
             </LinearLayout>
 

@@ -89,7 +89,7 @@
             android:layout_toRightOf="@+id/doneText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:minWidth="30sp"
+            android:minWidth="30dp"
             android:textSize="16sp" />
         <TextView
             android:id="@+id/times_Textview"
@@ -121,7 +121,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:paddingEnd="20sp"
+            android:paddingEnd="20dp"
             android:text="Best Set" />
 
     </RelativeLayout>

@@ -1,5 +1,6 @@
 package com.strong_weightlifting.strength_tracker_app
 
+import PreCachingLayoutManager
 import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
@@ -13,6 +14,7 @@ import android.os.Environment
 import android.os.ParcelFileDescriptor
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -470,10 +472,13 @@ class MainActivity : AppCompatActivity() {
                 datePickerDialog.show()
             }
         })
-
-        recyclerView!!.layoutManager = LinearLayoutManager(this)
+        val displayMetrics: DisplayMetrics = this.resources.displayMetrics
+        val height = displayMetrics.heightPixels
+        recyclerView!!.layoutManager = PreCachingLayoutManager(this,height*2)
         recyclerView!!.adapter = adapter
         recyclerView!!.setHasFixedSize(false)
+        recyclerView!!.setItemViewCacheSize(20)
+
 
 
 //        val touchHelperCallback = TouchHelperCallback()

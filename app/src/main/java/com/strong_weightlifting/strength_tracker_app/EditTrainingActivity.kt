@@ -1,21 +1,25 @@
 package com.strong_weightlifting.strength_tracker_app
 
+import PreCachingLayoutManager
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.DisplayMetrics
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.strong_weightlifting.strength_tracker_app.model.*
+import com.strong_weightlifting.strength_tracker_app.model.DataHelper
+import com.strong_weightlifting.strength_tracker_app.model.Exercise
+import com.strong_weightlifting.strength_tracker_app.model.ExerciseSet
+import com.strong_weightlifting.strength_tracker_app.model.Training
 import com.strong_weightlifting.strength_tracker_app.ui.recyclerview.ExerciseSetAdapter
 import com.strong_weightlifting.strength_tracker_app.ui.recyclerview.ExercisesRecyclerViewAdapter
 import io.realm.Realm
-
 import kotlinx.android.synthetic.main.activity_edit_training.*
 
 /*TODO
@@ -162,9 +166,14 @@ class EditTrainingActivity : AppCompatActivity() {
         })
 
 
-        recyclerView!!.layoutManager = LinearLayoutManager(this)
+//        recyclerView!!.layoutManager = LinearLayoutManager(this)
+        val displayMetrics: DisplayMetrics = this.resources.displayMetrics
+        val height = displayMetrics.heightPixels
+        recyclerView!!.layoutManager = PreCachingLayoutManager(this,height*2)
+
         recyclerView!!.adapter = adapter
         recyclerView!!.setHasFixedSize(true)
+        recyclerView!!.setItemViewCacheSize(10)
 
         adapter!!.setOnNotesEditListener(object : ExercisesRecyclerViewAdapter.OnNotesEditListener {
             override fun onNotesEdit(exercise: Exercise) {
@@ -237,6 +246,7 @@ class EditTrainingActivity : AppCompatActivity() {
         if(training?.isDone?.not()!!){
             menu.findItem(R.id.action_editItems).isVisible=false
         }
+
         return true
     }
 
