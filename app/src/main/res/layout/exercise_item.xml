@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:layout_marginStart="4dp"
-    android:layout_marginEnd="4dp"
     android:layout_marginTop="4dp"
+    android:layout_marginEnd="4dp"
     android:layout_marginBottom="4dp"
     android:nestedScrollingEnabled="false">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="16dp"
+        android:paddingStart="8dp"
         android:paddingTop="8dp"
-        android:paddingEnd="16dp"
+        android:paddingEnd="8dp"
         android:paddingBottom="8dp">
 
         <TextView
@@ -24,25 +24,25 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_toEndOf="@+id/exerciseName_ID"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
+            android:paddingLeft="3dp"
+            android:paddingRight="3dp"
             android:text="Name ..."
             android:textAlignment="viewStart"
+            android:textColor="@color/colorAccent"
             android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="@color/colorAccent"/>
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/exerciseItemOptions"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
             android:paddingEnd="10dp"
             android:text="&#8942;"
             android:textAlignment="textEnd"
             android:textAppearance="?android:textAppearanceLarge"
-            android:textColor="@color/colorAccent"/>
+            android:textColor="@color/colorAccent" />
 
         <TextView
             android:id="@+id/exerciseName_ID"
@@ -60,110 +60,111 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/notesExerciseHeader"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/notesExerciseHeader"
+            android:layout_below="@+id/exerciseName"
             android:paddingStart="16dp"
             android:paddingEnd="0dp"
             android:text="@string/notesHeader"
-            android:visibility="gone"
-            android:layout_below="@+id/exerciseName" />
+            android:visibility="gone" />
 
 
         <TextView
+            android:id="@+id/ExerciseNotesTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/ExerciseNotesTextView"
             android:layout_below="@+id/exerciseName"
+            android:layout_alignBaseline="@+id/notesExerciseHeader"
+            android:layout_marginTop="5dp"
+            android:layout_toEndOf="@+id/notesExerciseHeader"
             android:paddingStart="0dp"
             android:paddingEnd="16dp"
-            android:layout_marginTop="5dp"
-            android:layout_alignBaseline="@+id/notesExerciseHeader"
-            android:visibility="gone"
-            android:layout_toEndOf="@+id/notesExerciseHeader" />
+            android:visibility="gone" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/PRsTextView"
-                android:layout_below="@+id/exerciseName"
-                android:text="PRs:"
-                />
+        <TextView
+            android:id="@+id/PRsTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ExerciseNotesTextView"
+            android:text="PRs:" />
+
         <View
-            android:layout_below="@+id/PRsTextView"
             android:id="@+id/lineSeparator"
             android:layout_width="match_parent"
             android:layout_height="1dp"
+            android:layout_below="@+id/PRsTextView"
             android:background="#969696" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
+        <LinearLayout
+            android:id="@+id/ExerciseHeaderLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/lineSeparator">
+
+            <TextView
+                android:id="@+id/header_prev"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/ExerciseHeaderLayout"
-                android:layout_below="@+id/lineSeparator"
-                android:weightSum="1"
-                >
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/header_prev"
-                    android:text="prev."
-                    android:textSize="10sp"
-                    android:layout_weight="0.14"
-                    android:maxLines="1"
-                    />
+                android:layout_weight="0.2"
+                android:maxLines="1"
+                android:text="prev."
+                android:textSize="10sp" />
 
-                <TextView
-                    android:id="@+id/header_percent"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.2"
-                    android:maxLines="1"
-                    android:text="%of 1RM wt"
-                    android:textSize="10sp"
+            <TextView
+                android:id="@+id/header_percent"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.15"
+                android:maxLines="1"
+                android:text="%of 1RM wt"
+                android:textSize="10sp"
 
-                    />
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/header_weight"
-                    android:text="kg"
-                    android:textSize="10sp"
-                    android:textAlignment="center"
-                    android:layout_weight="0.18"
-                    />
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/header_reps"
-                    android:text=" reps"
-                    android:textSize="10sp"
-                    android:layout_weight="0.2"
-                    android:textAlignment="center"
-                    android:maxLines="1"
+                android:visibility="visible" />
 
-                    />
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/header_resulting_percent_of1RM"
-                    android:text="-->%1RM"
-                    android:textSize="10sp"
-                    android:layout_weight="0.2"
-                    android:maxLines="1"
+            <TextView
+                android:id="@+id/header_weight"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.2"
+                android:text="kg"
+                android:textAlignment="center"
+                android:textSize="10sp" />
 
-                    />
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/header_done"
-                    android:text="done"
-                    android:textSize="10sp"
-                    android:layout_weight="0.1"
-                    android:maxLines="1"
+            <TextView
+                android:id="@+id/header_reps"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.2"
+                android:maxLines="1"
+                android:text=" reps"
+                android:textAlignment="center"
+                android:textSize="10sp"
 
-                    />
-            </LinearLayout>
+                />
+
+            <TextView
+                android:id="@+id/header_resulting_percent_of1RM"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.13"
+                android:maxLines="1"
+                android:text="-->%1RM"
+                android:textSize="10sp"
+
+                />
+
+            <TextView
+                android:id="@+id/header_done"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.1"
+                android:maxLines="1"
+                android:text="done"
+                android:textSize="10sp"
+
+                />
+        </LinearLayout>
 
         <View
             android:id="@+id/lineSeparator2"
@@ -182,13 +183,13 @@
 
         <Button
             android:id="@+id/add_set_btn"
+            style="@style/Widget.MaterialComponents.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/exerciseSetRV"
-            android:layout_marginTop="10dp"
-            android:text="@string/add_set"
             android:layout_centerInParent="true"
-          />
+            android:layout_marginTop="10dp"
+            android:text="@string/add_set" />
 
 
     </RelativeLayout>

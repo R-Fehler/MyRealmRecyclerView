@@ -112,6 +112,23 @@ class MyMigration : RealmMigration {
             schema.get("ExerciseSet")!!
                 .addField("weightPercentOf1RM", Int::class.javaPrimitiveType)
         }
+        if (oldVersion==9L) {
+            schema.get("ExerciseSet")!!
+                .addField("weightPercentageForRoutine", Int::class.javaPrimitiveType)
+                .addField("isRoutineWithPercentage", Boolean::class.javaPrimitiveType)
+
+        }
+        if(oldVersion==10L){
+            schema.get("Training")!!
+                .addField("isRoutineWithPercentage", Boolean::class.javaPrimitiveType)
+            schema.get("ExerciseSet")!!
+                .removeField("isRoutineWithPercentage")
+
+        }
+        if(oldVersion==11L){
+            schema.get("Training")!!
+                .addField("isRoutineWithAbsoluteIncrement", Boolean::class.javaPrimitiveType)
+        }
 
     }
 }

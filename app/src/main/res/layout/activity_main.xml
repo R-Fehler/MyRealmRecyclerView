@@ -15,8 +15,8 @@
             android:id="@+id/mainToolBar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
             app:layout_scrollFlags="scroll|enterAlways"
+
         />
 
         <LinearLayout
@@ -67,7 +67,7 @@
                     android:id="@+id/search_bar_ExerciseID_editText"
                     android:hint="ID?"
                     />
-                <EditText
+                <AutoCompleteTextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.8"
@@ -89,7 +89,7 @@
                     android:hint="Notes durchsuchen"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.8"
+                    android:layout_weight="1"
                     />
 
             </LinearLayout>
@@ -110,23 +110,118 @@
         tools:listitem="@layout/training_item"
         />
 
+    <com.google.android.material.bottomappbar.BottomAppBar
+        android:id="@+id/bottom_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        style="@style/Widget.MaterialComponents.BottomAppBar"
+        app:fabAlignmentMode="center"
+        app:hideOnScroll="true"
+        app:contentInsetLeft="0dp"
+        app:contentInsetStart="0dp"
+        >
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/first_menu_item"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:text="Routines"
+                android:textAlignment="center"
+                android:textSize="10sp"
+                android:drawableTop="@drawable/ic_star_border_yellow_24dp"
+                android:background="?attr/selectableItemBackground"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/second_menu_item"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+            <!--                style="?android:attr/borderlessButtonStyle"-->
+            <TextView
+                android:id="@+id/second_menu_item"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Catalog"
+                android:textSize="10sp"
+                android:textAlignment="center"
+                android:drawableTop="@drawable/ic_fitness_center_white_24dp"
+                android:background="?attr/selectableItemBackground"
+                app:layout_constraintBottom_toBottomOf="@+id/first_menu_item"
+                app:layout_constraintEnd_toStartOf="@+id/placeholder"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintStart_toEndOf="@+id/first_menu_item"/>
+
+        <View
+            android:id="@+id/placeholder"
+            android:layout_width="70dp"
+            android:layout_height="0dp"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="@+id/first_menu_item"
+            app:layout_constraintEnd_toStartOf="@+id/third_menu_item"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toEndOf="@+id/second_menu_item"
+            app:layout_constraintTop_toTopOf="@+id/first_menu_item" />
+
+
+
+            <TextView
+                android:id="@+id/third_menu_item"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:visibility="visible"
+                android:text="Sensor"
+                android:textSize="10sp"
+                android:textAlignment="center"
+                android:drawableTop="@drawable/ic_bluetooth_white_24dp"
+                android:background="?attr/selectableItemBackground"
+                app:layout_constraintBottom_toBottomOf="@+id/first_menu_item"
+                app:layout_constraintEnd_toStartOf="@+id/fourth_menu_item"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintStart_toEndOf="@+id/placeholder"
+                />
+
+        <TextView
+            android:id="@+id/fourth_menu_item"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:visibility="visible"
+            android:text="Settings"
+            android:textSize="10sp"
+            android:textAlignment="center"
+            android:drawableTop="@drawable/ic_settings_white_24dp"
+            app:layout_constraintBottom_toBottomOf="@+id/first_menu_item"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toEndOf="@+id/third_menu_item"
+            app:layout_constraintTop_toTopOf="@+id/first_menu_item" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.bottomappbar.BottomAppBar>
+
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/add_Training_FAB"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
         android:visibility="visible"
         android:layout_margin="@dimen/fab_margin"
+        app:layout_anchor="@id/bottom_bar"
+        app:layout_anchorGravity="center"
         app:srcCompat="@drawable/ic_add_white_24dp"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/resume_Training_FAB"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
         app:backgroundTint="@android:color/holo_orange_dark"
-        app:srcCompat="@drawable/ic_arrow_forward_white_24dp"
-        android:visibility="gone"/>
+        app:layout_anchor="@id/bottom_bar"
+        app:layout_anchorGravity="center|top"
+        app:srcCompat="@drawable/ic_arrow_forward_white_24dp" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

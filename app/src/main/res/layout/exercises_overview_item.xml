@@ -23,13 +23,25 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
             android:text="Mon 12.12.2020 18:00"
             android:textAlignment="viewStart"
-            android:textSize="20sp"
+            android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="@color/colorAccent"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/exerciseOverViewTrainingName"
+            android:layout_below="@+id/exerciseOverViewDate"
+            android:text="5x5 Stronglifts Workout A"
+            android:paddingLeft="10dp"
+            android:textAlignment="viewStart"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            />
+
 
         <TextView
             android:id="@+id/exerciseOverViewItemOptions"
@@ -37,6 +49,7 @@
             android:layout_height="40dp"
             android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
+            android:visibility="gone"
             android:paddingEnd="10dp"
             android:text="&#8942;"
             android:textAlignment="textEnd"
@@ -52,14 +65,30 @@
             android:paddingEnd="0dp"
             android:text="@string/notesHeader"
             android:visibility="gone"
-            android:layout_below="@+id/exerciseOverViewDate" />
+            android:layout_below="@+id/exerciseOverViewTrainingName" />
+
+        <TextView
+            android:id="@+id/ExerciseOverViewTotalVolume"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/ExerciseOverViewNotesTextView"
+            android:paddingLeft="10dp"
+            android:text="Volume: 1.350kg" />
+
+        <TextView
+            android:id="@+id/ExerciseOverViewShort"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/ExerciseOverViewTotalVolume"
+            android:paddingLeft="10dp"
+            android:text="Squat 100kg/5/5/5 120/4/4" />
 
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/ExerciseOverViewNotesTextView"
-            android:layout_below="@+id/exerciseOverViewDate"
+            android:layout_below="@+id/exerciseOverViewTrainingName"
             android:paddingStart="0dp"
             android:paddingEnd="16dp"
             android:layout_marginTop="5dp"
@@ -72,8 +101,9 @@
             android:id="@+id/exerciseOverViewRV"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/ExerciseOverViewNotesTextView"
-            tools:listitem="@layout/exercise_overview_set_item"/>
+            android:layout_below="@id/ExerciseOverViewShort"
+            android:visibility="visible"
+            tools:listitem="@layout/exercise_overview_set_item" />
 
 
 

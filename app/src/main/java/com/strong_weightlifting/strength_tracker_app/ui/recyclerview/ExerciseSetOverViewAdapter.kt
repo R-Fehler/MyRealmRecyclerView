@@ -10,10 +10,13 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.strong_weightlifting.strength_tracker_app.R
+import com.strong_weightlifting.strength_tracker_app.model.Exercise
 import com.strong_weightlifting.strength_tracker_app.model.ExerciseSet
+import com.strong_weightlifting.strength_tracker_app.model.Training
 import io.realm.OrderedRealmCollection
 import io.realm.Realm
 import io.realm.RealmRecyclerViewAdapter
+import kotlin.math.roundToInt
 
 class ExerciseSetOverViewAdapter(data: OrderedRealmCollection<ExerciseSet>) :
     RealmRecyclerViewAdapter<ExerciseSet, ExerciseSetOverViewAdapter.MyViewHolder>(data, false) {
@@ -48,13 +51,17 @@ class ExerciseSetOverViewAdapter(data: OrderedRealmCollection<ExerciseSet>) :
 
         val weightString = holder.data?.weight.toString()
         val repsString = holder.data?.reps.toString()
+        val oneRepMax=ExerciseSet.epleyValue(holder.data!!).roundToInt()
+        val oneRepMaxText= "--> $oneRepMax kg ${holder.data?.prToString()}"
         holder.weightEditText.text=weightString
         holder.repsEditText.text=repsString
+        holder.oneRepMaxTextView.text=oneRepMaxText
     }
 
     inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val weightEditText: TextView = itemView.findViewById(R.id.setOverViewWeight)
         val repsEditText: TextView = itemView.findViewById(R.id.setOverViewReps)
+        val oneRepMaxTextView: TextView=itemView.findViewById(R.id.setOverViewOneRepMax)
         var data: ExerciseSet? = null
 
 

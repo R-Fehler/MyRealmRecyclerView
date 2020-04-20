@@ -5,12 +5,22 @@
     <item
         android:id="@+id/action_editKnownExercises"
         android:title="@string/edit"
-        android:checkable="true"
-        android:checked="false"
-        app:showAsAction="always" />
+        app:showAsAction="never" />
     <item
         android:id="@+id/action_delete_KnownExercise"
         android:title="@string/delete"
+        app:showAsAction="never"
+        />
+    <item
+        android:id="@+id/action_showGraph"
+        android:title="Graph"
+        app:showAsAction="always"
+        />
+    <item
+        android:id="@+id/action_shortVersion"
+        android:title="extended"
+        android:checked="true"
+        android:checkable="true"
         app:showAsAction="never"
         />
 

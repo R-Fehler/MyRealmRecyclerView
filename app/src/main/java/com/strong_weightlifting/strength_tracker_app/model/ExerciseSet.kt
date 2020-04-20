@@ -13,9 +13,10 @@ open class ExerciseSet : RealmObject() {
     var orderNumber=1
     var weight: Int = 0 // done
     var weightPercentOf1RM: Int =0
+    var weightPercentageForRoutine: Int =0
     var reps: Int = 0 // done
-    var weightPlanned: Int=0
-    var repsPlanned: Int=0
+    var weightPlanned: Int=0 //previous
+    var repsPlanned: Int=0 //previous
     var duration: Long = 0
     var isPR: Boolean =false
     var isDone: Boolean = false
@@ -49,6 +50,7 @@ open class ExerciseSet : RealmObject() {
 
                 exerciseSet.weight=sets.last()?.weight ?:20
                 exerciseSet.reps= sets.last()?.reps ?: 10
+                exerciseSet.weightPercentageForRoutine=sets.last()?.weightPercentageForRoutine ?: 1
                 val lastSetWithSameOrderNo=prevExercise?.sets?.find { it.orderNumber==exerciseSet.orderNumber }
                 exerciseSet.weightPlanned=lastSetWithSameOrderNo?.weight ?: 0
                 exerciseSet.repsPlanned=lastSetWithSameOrderNo?.reps ?: 0
@@ -58,6 +60,7 @@ open class ExerciseSet : RealmObject() {
                 exerciseSet.orderNumber= 1
                 exerciseSet.weight= firstSetLastKnownEx?.weight ?:20
                 exerciseSet.reps= firstSetLastKnownEx?.reps ?:10
+                exerciseSet.weightPercentageForRoutine=firstSetLastKnownEx?.weightPercentageForRoutine ?: 1
                 exerciseSet.weightPlanned=firstSetLastKnownEx?.weight ?:0
                 exerciseSet.repsPlanned=firstSetLastKnownEx?.reps ?: 0
             }
@@ -106,19 +109,7 @@ open class ExerciseSet : RealmObject() {
         }
 
         fun epleyValue(exerciseSet: ExerciseSet): Double {
-            var fixedWeight=0.0
-            if(exerciseSet.reps<1){
-                return 0.0
-            }
-            if(exerciseSet.reps==1){
-                return exerciseSet.weight.toDouble()
-            }
-            if(exerciseSet.weight==0)
-                fixedWeight=1.0
-            else
-                fixedWeight=exerciseSet.weight.toDouble()
-
-            return  fixedWeight * (1.0 + (exerciseSet.reps.toDouble() / 30.0))
+            return epleyValue(exerciseSet.weight,exerciseSet.reps)
         }
         fun epleyValue(weight:Int, reps:Int): Double {
             var fixedWeight=0.0
@@ -143,6 +134,13 @@ open class ExerciseSet : RealmObject() {
         }
 
 
+    }
+    fun prToString(): String {
+
+            if(isPR){
+                return "\u2B50" }
+            else return ""
+        return ""
     }
 
     override fun toString(): String {

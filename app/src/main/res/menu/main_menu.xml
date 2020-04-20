@@ -4,12 +4,7 @@
       tools:context=".MyActivity">
     <group android:id="@+id/group_normal_mode">
 
-        <item
-            android:id="@+id/action_KnownExerciseOverView"
-            android:title="@string/catalog_of_exercises"
-            app:showAsAction="never"
 
-            />
         <item
             android:id="@+id/action_searchTrainings"
             android:title="@string/search"
@@ -18,25 +13,31 @@
             android:checkable="true"
             android:checked="false"
             />
-        <item
-            android:id="@+id/action_showRoutines"
-            android:title="@string/show_routines"
-            android:icon="@drawable/ic_star_yellow_24dp"
-            app:showAsAction="never"
-            android:checkable="true"
-            android:checked="false"
+<!--        <item-->
+<!--            android:id="@+id/action_KnownExerciseOverView"-->
+<!--            android:title="@string/catalog_of_exercises"-->
+<!--            app:showAsAction="ifRoom"-->
+<!--            android:icon="@drawable/ic_fitness_center_white_24dp"-->
+<!--            />-->
+<!--        <item-->
+<!--            android:id="@+id/action_showRoutines"-->
+<!--            android:title="@string/show_routines"-->
+<!--            android:icon="@drawable/ic_star_border_yellow_24dp"-->
+<!--            app:showAsAction="ifRoom"-->
+<!--            android:checkable="true"-->
+<!--            android:checked="false"-->
 
-            />
+<!--            />-->
 <!--        <item-->
 <!--            android:id="@+id/action_importCSV"-->
 <!--            android:title="importiere Strong CSV"-->
 <!--            app:showAsAction="never"-->
 <!--            />-->
-<!--        <item-->
-<!--            android:id="@+id/action_importOldTrainingCSV"-->
-<!--            android:title="import Excel CSV File"-->
-<!--            app:showAsAction="never"-->
-<!--            />-->
+        <item
+            android:id="@+id/action_importOldTrainingCSV"
+            android:title="import Excel CSV File"
+            app:showAsAction="never"
+            />
         <item
             android:id="@+id/action_delete_all_realm_data"
             android:title="@string/delete_all_data"
@@ -50,6 +51,12 @@
         <item
             android:id="@+id/action_import_realm_file"
             android:title="@string/import_backup_db"
+            app:showAsAction="never"
+            />
+
+        <item
+            android:id="@+id/action_settings"
+            android:title="@string/settings"
             app:showAsAction="never"
             />
     </group>

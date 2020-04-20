@@ -6,6 +6,7 @@ import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 import java.util.*
 import java.util.concurrent.atomic.AtomicLong
+import kotlin.math.roundToInt
 
 open class Training : RealmObject() {
     @PrimaryKey
@@ -21,6 +22,8 @@ open class Training : RealmObject() {
     var tonnage=0.0
     var isDone:Boolean=false
     var isRoutine: Boolean=false
+    var isRoutineWithPercentage: Boolean=false
+    var isRoutineWithAbsoluteIncrement: Boolean=false
     companion object{
          const val FIELD_UUID="uuid"
         private val INTEGER_COUNTER = AtomicLong(0)
@@ -59,7 +62,13 @@ open class Training : RealmObject() {
                     val newRoutineTraining = createRoutine(realm)
                     newRoutineTraining?.name = training.name
                     training.exercises.forEachIndexed { index, exercise ->
-                        createAndCopyFields(realm,index, exercise, newRoutineTraining)
+                        createAndCopyFields(
+                            realm,
+                            index,
+                            exercise,
+                            newRoutineTraining,
+                            training.isRoutineWithPercentage
+                        )
 
                     }
 
@@ -73,7 +82,7 @@ open class Training : RealmObject() {
             val newTraining = create(realm)
             newTraining?.name = training.name
             training.exercises.forEachIndexed { index, exercise ->
-                createAndCopyFields(realm,index, exercise, newTraining)
+                createAndCopyFields(realm,index, exercise, newTraining,training.isRoutineWithPercentage)
 
             }
             return newTraining
@@ -81,17 +90,33 @@ open class Training : RealmObject() {
 
 
 
-        private fun createAndCopyFields(realm: Realm, index: Int, exercise: Exercise, newTraining: Training?) {
+        private fun createAndCopyFields(
+            realm: Realm,
+            index: Int,
+            exercise: Exercise,
+            newTraining: Training?,
+            routineWithPercentage: Boolean ) {
             var exID:Long=0
             newTraining?.uuid?.let { exID=Exercise.create(realm, it) }
-            newTraining?.exercises?.get(index)?.knownExercise=exercise.knownExercise
-            newTraining?.exercises?.get(index)?.prCalculatedAtTheMoment= exercise.knownExercise?.prCalculated!!
-            newTraining?.exercises?.get(index)?.prWeightAtTheMoment=exercise.knownExercise?.prWeight!!
-            newTraining?.exercises?.get(index)?.repsAtPRWeightAtTheMoment=exercise.knownExercise?.repsAtPRWeight!!
-            exercise.sets.forEachIndexed { index, exerciseSet ->
-                val newSet=ExerciseSet.create(realm,exID)
-                newSet?.weight=exerciseSet.weight
-                newSet?.reps=exerciseSet.reps
+            newTraining?.exercises?.get(index)?.knownExercise = exercise.knownExercise
+            newTraining?.exercises?.get(index)?.prCalculatedAtTheMoment = exercise.knownExercise?.prCalculated!!
+            newTraining?.exercises?.get(index)?.prWeightAtTheMoment = exercise.knownExercise?.prWeight!!
+            newTraining?.exercises?.get(index)?.repsAtPRWeightAtTheMoment = exercise.knownExercise?.repsAtPRWeight!!
+            val prWeight= exercise.knownExercise!!.prCalculated.roundToInt()
+            if(routineWithPercentage){
+                exercise.sets.forEachIndexed { index, exerciseSet ->
+                    val newSet = ExerciseSet.create(realm, exID)
+                    newSet?.weight = (exerciseSet.weightPercentageForRoutine*prWeight*0.01+1).toInt()
+                    newSet?.reps = exerciseSet.reps
+                }
+            }
+            else {
+
+                exercise.sets.forEachIndexed { index, exerciseSet ->
+                    val newSet = ExerciseSet.create(realm, exID)
+                    newSet?.weight = exerciseSet.weight
+                    newSet?.reps = exerciseSet.reps
+                }
             }
         }
 

@@ -13,14 +13,18 @@
         android:title="@string/done"
         app:showAsAction="always" />
     <item
-        android:id="@+id/action_delete"
-        android:title="@string/delete"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/action_RoutineAsPercentage"
-        android:title="use Percentage"
+        android:id="@+id/action_sort_byName"
+        android:title="sort: Name"
         app:showAsAction="never"
-        android:checkable="true"
-        android:checked="false"
+        />
+    <item
+        android:id="@+id/action_sort_byID"
+        android:title="sort: ID"
+        app:showAsAction="never"
+        />
+    <item
+        android:id="@+id/action_sort_byFavourites"
+        android:title="sort: Favourites"
+        app:showAsAction="never"
         />
 </menu>

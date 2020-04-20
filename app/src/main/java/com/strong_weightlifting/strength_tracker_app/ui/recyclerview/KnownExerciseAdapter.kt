@@ -57,7 +57,7 @@ class KnownExerciseAdapter(data: OrderedRealmCollection<KnownExercise>) :
         var maxDate =knownExercise?.dateOfPR
         var prCalculated =knownExercise?.prCalculated?.roundToInt()
         val dateformatted=if(maxDate!=null)SimpleDateFormat("EEE, d MMM yyyy").format(maxDate) else ""
-        val textPR="$dateformatted : $prCalculated kg  <-- == "
+        val textPR="$dateformatted : $prCalculated kg  <---- "
         holder.prCalculatedTextView.text=textPR
 
         holder.prWeightEditText.text.clear()

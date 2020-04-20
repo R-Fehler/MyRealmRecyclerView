@@ -32,5 +32,29 @@
     <string name="delete_all_data">delete all Data</string>
     <string name="backup_database">Backup Database</string>
     <string name="import_backup_db">Import Backup DB</string>
+    <string name="title_activity_settings">Settings</string>
+    <string name="star_emoji">&#9733;</string>
+
+
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails</string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="settings">Settings</string>
+    <string name="percentage_title">% of 1RM as Weight Input visible</string>
+    <string name="percentage_summaryOff">Input Field of % of 1RM not visible</string>
+    <string name="percentage_summaryOn">Input Field of % of 1RM visible</string>
+    <string name="add_notes_hint">Notizen hinzufügen</string>
+    <string name="ok">OK</string>
+    <string name="clear">clear</string>
 
 </resources>

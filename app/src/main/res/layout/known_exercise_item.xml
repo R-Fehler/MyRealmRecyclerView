@@ -9,39 +9,47 @@
     android:layout_marginTop="4dp"
     android:layout_marginBottom="4dp"
     android:nestedScrollingEnabled="false">
-<LinearLayout
+
+<RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
-<LinearLayout
     android:orientation="horizontal"
-    android:layout_width="match_parent" android:layout_height="wrap_content"
-    android:weightSum="1">
+    android:paddingStart="6dp"
+    android:paddingEnd="6dp"
+    >
 
     <TextView
         android:id="@+id/knownExerciseRV_ID"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="0.15"
-        android:ems="3"
         android:text="ID"
         android:textAlignment="center"
-        android:textSize="24sp" />
+        android:layout_alignParentStart="true"
+        android:textSize="18sp" />
 
     <TextView
         android:id="@+id/knownExerciseRV_Name"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="0.62"
-        android:text="Name der Exercise"
-        android:textSize="20sp"
-        />
+        android:layout_alignBottom="@+id/PR_Weight_EditText"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginBottom="0dp"
+        android:layout_toStartOf="@+id/PR_Weight_EditText"
+        android:layout_toEndOf="@id/knownExerciseRV_ID"
+        android:layout_toRightOf="@id/knownExerciseRV_ID"
+        app:autoSizeMaxTextSize="20sp"
+        app:autoSizeMinTextSize="10sp"
+        app:autoSizeTextType="uniform"
+        android:maxLines="1"
+        android:text="Name der Exercise" />
 
     <EditText
         android:id="@+id/PR_Weight_EditText"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="0.1"
+        android:layout_toLeftOf="@id/PR_Reps_EditText"
         android:ems="3"
         android:hint="kg"
         android:imeOptions="actionNext"
@@ -49,14 +57,13 @@
         android:maxLines="1"
         android:selectAllOnFocus="true"
         android:textAlignment="center"
-        android:textSize="16sp"
-        />
+        android:textSize="16sp" />
 
     <EditText
         android:id="@+id/PR_Reps_EditText"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="0.1"
+        android:layout_alignParentEnd="true"
         android:ems="3"
         android:hint="rps"
         android:imeOptions="actionNext"
@@ -64,67 +71,77 @@
         android:maxLines="1"
         android:selectAllOnFocus="true"
         android:textAlignment="center"
-        android:textSize="16sp"
-        />
+        android:textSize="16sp" />
 
 
-</LinearLayout>
-    <RelativeLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/doneText"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingStart="6dp"
-        android:paddingEnd="6dp"
-        >
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/doneText"
-            android:text=" x "
-            android:textSize="16sp"
-            />
+        android:layout_below="@id/knownExerciseRV_ID"
+        android:layout_alignBaseline="@id/baseSetTextView"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="2dp"
+        android:text=" x "
+        android:textSize="16sp"
+        android:visibility="gone" />
 
-        <TextView
-            android:id="@+id/doneInNumber_TextView"
-            android:layout_toRightOf="@+id/doneText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minWidth="30dp"
-            android:textSize="16sp" />
-        <TextView
-            android:id="@+id/times_Textview"
-            android:layout_toRightOf="@+id/doneInNumber_TextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:text=""
-            />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/PR_TagTextView"
-            android:layout_toRightOf="@id/times_Textview"
-            android:textSize="16sp"
-            android:text=""
-            />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/prDateTextView"
-            android:textSize="16sp"
-            android:layout_toRightOf="@id/PR_TagTextView"
-            android:text="Mon 12.02.2002 1RM: 140kg"
-            />
+    <TextView
+        android:id="@+id/doneInNumber_TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/knownExerciseRV_ID"
+        android:layout_alignBaseline="@id/baseSetTextView"
+        android:layout_marginStart="3dp"
+        android:layout_marginTop="14dp"
+        android:layout_toEndOf="@+id/doneText"
+        android:text="210"
+        android:textSize="16sp"
+        android:visibility="gone"
+        tools:layout_toRightOf="@id/doneText" />
+
+    <TextView
+        android:id="@+id/times_Textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/doneInNumber_TextView"
+        android:text=""
+        android:textSize="16sp"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/PR_TagTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/times_Textview"
+        android:text=""
+        android:textSize="16sp"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/prDateTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/knownExerciseRV_Name"
+        android:layout_alignBaseline="@id/baseSetTextView"
+        android:layout_marginEnd="6dp"
+        android:layout_toStartOf="@+id/baseSetTextView"
+        android:layout_toRightOf="@id/doneInNumber_TextView"
+        android:text="Mon 12.02.2002 1RM: 140kg"
+        android:textSize="16sp"
+        android:visibility="gone" />
 
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:paddingEnd="20dp"
-            android:text="Best Set" />
+    <TextView
+        android:id="@+id/baseSetTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/PR_Reps_EditText"
+        android:layout_alignParentEnd="true"
+        android:paddingEnd="20dp"
+        android:text="Best Set"
+        android:visibility="gone" />
 
-    </RelativeLayout>
 
-</LinearLayout>
+</RelativeLayout>
 </androidx.cardview.widget.CardView>

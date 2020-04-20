@@ -6,13 +6,13 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.PopupMenu
 import android.widget.TextView
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.strong_weightlifting.strength_tracker_app.R
 import com.strong_weightlifting.strength_tracker_app.model.DataHelper
 import com.strong_weightlifting.strength_tracker_app.model.Exercise
-import com.strong_weightlifting.strength_tracker_app.model.Training
 import io.realm.OrderedRealmCollection
 import io.realm.Realm
 import io.realm.RealmRecyclerViewAdapter
@@ -137,11 +137,7 @@ class ExercisesRecyclerViewAdapter(data: OrderedRealmCollection<Exercise>) :
             updateData(data)
         }
         val trainingIsDone=exercise?.doneInTrainings?.first()?.isDone
-        if(trainingIsDone?.not()!!){
-            val touchHelperCallback = TouchHelperCallback()
-            val touchHelper = ItemTouchHelper(touchHelperCallback)
-            touchHelper.attachToRecyclerView(holder.recyclerView)
-        }
+
 
         holder.name.text = exercise?.knownExercise?.name ?: "DefaultName"
         val idText="[${exercise?.knownExercise?.user_custom_id.toString()}]"
@@ -152,11 +148,25 @@ class ExercisesRecyclerViewAdapter(data: OrderedRealmCollection<Exercise>) :
             holder.notes.visibility=View.GONE
             holder.notesHeader.visibility=View.GONE
         }
+        else{
+            holder.notes.visibility=View.VISIBLE
+            holder.notesHeader.visibility=View.VISIBLE
+        }
 
         val popup = PopupMenu(holder.itemView.context, holder.menu)
         popup.inflate(R.menu.exercise_menu)
-        if(trainingIsDone){
+
+
+        if(trainingIsDone!!){
             popup.menu.findItem(R.id.action_exercise_delete).isVisible=false
+            holder.add_btn.visibility=View.GONE
+        }
+        else{
+            holder.add_btn.visibility=View.VISIBLE
+            val touchHelperCallback = TouchHelperCallback()
+            val touchHelper = ItemTouchHelper(touchHelperCallback)
+            touchHelper.attachToRecyclerView(holder.recyclerView)
+
         }
         popup.setOnMenuItemClickListener {
             val id = it.itemId
@@ -189,6 +199,8 @@ class ExercisesRecyclerViewAdapter(data: OrderedRealmCollection<Exercise>) :
     }
 
 
+
+
     inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val name: TextView = itemView.findViewById(R.id.exerciseName)
         val user_custom_id: TextView = itemView.findViewById(R.id.exerciseName_ID)
@@ -199,6 +211,7 @@ class ExercisesRecyclerViewAdapter(data: OrderedRealmCollection<Exercise>) :
         val notesHeader: TextView = itemView.findViewById(R.id.notesExerciseHeader)
         val notes: TextView = itemView.findViewById(R.id.ExerciseNotesTextView)
         val prOverView: TextView = itemView.findViewById(R.id.PRsTextView)
+        val percentageHeader: TextView=itemView.findViewById(R.id.header_percent)
 
         init {
             itemView.setOnClickListener {
@@ -213,6 +226,13 @@ class ExercisesRecyclerViewAdapter(data: OrderedRealmCollection<Exercise>) :
                     getItem(position)?.let { it -> namClickListener?.onNameClick(it) }
                 }
             }
+            val sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(name.context)
+            val percentageIsActive = sharedPreferences.getBoolean("percentageInputActive", false)
+            if(!percentageIsActive){
+                percentageHeader.visibility=View.GONE
+            }
+
         }
 
     }

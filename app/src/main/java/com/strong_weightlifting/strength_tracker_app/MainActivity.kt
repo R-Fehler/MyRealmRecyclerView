@@ -5,6 +5,7 @@ import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -22,9 +23,13 @@ import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityCompat
+import androidx.preference.Preference
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.strong_weightlifting.strength_tracker_app.model.*
 import com.strong_weightlifting.strength_tracker_app.ui.recyclerview.TrainingRecyclerViewAdapter
@@ -32,12 +37,12 @@ import io.realm.Realm
 import io.realm.RealmList
 import io.realm.RealmResults
 import io.realm.Sort
+import kotlinx.android.synthetic.main.activity_edit_training.*
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.*
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.function.Predicate
 import kotlin.math.roundToInt
 
 /*TODO
@@ -47,7 +52,6 @@ Trainingsplanung zb wöchentlich kopieren. Mit neuen RealmObjects die aber die s
 Traininglist: die Views der einzelnen Trainings anpassen um Datum, Wochentag, Uhrzeit, Dauer, exercises und Kurzfassung der Sets anzuzeigen. Dazu Gesamtvolumen und PRs
 Bei add Training neuen erstellen und gleich edit Training acitivity mit der uuid starten
 Training als geplant in Traininglist activity markieren.. Dient später als Plan für gadget. (Das mit dem aktuellsten Datum)
-
  */
 
 
@@ -100,6 +104,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(mainToolBar)
+//        inflateBottomAppBar()
         realm = Realm.getDefaultInstance()
 
         when {
@@ -112,11 +117,14 @@ class MainActivity : AppCompatActivity() {
 
         val sharedPref = this.getSharedPreferences(getString(R.string.KEY_PREFERENCE_FILE), Context.MODE_PRIVATE)
         activeTrainingUUID = sharedPref.getLong(getString(R.string.KEY_ACTIVE_TRAINING), -1)
-        if (activeTrainingUUID > 0)
+        if (activeTrainingUUID > 0) {
             resume_Training_FAB.show()
-        else
+            add_Training_FAB.hide()
+        }
+        else{
             resume_Training_FAB.hide()
-
+            add_Training_FAB.show()
+        }
 
         recyclerView = findViewById(R.id.recycler_view_trainings)
 
@@ -126,25 +134,48 @@ class MainActivity : AppCompatActivity() {
 //        readCatalogFile("mycatalog")
 
 
+        first_menu_item.setOnClickListener {
+            showRoutines=!showRoutines
+            adapter?.showRoutines=showRoutines
+
+            if (showRoutines) {
+                setTitle(R.string.title_showRoutines)
+                first_menu_item.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_star_yellow_24dp,0,0)
+                adapter?.updateData(returnRoutines(realm))
+            } else {
+                setTitle(R.string.app_name)
+                first_menu_item.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_star_border_yellow_24dp,0,0)
+                adapter?.updateData(
+                    returnTrainings(realm)
+                )
+            }
+        }
+
+        second_menu_item.setOnClickListener {
+            val knownExIntent = Intent(this, KnownExerciseListActivity::class.java)
+            knownExIntent.putExtra(EditTrainingActivity.VIEWKNOWNEXERCISES, true)
+            startActivity(knownExIntent)
+        }
+
         fabAddTraining = findViewById(R.id.add_Training_FAB)
         fabResumeTraining = findViewById(R.id.resume_Training_FAB)
-
-
         fabAddTraining?.setOnClickListener {
-            if(showRoutines.not())
-            menu?.performIdentifierAction(R.id.action_showRoutines,0)
-            else{
-
-
-
-            var newTraining: Training?=null
-            realm?.let {newTraining= DataHelper.addTraining(it) }
-            adapter?.updateData(adapter?.data)
-            val llm: LinearLayoutManager = recyclerView?.layoutManager as LinearLayoutManager
-            llm.scrollToPositionWithOffset(0, 0)
-            var intent =Intent(baseContext,EditTrainingActivity::class.java)
-            intent.putExtra(EditTrainingActivity.TRAINING_ID,newTraining?.uuid)
-            startActivityForResult(intent, REQUEST_TRAINING)
+            if(showRoutines){
+                var newRoutine: Training?=null
+                realm?.executeTransaction {newRoutine= Training.createRoutine(it) }
+                var intent =Intent(baseContext,EditTrainingActivity::class.java)
+                intent.putExtra(EditTrainingActivity.TRAINING_ID,newRoutine?.uuid)
+                startActivityForResult(intent, REQUEST_TRAINING)
+            }
+            else {
+                var newTraining: Training? = null
+                realm?.let { newTraining = DataHelper.addTraining(it) }
+                adapter?.updateData(adapter?.data)
+                val llm: LinearLayoutManager = recyclerView?.layoutManager as LinearLayoutManager
+                llm.scrollToPositionWithOffset(0, 0)
+                var intent = Intent(baseContext, EditTrainingActivity::class.java)
+                intent.putExtra(EditTrainingActivity.TRAINING_ID, newTraining?.uuid)
+                startActivityForResult(intent, REQUEST_TRAINING)
             }
 
         }
@@ -217,6 +248,10 @@ class MainActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
 
+        val distinctNames=realm?.where(KnownExercise::class.java)?.distinct("name")?.findAll()
+        val exNames= Array(distinctNames?.size!!){i -> distinctNames[i]?.name}
+        val exNameAdapter: ArrayAdapter<String> = ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,exNames)
+        search_bar_ExerciseName_editText.setAdapter(exNameAdapter)
         search_bar_ExerciseName_editText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 if (!s.isNullOrBlank()) {
@@ -319,7 +354,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         this.menu = menu
-        menuInflater.inflate(R.menu.listview_options, menu)
+        menuInflater.inflate(R.menu.main_menu, menu)
         menu.setGroupVisible(R.id.group_normal_mode, true)
         return true
     }
@@ -331,46 +366,58 @@ class MainActivity : AppCompatActivity() {
             R.id.action_searchTrainings -> {
                 item.isChecked=item.isChecked.not()
                 if(item.isChecked) {
+                    item.icon=getDrawable(R.drawable.ic_search_white_opaque_24dp)
                     CompleteSearchBar.visibility = View.VISIBLE
+                    title=getString(R.string.search)
                 }
                 else{
+                    item.icon=getDrawable(R.drawable.ic_search_white_24dp)
                     CompleteSearchBar.visibility=View.GONE
                     adapter?.updateData( returnTrainings(realm))
+                    title=getString(R.string.app_name)
                 }
                 return true
             }
 
-            R.id.action_showRoutines ->{
-                item.isChecked=item.isChecked.not()
-                showRoutines=item.isChecked
-                adapter?.showRoutines=item.isChecked
-                if(showRoutines){
-                    setTitle(R.string.title_showRoutines)
+            R.id.action_settings ->{
+                val intent = Intent(baseContext, SettingsActivity::class.java)
+                startActivity(intent)
+                return true
+            }
 
-                    adapter?.updateData(returnRoutines(realm))
-                }
-                else {
-                    setTitle(R.string.app_name)
-                    adapter?.updateData(
-                        returnTrainings(realm)
-                        )
-                }
-                return true
-            }
-            R.id.action_KnownExerciseOverView -> {
-                val knownExIntent = Intent(this, KnownExerciseListActivity::class.java)
-                knownExIntent.putExtra(EditTrainingActivity.VIEWKNOWNEXERCISES, true)
-                startActivity(knownExIntent)
-                return true
-            }
+//            R.id.action_showRoutines ->{
+//                item.isChecked=item.isChecked.not()
+//                showRoutines=item.isChecked
+//                adapter?.showRoutines=item.isChecked
+//
+//                if(showRoutines){
+//                    setTitle(R.string.title_showRoutines)
+//                    item.icon=getDrawable(R.drawable.ic_star_yellow_24dp)
+//                    adapter?.updateData(returnRoutines(realm))
+//                }
+//                else {
+//                    setTitle(R.string.app_name)
+//                    item.icon=getDrawable(R.drawable.ic_star_border_yellow_24dp)
+//                    adapter?.updateData(
+//                        returnTrainings(realm)
+//                        )
+//                }
+//                return true
+//            }
+//            R.id.action_KnownExerciseOverView -> {
+//                val knownExIntent = Intent(this, KnownExerciseListActivity::class.java)
+//                knownExIntent.putExtra(EditTrainingActivity.VIEWKNOWNEXERCISES, true)
+//                startActivity(knownExIntent)
+//                return true
+//            }
 //            R.id.action_importCSV -> {
 //                getCSVFileForImport()
 //                return true
 //            }
-//            R.id.action_importOldTrainingCSV -> {
-//                getOldTrainingCSVFileForImport()
-//                return true
-//            }
+            R.id.action_importOldTrainingCSV -> {
+                getOldTrainingCSVFileForImport()
+                return true
+            }
             R.id.action_delete_all_realm_data -> {
                 deleteAllRealmData()
                 return true
@@ -384,6 +431,8 @@ class MainActivity : AppCompatActivity() {
                 importRealm()
                 return true
             }
+
+
 
             else -> return super.onOptionsItemSelected(item)
         }
@@ -399,7 +448,7 @@ class MainActivity : AppCompatActivity() {
         if(trainingResults!=null) adapter = TrainingRecyclerViewAdapter( trainingResults )
         adapter!!.setOnItemClickListener(object : TrainingRecyclerViewAdapter.OnItemClickListener {
             override fun onItemClick(training: Training) {
-                if (activeTrainingUUID < 0) { // TODO andere Trotzdem ansehen können
+                if (activeTrainingUUID < 0) {
                     if(showRoutines){
                         var newTraining:Training?=null
                         realm?.executeTransaction { newTraining=Training.createCopy(it,training) }
@@ -444,24 +493,39 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+        adapter?.setOnEditRoutineListener(object : TrainingRecyclerViewAdapter.OnEditRoutineListener{
+            override fun OnEditRoutine(training: Training) {
+                val intent = Intent(baseContext, EditTrainingActivity::class.java)
+                intent.putExtra(EditTrainingActivity.TRAINING_ID, training.uuid) //TODO LongExtra?
+
+                startActivityForResult(intent, REQUEST_TRAINING)
+            }
+        })
+
         adapter?.setOnDateClickListener(object : TrainingRecyclerViewAdapter.OnDateClickListener {
-            val cal = Calendar.getInstance()
-            var date = Date()
             override fun onDateClicked(training: Training) {
+                val cal = Calendar.getInstance()
+                var date = Date()
+
 
                 dateSetListener = DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
-                    date = Date(year - 1900, month, dayOfMonth, 18, 0)
+                    cal.set(Calendar.YEAR,year)
+                    cal.set(Calendar.MONTH,month)
+                    cal.set(Calendar.DAY_OF_MONTH,dayOfMonth)
+                    date = cal.time
 
                     realm?.executeTransaction {
                         training.date = date
-                        training.year = year - 1900
-                        training.month = month
+                        training.year = cal.get(Calendar.YEAR)
+                        training.month = cal.get(Calendar.MONTH)
                         training.exercises.forEachIndexed { index, exercise ->
-                            exercise.date = Date(date.time + index)
+                            exercise.date = Date(date.time+index)
                         }
                     }
                     adapter?.updateData(adapter?.data)
                 }
+
+
                 val datePickerDialog = DatePickerDialog(
                     this@MainActivity,
                     dateSetListener,
@@ -469,7 +533,27 @@ class MainActivity : AppCompatActivity() {
                     cal.get(Calendar.MONTH),
                     cal.get(Calendar.DAY_OF_MONTH)
                 )
+
+                TimePickerDialog(this@MainActivity,
+                    TimePickerDialog.OnTimeSetListener { view, hourOfDay, minute ->
+                        cal.set(Calendar.HOUR_OF_DAY,hourOfDay)
+                        cal.set(Calendar.MINUTE,minute)
+                        date=cal.time
+                        realm?.executeTransaction {
+                            training.date = date
+                            training.year = cal.get(Calendar.YEAR)
+                            training.month = cal.get(Calendar.MONTH)
+                            training.exercises.forEachIndexed { index, exercise ->
+                                exercise.date = Date(date.time+index)
+                            }
+                        }
+                        adapter?.updateData(adapter?.data)
+
+                    },
+                    cal.get(Calendar.HOUR_OF_DAY),cal.get(Calendar.MINUTE),true).show()
+
                 datePickerDialog.show()
+
             }
         })
         val displayMetrics: DisplayMetrics = this.resources.displayMetrics
@@ -652,8 +736,12 @@ class MainActivity : AppCompatActivity() {
             }
             if (activeTrainingUUID > 0) {
                 resume_Training_FAB.show()
-            } else
+                add_Training_FAB.hide()
+            } else {
                 resume_Training_FAB.hide()
+                add_Training_FAB.show()
+            }
+
         }
 
 
@@ -709,7 +797,7 @@ class MainActivity : AppCompatActivity() {
                         training?.name=field[StrongCSV.WorkoutName.ordinal].trim('"')
                         training?.isDone=true
                         val dateString = field[StrongCSV.Date.ordinal].trim()
-                        val format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                        val format = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
                         val parsedDate = format.parse(dateString)
                         training?.date = parsedDate
                         training?.year = parsedDate.year + 1900
@@ -753,13 +841,13 @@ class MainActivity : AppCompatActivity() {
                             training?.isDone=true
                             val dateString = field[StrongCSV.Date.ordinal].trim()
                             try {
-                                val format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                                val format = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
                                 val parsedDate = format.parse(dateString)
                                 training?.date = parsedDate
                                 training?.year = parsedDate.year + 1900
                                 training?.month = parsedDate.month
                             } catch (e: ParseException) {
-                                val format = SimpleDateFormat("MM-dd HH:mm:ss", Locale.getDefault())
+                                val format = SimpleDateFormat("MM-dd HH:mm", Locale.getDefault())
                                 val parsedDate = format.parse(dateString)
                                 parsedDate?.year = prevtraining?.date?.year ?: throw e
                                 training?.date = parsedDate
@@ -879,9 +967,10 @@ class MainActivity : AppCompatActivity() {
                         training?.date = parsedDate
                         training?.year = parsedDate.year + 1900
                         training?.month = parsedDate.month
+                        training?.name=field[CSV.Ort.ordinal].trim(' ','"').toUpperCase()
                         exercise?.date = training?.date!!
                         exercise?.notes = field[CSV.Notizen.ordinal].trim('"')
-                        training?.isDone=true
+                        training.isDone=true
 
                         val knownName = field[CSV.Name.ordinal].trim('"').trim().toUpperCase()
                         val userCustomID =
@@ -927,6 +1016,7 @@ class MainActivity : AppCompatActivity() {
                             training?.date = parsedDate
                             training?.year = parsedDate.year + 1900
                             training?.month = parsedDate.month
+                            training?.name=field[CSV.Ort.ordinal].trim(' ','"').toUpperCase()
                             training?.isDone=true
 
 
@@ -980,6 +1070,7 @@ class MainActivity : AppCompatActivity() {
                                 exercise.knownExercise!!.prWeight = epWeight
                                 exercise.knownExercise!!.repsAtPRWeight = epReps
                                 exercise.knownExercise!!.dateOfPR = exercise.doneInTrainings?.first()?.date!!
+                                it.isPR=true
                             }
                             exercise.prWeightAtTheMoment= exercise.knownExercise!!.prWeight
                             exercise.repsAtPRWeightAtTheMoment=exercise.knownExercise!!.repsAtPRWeight
@@ -1030,21 +1121,34 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+
+    private fun inflateBottomAppBar(): Boolean {
+        val bottomAppBar = findViewById<BottomAppBar>(R.id.bottom_bar)
+        val bottomMenu = bottomAppBar.menu
+        menuInflater.inflate(R.menu.bottom_bar_menu, bottomMenu)
+        for (i in 0 until bottomMenu.size()) {
+            bottomMenu.getItem(i).setOnMenuItemClickListener { menuItem -> onOptionsItemSelected(menuItem) }
+        }
+
+
+        return super.onCreateOptionsMenu(menu)
+    }
+
+
+
     override fun onResume() {
         super.onResume()
-        adapter?.updateData(adapter?.data)
         if(showRoutines) {
-            menu?.performIdentifierAction(R.id.action_showRoutines, 0)
+            first_menu_item.performClick()
         }
+        adapter?.updateData(adapter?.data)
     }
 
     override fun onBackPressed() {
-        if(showRoutines){
-            menu?.performIdentifierAction(R.id.action_showRoutines, 0)
-        }
-        else {
+
+
             super.onBackPressed()
-        }
+
 
     }
 }

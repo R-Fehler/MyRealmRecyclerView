@@ -2,14 +2,17 @@ package com.strong_weightlifting.strength_tracker_app
 
 import android.app.Activity
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_edit_text.*
 
 class EditTextActivity : AppCompatActivity() {
-
+    private var realm: Realm?= null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        realm = Realm.getDefaultInstance()
+
         setContentView(R.layout.activity_edit_text)
         val notes=intent.getStringExtra(EditTrainingActivity.NOTES)
         editText.text.insert(0,notes)
@@ -24,5 +27,14 @@ class EditTextActivity : AppCompatActivity() {
             setResult(Activity.RESULT_OK,returnIntent)
             finish()
         }
+
+        clear_btn.setOnClickListener {
+            editText.text.clear()
+        }
+
+
+
+
     }
+
 }

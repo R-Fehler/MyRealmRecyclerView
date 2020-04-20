@@ -186,7 +186,7 @@ class KnownExerciseListActivity : AppCompatActivity() {
     }
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         this.menu = menu
-        menuInflater.inflate(R.menu.edit_training_menu, menu)
+        menuInflater.inflate(R.menu.known_menu, menu)
         menu.setGroupVisible(R.id.group_normal_mode, true)
         menu.findItem(R.id.action_done).isVisible = adapter?.isEditMode!!
         menu.findItem(R.id.action_editItems).title=getString(R.string.edit_pr)
@@ -214,10 +214,27 @@ class KnownExerciseListActivity : AppCompatActivity() {
                 menu?.findItem(R.id.action_editItems)?.isVisible = adapter?.isEditMode!!.not()
                 return true
             }
+
+            R.id.action_sort_byName-> {
+                adapter?.updateData(allKnownExercises!!.sort("name"))
+                return true
+            }
+            R.id.action_sort_byID -> {
+               adapter?.updateData( allKnownExercises!!.sort("user_custom_id"))
+                return true
+            }
+            R.id.action_sort_byFavourites -> {
+                adapter?.updateData(allKnownExercises!!.sort("doneInExercisesSize", Sort.DESCENDING))
+                return true
+            }
             else -> return super.onOptionsItemSelected(item)
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        adapter?.updateData(adapter?.data)
+    }
 
 }
 

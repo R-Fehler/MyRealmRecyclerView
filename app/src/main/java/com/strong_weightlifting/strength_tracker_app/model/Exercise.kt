@@ -1,5 +1,7 @@
 package com.strong_weightlifting.strength_tracker_app.model
 
+import androidx.core.content.ContextCompat
+import com.strong_weightlifting.strength_tracker_app.R
 import io.realm.Realm
 import io.realm.RealmList
 import io.realm.RealmObject
@@ -64,15 +66,16 @@ open class Exercise : RealmObject() {
             exercise?.notes=notes
         }
     }
-    fun prToString(set: ExerciseSet?): String {
-        set?.let {
-            if(set.isPR)
-                return "(PR)"
-            else return "" }
-        return ""
-    }
+
 
     override fun toString(): String {
+            val text=toShortString()
+            val name="[${knownExercise?.user_custom_id}] ${knownExercise?.name} :"
+        if(name.length+text.length<50) return "$name $text"
+        else return "$name \n $text"
+
+    }
+    fun toShortString():String{
         var text = ""
         if (sets.size>1) {
             for (n in 0 until sets.size) {
@@ -80,23 +83,23 @@ open class Exercise : RealmObject() {
 
                     when {
 
-                        n == 0 -> "${sets[n]?.weight}kg:${sets[n]?.reps}${prToString(sets[n])}"
-                        sets[n]?.weight == sets[n - 1]?.weight -> "/${sets[n]?.reps}${prToString(sets[n])}"
-                        else -> "  ${sets[n]?.weight}kg:${sets[n]?.reps}${prToString(sets[n])}"
+                        n == 0 -> "${sets[n]?.weight}kg:${sets[n]?.reps}${sets[n]?.prToString()}"
+                        sets[n]?.weight == sets[n - 1]?.weight -> "/${sets[n]?.reps}${sets[n]?.prToString()}"
+                        else -> "  ${sets[n]?.weight}kg:${sets[n]?.reps}${sets[n]?.prToString()}"
 
                     }
                 }
                 else ""
 
             }
-            return "[${knownExercise?.user_custom_id}] ${knownExercise?.name} : $text"
+            return text
         }
         else if(sets.size==1) {
             text += "${sets[0]?.weight}kg:${sets[0]?.reps}"
-            return "[${knownExercise?.user_custom_id}] ${knownExercise?.name} : $text"
+            return text
         }
         else
 
-        return "[${knownExercise?.user_custom_id}] ${knownExercise?.name} :"
+            return text
     }
 }
