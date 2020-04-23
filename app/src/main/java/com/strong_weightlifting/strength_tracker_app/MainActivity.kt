@@ -23,21 +23,18 @@ import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityCompat
-import androidx.preference.Preference
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.strong_weightlifting.strength_tracker_app.model.*
+import com.strong_weightlifting.strength_tracker_app.terminal_app.BluetoothActivity
 import com.strong_weightlifting.strength_tracker_app.ui.recyclerview.TrainingRecyclerViewAdapter
 import io.realm.Realm
 import io.realm.RealmList
 import io.realm.RealmResults
 import io.realm.Sort
-import kotlinx.android.synthetic.main.activity_edit_training.*
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.*
 import java.text.ParseException
@@ -156,7 +153,11 @@ class MainActivity : AppCompatActivity() {
             knownExIntent.putExtra(EditTrainingActivity.VIEWKNOWNEXERCISES, true)
             startActivity(knownExIntent)
         }
-
+        third_menu_item.setOnClickListener {
+            val intentBLE=Intent(this,
+                BluetoothActivity::class.java)
+            startActivity(intentBLE)
+        }
         fabAddTraining = findViewById(R.id.add_Training_FAB)
         fabResumeTraining = findViewById(R.id.resume_Training_FAB)
         fabAddTraining?.setOnClickListener {

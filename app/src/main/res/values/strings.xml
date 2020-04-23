@@ -35,7 +35,15 @@
     <string name="title_activity_settings">Settings</string>
     <string name="star_emoji">&#9733;</string>
 
+<!--    Simple BLE Strings-->
+    <string name="devices">Bluetooth LE Devices</string>
 
+    <string name="location_permission_title">Location permission required</string>
+    <string name="location_permission_message">This app does not use location information, but scanning for Bluetooth LE devices requires this permission</string>
+
+    <string name="location_denied_title">Location permission denied</string>
+    <string name="location_denied_message">As location permission has not been granted, this app cannot scan for Bluetooth LE devices.</string>
+    <string name="pairing_request">PAIRING requested\n-> Perform pairing steps. Connect again</string>
     <!-- Preference Titles -->
     <string name="messages_header">Messages</string>
     <string name="sync_header">Sync</string>
