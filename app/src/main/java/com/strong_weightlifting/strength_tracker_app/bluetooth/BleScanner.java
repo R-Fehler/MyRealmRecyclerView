@@ -23,7 +23,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.util.Log;
-import com.bluetooth.mwoolley.microbitbledemo.Constants;
+import com.strong_weightlifting.strength_tracker_app.microbit_blue.Constants;
 
 /**
  * Created by mwoolley on 21/11/2015.

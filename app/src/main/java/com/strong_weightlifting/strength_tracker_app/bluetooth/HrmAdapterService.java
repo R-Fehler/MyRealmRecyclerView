@@ -24,7 +24,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.*;
 import android.util.Log;
-import com.bluetooth.mwoolley.microbitbledemo.Constants;
+import com.strong_weightlifting.strength_tracker_app.microbit_blue.Constants;
 
 import java.util.ArrayList;
 import java.util.List;

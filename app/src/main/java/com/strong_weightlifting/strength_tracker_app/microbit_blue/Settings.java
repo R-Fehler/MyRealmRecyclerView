@@ -1,4 +1,4 @@
-package com.strong_weightlifting.strength_tracker_app;
+package com.strong_weightlifting.strength_tracker_app.microbit_blue;
 /*
  * Author: Martin Woolley
  * Twitter: @bluetooth_mdw

@@ -1,4 +1,4 @@
-package com.strong_weightlifting.strength_tracker_app;
+package com.strong_weightlifting.strength_tracker_app.microbit_blue;
 /*
  * Author: Martin Woolley
  * Twitter: @bluetooth_mdw
@@ -20,8 +20,8 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.util.Log;
-import com.bluetooth.mwoolley.microbitbledemo.bluetooth.ConnectionStatusListener;
-import com.bluetooth.mwoolley.microbitbledemo.bluetooth.Handle;
+import com.strong_weightlifting.strength_tracker_app.bluetooth.ConnectionStatusListener;
+import com.strong_weightlifting.strength_tracker_app.bluetooth.Handle;
 
 import java.util.Hashtable;
 import java.util.List;

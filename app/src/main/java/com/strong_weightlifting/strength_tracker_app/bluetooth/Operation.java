@@ -16,8 +16,9 @@ package com.strong_weightlifting.strength_tracker_app.bluetooth;
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-import com.bluetooth.mwoolley.microbitbledemo.Utility;
 
+
+import com.strong_weightlifting.strength_tracker_app.microbit_blue.Utility;
 
 public class Operation {
 

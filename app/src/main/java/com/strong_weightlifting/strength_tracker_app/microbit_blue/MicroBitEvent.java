@@ -1,4 +1,4 @@
-package com.strong_weightlifting.strength_tracker_app;
+package com.strong_weightlifting.strength_tracker_app.microbit_blue;
 
 /**
  * Created by Martin on 27/01/2016.
