@@ -15,8 +15,10 @@ import android.view.*
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.ListFragment
+import androidx.preference.PreferenceManager
 import com.strong_weightlifting.strength_tracker_app.R
 import java.util.*
 
@@ -213,14 +215,9 @@ class DevicesFragment : ListFragment() {
         if (scanState == ScanState.NONE) return
         if (listItems.indexOf(device) < 0) {
             listItems.add(device)
-            Collections.sort(
-                listItems
-            ) { a: BluetoothDevice, b: BluetoothDevice ->
-                compareTo(
-                    a,
-                    b
-                )
-            }
+            listItems.sortWith(Comparator { a: BluetoothDevice, b: BluetoothDevice ->
+                compareTo(a, b)
+            })
             listAdapter!!.notifyDataSetChanged()
         }
     }
@@ -248,13 +245,23 @@ class DevicesFragment : ListFragment() {
     override fun onListItemClick(l: ListView, v: View, position: Int, id: Long) {
         stopScan()
         val device = listItems[position - 1]
-        val args = Bundle()
-        args.putString("device", device.address)
-        val fragment: Fragment =
-            TerminalFragment()
-        fragment.arguments = args
-        fragmentManager!!.beginTransaction().replace(R.id.fragment, fragment, "terminal").addToBackStack(null)
-            .commit()
+        val sharedPreferences =
+            PreferenceManager.getDefaultSharedPreferences(context)
+        val editor = sharedPreferences.edit()
+        with(editor){
+            putString("device",device.address)
+            apply()
+        }
+        Toast.makeText(context,"device: ${device.address}",Toast.LENGTH_LONG).show()
+
+//        val args = Bundle()
+//        args.putString("device", device.address)
+
+//        val fragment: Fragment =
+//            TerminalFragment()
+//        fragment.arguments = args
+//        fragmentManager!!.beginTransaction().replace(R.id.fragment, fragment, "terminal").addToBackStack(null)
+//            .commit()
     }
 
     companion object {

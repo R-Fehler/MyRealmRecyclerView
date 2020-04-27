@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.strong_weightlifting.strength_tracker_app.microbit_blue.TemperatureAlarmActivity
 import com.strong_weightlifting.strength_tracker_app.model.*
 import com.strong_weightlifting.strength_tracker_app.terminal_app.BluetoothActivity
 import com.strong_weightlifting.strength_tracker_app.ui.recyclerview.TrainingRecyclerViewAdapter
@@ -193,7 +194,7 @@ class MainActivity : AppCompatActivity() {
 
         val distinctTrainings=realm?.where(Training::class.java)?.distinct("name")?.findAll()
         val nameArray= Array(distinctTrainings?.size!!){i -> distinctTrainings[i]?.name}
-        val nameAdaper: ArrayAdapter<String> = ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,nameArray)
+        val nameAdaper: ArrayAdapter<String> = ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,nameArray)!!
         search_TrainingName_EditText.setAdapter(nameAdaper)
         search_TrainingName_EditText.setOnTouchListener { v, event ->
             search_TrainingName_EditText.showDropDown()
@@ -251,7 +252,7 @@ class MainActivity : AppCompatActivity() {
 
         val distinctNames=realm?.where(KnownExercise::class.java)?.distinct("name")?.findAll()
         val exNames= Array(distinctNames?.size!!){i -> distinctNames[i]?.name}
-        val exNameAdapter: ArrayAdapter<String> = ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,exNames)
+        val exNameAdapter: ArrayAdapter<String> = ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,exNames)!!
         search_bar_ExerciseName_editText.setAdapter(exNameAdapter)
         search_bar_ExerciseName_editText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {

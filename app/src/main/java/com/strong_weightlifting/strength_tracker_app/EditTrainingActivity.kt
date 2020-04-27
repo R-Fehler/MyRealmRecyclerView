@@ -5,15 +5,24 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.bluetooth.BluetoothAdapter
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.IBinder
 import android.text.Editable
+import android.text.Spannable
+import android.text.SpannableStringBuilder
 import android.text.TextWatcher
+import android.text.style.ForegroundColorSpan
 import android.util.DisplayMetrics
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.ArrayAdapter
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -22,6 +31,9 @@ import com.strong_weightlifting.strength_tracker_app.model.DataHelper
 import com.strong_weightlifting.strength_tracker_app.model.Exercise
 import com.strong_weightlifting.strength_tracker_app.model.ExerciseSet
 import com.strong_weightlifting.strength_tracker_app.model.Training
+import com.strong_weightlifting.strength_tracker_app.terminal_app.SerialListener
+import com.strong_weightlifting.strength_tracker_app.terminal_app.SerialService
+import com.strong_weightlifting.strength_tracker_app.terminal_app.SerialSocket
 import com.strong_weightlifting.strength_tracker_app.ui.recyclerview.ExerciseSetAdapter
 import com.strong_weightlifting.strength_tracker_app.ui.recyclerview.ExercisesRecyclerViewAdapter
 import io.realm.Realm
@@ -37,7 +49,7 @@ Geplant vs done? : setze den Wert von planned in normale properties. Wenn gleich
 Vorschläge in edittext aufgrund des letzten Trainings mit der known exercise. Query in oncreate für exercise mit known exercise Feld equalto this known exercise und Sets orderNo equalto this orderNo Else den vom letzten Satz
 
  */
-class EditTrainingActivity : AppCompatActivity() {
+class EditTrainingActivity : AppCompatActivity(),ServiceConnection, SerialListener {
 
     private var realm: Realm? = null
     private var recyclerView: RecyclerView? = null
@@ -47,6 +59,17 @@ class EditTrainingActivity : AppCompatActivity() {
     private var dateSetListener: DatePickerDialog.OnDateSetListener? = null
     private var timeSetListener: TimePickerDialog.OnTimeSetListener? = null
 
+    private enum class Connected {
+        False, Pending, True
+    }
+
+    private var deviceAddress: String? = null
+    private var newline = "\n"
+    private var socket: SerialSocket? = null
+    private var service: SerialService? = null
+    private var initialStart = true
+    private var connected =
+        Connected.False
 
     companion object {
         const val TRAINING_ID = "com.strong_weightlifting.strength_tracker_app.TRAINING_ID"
@@ -86,6 +109,12 @@ class EditTrainingActivity : AppCompatActivity() {
         setContentView(R.layout.activity_edit_training)
         realm = Realm.getDefaultInstance()
         setSupportActionBar(editTrainingToolbar)
+        val sharedPreferences =
+            PreferenceManager.getDefaultSharedPreferences(this)
+        deviceAddress = sharedPreferences.getString("device","0") //TODO aus Settings holen
+        if(deviceAddress=="0"){
+            Toast.makeText(this,"no ble device paired",Toast.LENGTH_SHORT).show()
+        }
 
 
         recyclerView = findViewById(R.id.recycler_view_exercises)
@@ -183,9 +212,9 @@ class EditTrainingActivity : AppCompatActivity() {
 
         val distinctTrainings = realm?.where(Training::class.java)?.distinct("name")?.findAll()
         val nameArray = Array(distinctTrainings?.size!!) { i -> distinctTrainings[i]?.name }
-        val nameAdaper: ArrayAdapter<String> =
+        val nameAdapter: ArrayAdapter<String> =
             ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, nameArray)
-        nameOfTrainingEditText.setAdapter(nameAdaper)
+        nameOfTrainingEditText.setAdapter(nameAdapter)
         nameOfTrainingEditText.setOnTouchListener { v, event ->
             nameOfTrainingEditText.showDropDown()
             return@setOnTouchListener false
@@ -199,6 +228,7 @@ class EditTrainingActivity : AppCompatActivity() {
                     if (s.toString() != training?.name) {
                         realm?.executeTransaction {
                             training?.name = s.toString()
+
                         }
                     }
                 }
@@ -245,9 +275,121 @@ class EditTrainingActivity : AppCompatActivity() {
  * the view may still be reachable if anybody is still holding a reference to the <code>RealmResult>.
  */
     override fun onDestroy() {
-        super.onDestroy()
         recyclerView!!.adapter = null
         realm!!.close()
+        if (connected != Connected.False) disconnect()
+       stopService(Intent(this, SerialService::class.java))
+        super.onDestroy()
+    }
+    override fun onStart() {
+        super.onStart()
+        if (service != null) service!!.attach(this) else startService(
+            Intent(
+                this,
+                SerialService::class.java
+            )
+        ) // prevents service destroy on unbind from recreated activity caused by orientation change
+        bindService(Intent(this, SerialService::class.java), this, Context.BIND_AUTO_CREATE)
+
+        if (initialStart && service != null) {
+            initialStart = false
+         connect()
+        }
+    }
+
+
+    override fun onStop() {
+        if (service != null && isChangingConfigurations) service!!.detach()
+        try {
+            unbindService(this)
+        } catch (ignored: Exception) {
+        }
+        super.onStop()
+    }
+    override fun onServiceConnected(name: ComponentName, binder: IBinder) {
+        service = (binder as SerialService.SerialBinder).service
+        if (initialStart) {
+            initialStart = false
+            connect()
+        }
+    }
+    override fun onServiceDisconnected(name: ComponentName) {
+        service = null
+    }
+
+    private fun connect() {
+        try {
+            val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+            val device = bluetoothAdapter.getRemoteDevice(deviceAddress)
+            val deviceName = if (device.name != null) device.name else device.address
+            status("connecting...")
+            connected =
+                Connected.Pending
+            socket = SerialSocket()
+            service!!.connect(this, "Connected to $deviceName")
+            socket!!.connect(this, service, device)
+        } catch (e: Exception) {
+            onSerialConnectError(e)
+        }
+    }
+
+    private fun disconnect() {
+        connected =
+            Connected.False
+        service!!.disconnect()
+        socket?.disconnect()
+        socket = null
+    }
+
+    private fun send(str: String) {
+        if (connected != Connected.True) {
+            return
+        }
+        try {
+            val data = (str + newline).toByteArray()
+            /// hier schreibt man die daten ueber uart wichtig! byte[]
+
+            socket!!.write(data)
+        } catch (e: Exception) {
+            onSerialIoError(e)
+        }
+    }
+    // receive ist teil von impl. SerialListener onSerialRead l.225
+
+    private fun receive(data: ByteArray?) {
+        val stringData=String(data!!)
+        val indexEx=training?.exercises?.indexOfFirst {
+            it.sets.any { it.isDone.not() }
+        }
+
+        val firstExNotDone= training?.exercises?.get(indexEx!!)
+        val indexSet=firstExNotDone?.sets?.indexOfFirst{ it.isDone.not() }
+        val firstSetNotDone=firstExNotDone?.sets?.get(indexSet!!)
+        realm?.executeTransaction { firstSetNotDone?.reps=String(data!!).toInt() }
+        indexEx?.let { adapter?.notifyItemChanged(it) }
+    }
+
+    private fun status(str: String) {
+        Toast.makeText(this,str,Toast.LENGTH_SHORT).show()
+
+    }
+    override fun onSerialConnect() {
+        status("connected")
+        connected = Connected.True
+    }
+
+    override fun onSerialConnectError(e: Exception) {
+        status("connection failed: " + e.message)
+        disconnect()
+    }
+
+    override fun onSerialRead(data: ByteArray?) {
+        receive(data)
+    }
+
+    override fun onSerialIoError(e: Exception) {
+        status("connection lost: " + e.message)
+        disconnect()
     }
 
     private fun setUpRecyclerView() {
