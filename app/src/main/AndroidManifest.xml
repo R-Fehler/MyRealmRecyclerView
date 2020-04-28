@@ -58,7 +58,9 @@
             </intent-filter>
         </activity>
         <service android:name=".terminal_app.SerialService" />
-
+        <service
+            android:name=".bluetooth.BleAdapterService"
+            android:enabled="true" />
     </application>
 
 </manifest>

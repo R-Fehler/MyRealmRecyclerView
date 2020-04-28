@@ -1,23 +1,24 @@
 package com.strong_weightlifting.strength_tracker_app
 
 import PreCachingLayoutManager
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import android.bluetooth.BluetoothAdapter
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.Handler
 import android.os.IBinder
+import android.os.Message
 import android.text.Editable
-import android.text.Spannable
-import android.text.SpannableStringBuilder
 import android.text.TextWatcher
-import android.text.style.ForegroundColorSpan
 import android.util.DisplayMetrics
+import android.util.Log
+import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ArrayAdapter
@@ -27,13 +28,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.strong_weightlifting.strength_tracker_app.bluetooth.BleAdapterService
+import com.strong_weightlifting.strength_tracker_app.bluetooth.ConnectionStatusListener
+import com.strong_weightlifting.strength_tracker_app.microbit_blue.Constants
+import com.strong_weightlifting.strength_tracker_app.microbit_blue.MicroBit
+import com.strong_weightlifting.strength_tracker_app.microbit_blue.Utility
 import com.strong_weightlifting.strength_tracker_app.model.DataHelper
 import com.strong_weightlifting.strength_tracker_app.model.Exercise
 import com.strong_weightlifting.strength_tracker_app.model.ExerciseSet
 import com.strong_weightlifting.strength_tracker_app.model.Training
-import com.strong_weightlifting.strength_tracker_app.terminal_app.SerialListener
-import com.strong_weightlifting.strength_tracker_app.terminal_app.SerialService
-import com.strong_weightlifting.strength_tracker_app.terminal_app.SerialSocket
 import com.strong_weightlifting.strength_tracker_app.ui.recyclerview.ExerciseSetAdapter
 import com.strong_weightlifting.strength_tracker_app.ui.recyclerview.ExercisesRecyclerViewAdapter
 import io.realm.Realm
@@ -49,7 +52,7 @@ Geplant vs done? : setze den Wert von planned in normale properties. Wenn gleich
 Vorschläge in edittext aufgrund des letzten Trainings mit der known exercise. Query in oncreate für exercise mit known exercise Feld equalto this known exercise und Sets orderNo equalto this orderNo Else den vom letzten Satz
 
  */
-class EditTrainingActivity : AppCompatActivity(),ServiceConnection, SerialListener {
+class EditTrainingActivity : AppCompatActivity(), ConnectionStatusListener {
 
     private var realm: Realm? = null
     private var recyclerView: RecyclerView? = null
@@ -59,17 +62,215 @@ class EditTrainingActivity : AppCompatActivity(),ServiceConnection, SerialListen
     private var dateSetListener: DatePickerDialog.OnDateSetListener? = null
     private var timeSetListener: TimePickerDialog.OnTimeSetListener? = null
 
-    private enum class Connected {
-        False, Pending, True
-    }
+
 
     private var deviceAddress: String? = null
     private var newline = "\n"
-    private var socket: SerialSocket? = null
-    private var service: SerialService? = null
-    private var initialStart = true
-    private var connected =
-        Connected.False
+
+    private var bluetooth_le_adapter: BleAdapterService? = null
+
+    private var exiting = false
+    private var notifications_on = false
+
+    // micro:bit event codes:
+    // 9000 = 0x2823 (LE) = temperature alarm. Value=0 means OK, 1 means cold, 2 means hot
+    // client event codes:
+    // 9001=0x2923 (LE) = set lower limit, value is the limit value in celsius
+    // 9002=0x2A23 (LE) = set upper limit, value is the limit value in celsius
+    private val event_set_lower = byteArrayOf(0x29, 0x23, 0x00, 0x00) // event 9001
+
+    private val event_set_upper = byteArrayOf(0x2A, 0x23, 0x00, 0x00) // event 9002
+
+
+    private val mServiceConnection: ServiceConnection = object : ServiceConnection {
+        override fun onServiceConnected(componentName: ComponentName, service: IBinder) {
+            Log.d(Constants.TAG, "onServiceConnected")
+            notifications_on = false
+            bluetooth_le_adapter = (service as BleAdapterService.LocalBinder).service
+            bluetooth_le_adapter?.setActivityHandler(mMessageHandler)
+            connectToDevice()
+
+
+            setLowerLimit()
+            setUpperLimit()
+
+
+            if (bluetooth_le_adapter?.setNotificationsState(
+                    Utility.normaliseUUID(BleAdapterService.EVENTSERVICE_SERVICE_UUID),
+                    Utility.normaliseUUID(BleAdapterService.MICROBITEVENT_CHARACTERISTIC_UUID),
+                    true
+                )!!
+            ) {
+                showMsg(Utility.htmlColorGreen("micro:bit event notifications ON"))
+            } else {
+                showMsg(Utility.htmlColorRed("Failed to set micro:bit event notifications ON"))
+            }
+        }
+
+        override fun onServiceDisconnected(componentName: ComponentName) {
+            bluetooth_le_adapter = null
+        }
+    }
+
+    private fun connectToDevice() {
+        status("Connecting to micro:bit")
+        if (bluetooth_le_adapter!!.connect(MicroBit.getInstance().microbit_address)) {
+        } else {
+            status("onConnect: failed to connect")
+        }
+    }
+
+    private fun refreshBluetoothServices() {
+        if (MicroBit.getInstance().isMicrobit_connected) {
+            val toast = Toast.makeText(this, "Refreshing GATT services", Toast.LENGTH_SHORT)
+            toast.setGravity(Gravity.CENTER, 0, 0)
+            toast.show()
+            MicroBit.getInstance().resetAttributeTables()
+            bluetooth_le_adapter!!.refreshDeviceCache()
+            bluetooth_le_adapter!!.discoverServices()
+        } else {
+            val toast = Toast.makeText(this, "Request Ignored - Not Connected", Toast.LENGTH_SHORT)
+            toast.setGravity(Gravity.CENTER, 0, 0)
+            toast.show()
+        }
+    }
+
+    private fun setUpperLimit() {
+        event_set_upper[2] = 10.toByte()
+        Log.d(Constants.TAG, Utility.byteArrayAsHexString(event_set_upper))
+        bluetooth_le_adapter!!.writeCharacteristic(
+            Utility.normaliseUUID(BleAdapterService.EVENTSERVICE_SERVICE_UUID),
+            Utility.normaliseUUID(BleAdapterService.CLIENTEVENT_CHARACTERISTIC_UUID),
+            event_set_upper
+        )
+    }
+
+    private fun setLowerLimit() {
+        event_set_lower[2] = 1.toByte()
+        Log.d(Constants.TAG, Utility.byteArrayAsHexString(event_set_lower))
+        bluetooth_le_adapter!!.writeCharacteristic(
+            Utility.normaliseUUID(BleAdapterService.EVENTSERVICE_SERVICE_UUID),
+            Utility.normaliseUUID(BleAdapterService.CLIENTEVENT_CHARACTERISTIC_UUID),
+            event_set_lower
+        )
+    }
+
+    private fun showMsg(msg: String) {
+        Log.d(Constants.TAG, msg)
+
+    }
+    @SuppressLint("HandlerLeak")
+    private val mMessageHandler: Handler = object : Handler() {
+        override fun handleMessage(msg: Message) {
+            val bundle: Bundle
+            var service_uuid: String? = ""
+            var characteristic_uuid: String? = ""
+            var descriptor_uuid: String? = ""
+            var b: ByteArray? = null
+            val value_text: TextView? = null
+
+
+            when (msg.what) {
+                BleAdapterService.GATT_CONNECTED -> {
+                    showMsg(Utility.htmlColorGreen("Connected"))
+                    showMsg(Utility.htmlColorGreen("Discovering services..."))
+                    bluetooth_le_adapter!!.discoverServices()
+                }
+                BleAdapterService.GATT_DISCONNECT -> {
+                    showMsg(Utility.htmlColorRed("Disconnected"))
+                }
+                BleAdapterService.GATT_SERVICES_DISCOVERED -> {
+                    Log.d(Constants.TAG, "XXXX Services discovered")
+                    showMsg(Utility.htmlColorGreen("Ready"))
+                    val slist =
+                        bluetooth_le_adapter!!.supportedGattServices
+                    for (svc in slist) {
+                        Log.d(
+                            Constants.TAG,
+                            "UUID=" + svc.uuid.toString().toUpperCase() + " INSTANCE=" + svc.instanceId
+                        )
+                        MicroBit.getInstance().addService(svc)
+                    }
+                    MicroBit.getInstance().isMicrobit_services_discovered = true
+                }
+
+                BleAdapterService.GATT_CHARACTERISTIC_WRITTEN -> {
+                    Log.d(Constants.TAG, "Handler received characteristic written result")
+                    bundle = msg.data
+                    service_uuid = bundle.getString(BleAdapterService.PARCEL_SERVICE_UUID)
+                    characteristic_uuid = bundle.getString(BleAdapterService.PARCEL_CHARACTERISTIC_UUID)
+                    Log.d(
+                        Constants.TAG,
+                        "characteristic $characteristic_uuid of service $service_uuid written OK"
+                    )
+                    showMsg(Utility.htmlColorGreen("Subscribed to micro:bit event"))
+                }
+                BleAdapterService.GATT_DESCRIPTOR_WRITTEN -> {
+                    Log.d(Constants.TAG, "Handler received descriptor written result")
+                    bundle = msg.data
+                    service_uuid = bundle.getString(BleAdapterService.PARCEL_SERVICE_UUID)
+                    characteristic_uuid = bundle.getString(BleAdapterService.PARCEL_CHARACTERISTIC_UUID)
+                    descriptor_uuid = bundle.getString(BleAdapterService.PARCEL_DESCRIPTOR_UUID)
+                    Log.d(
+                        Constants.TAG,
+                        "descriptor $descriptor_uuid of characteristic $characteristic_uuid of service $service_uuid written OK"
+                    )
+                    if (!exiting) {
+                        showMsg(Utility.htmlColorGreen("Temperature Alarm notifications ON"))
+                        notifications_on = true
+                        bluetooth_le_adapter!!.writeCharacteristic(
+                            Utility.normaliseUUID(BleAdapterService.EVENTSERVICE_SERVICE_UUID),
+                            Utility.normaliseUUID(BleAdapterService.CLIENTREQUIREMENTS_CHARACTERISTIC_UUID),
+                            Utility.leBytesFromTwoShorts(
+                                Constants.MICROBIT_EVENT_TYPE_TEMPERATURE_ALARM,
+                                Constants.MICROBIT_EVENT_VALUE_ANY
+                            )
+                        )
+                    } else {
+                        showMsg(Utility.htmlColorGreen("Temperature Alarm notifications OFF"))
+                        notifications_on = false
+                        finish()
+                    }
+                }
+                BleAdapterService.NOTIFICATION_OR_INDICATION_RECEIVED -> {
+                    bundle = msg.data
+                    service_uuid = bundle.getString(BleAdapterService.PARCEL_SERVICE_UUID)
+                    characteristic_uuid = bundle.getString(BleAdapterService.PARCEL_CHARACTERISTIC_UUID)
+                    b = bundle.getByteArray(BleAdapterService.PARCEL_VALUE)
+                    Log.d(Constants.TAG, "Value=" + Utility.byteArrayAsHexString(b))
+                    if (characteristic_uuid.equals(
+                            Utility.normaliseUUID(BleAdapterService.MICROBITEVENT_CHARACTERISTIC_UUID),
+                            ignoreCase = true
+                        )
+                    ) {
+                        val event_bytes = ByteArray(2)
+                        val value_bytes = ByteArray(2)
+                        System.arraycopy(b!!, 0, event_bytes, 0, 2)
+                        System.arraycopy(b, 2, value_bytes, 0, 2)
+                        val event: Short = Utility.shortFromLittleEndianBytes(event_bytes)
+                        val value: Short = Utility.shortFromLittleEndianBytes(value_bytes)
+                        Log.d(Constants.TAG, "Temperature Alarm received: event=$event value=$value")
+                        if (event == Constants.MICROBIT_EVENT_TYPE_TEMPERATURE_ALARM) {
+                            val indexEx=training?.exercises?.indexOfFirst {
+                                it.sets.any { it.isDone.not() }
+                            }
+
+                            val firstExNotDone= training?.exercises?.get(indexEx!!)
+                            val indexSet=firstExNotDone?.sets?.indexOfFirst{ it.isDone.not() }
+                            val firstSetNotDone=firstExNotDone?.sets?.get(indexSet!!)
+                            realm?.executeTransaction { firstSetNotDone?.reps=value.toInt() }
+                            indexEx?.let { adapter?.notifyItemChanged(it) }
+                        }
+                    }
+                }
+                BleAdapterService.MESSAGE -> {
+                    bundle = msg.data
+                    val text = bundle.getString(BleAdapterService.PARCEL_TEXT)
+                    showMsg(Utility.htmlColorRed(text))
+                }
+            }
+        }
+    }
 
     companion object {
         const val TRAINING_ID = "com.strong_weightlifting.strength_tracker_app.TRAINING_ID"
@@ -115,7 +316,22 @@ class EditTrainingActivity : AppCompatActivity(),ServiceConnection, SerialListen
         if(deviceAddress=="0"){
             Toast.makeText(this,"no ble device paired",Toast.LENGTH_SHORT).show()
         }
+        val microbit = MicroBit.getInstance()
 
+        MicroBit.getInstance().microbit_name = "MyMicro"
+        MicroBit.getInstance().microbit_address =deviceAddress
+        MicroBit.getInstance().connection_status_listener = this
+
+
+        // connect to the Bluetooth service
+        val gattServiceIntent = Intent(this, BleAdapterService::class.java)
+        bindService(gattServiceIntent, mServiceConnection, Context.BIND_AUTO_CREATE)
+
+        notesOfTrainingEditText.setOnTouchListener { v, event ->
+            setLowerLimit()
+            setUpperLimit()
+            return@setOnTouchListener true
+        }
 
         recyclerView = findViewById(R.id.recycler_view_exercises)
 
@@ -213,7 +429,7 @@ class EditTrainingActivity : AppCompatActivity(),ServiceConnection, SerialListen
         val distinctTrainings = realm?.where(Training::class.java)?.distinct("name")?.findAll()
         val nameArray = Array(distinctTrainings?.size!!) { i -> distinctTrainings[i]?.name }
         val nameAdapter: ArrayAdapter<String> =
-            ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, nameArray)
+            ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, nameArray)!!
         nameOfTrainingEditText.setAdapter(nameAdapter)
         nameOfTrainingEditText.setOnTouchListener { v, event ->
             nameOfTrainingEditText.showDropDown()
@@ -277,120 +493,34 @@ class EditTrainingActivity : AppCompatActivity(),ServiceConnection, SerialListen
     override fun onDestroy() {
         recyclerView!!.adapter = null
         realm!!.close()
-        if (connected != Connected.False) disconnect()
-       stopService(Intent(this, SerialService::class.java))
-        super.onDestroy()
+
+        try {
+            // may already have unbound. No API to check state so....
+            unbindService(mServiceConnection)
+        } catch (e: Exception) {
+        }
+         super.onDestroy()
     }
     override fun onStart() {
         super.onStart()
-        if (service != null) service!!.attach(this) else startService(
-            Intent(
-                this,
-                SerialService::class.java
-            )
-        ) // prevents service destroy on unbind from recreated activity caused by orientation change
-        bindService(Intent(this, SerialService::class.java), this, Context.BIND_AUTO_CREATE)
 
-        if (initialStart && service != null) {
-            initialStart = false
-         connect()
-        }
     }
 
 
     override fun onStop() {
-        if (service != null && isChangingConfigurations) service!!.detach()
-        try {
-            unbindService(this)
-        } catch (ignored: Exception) {
-        }
+
         super.onStop()
     }
-    override fun onServiceConnected(name: ComponentName, binder: IBinder) {
-        service = (binder as SerialService.SerialBinder).service
-        if (initialStart) {
-            initialStart = false
-            connect()
-        }
-    }
-    override fun onServiceDisconnected(name: ComponentName) {
-        service = null
-    }
 
-    private fun connect() {
-        try {
-            val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
-            val device = bluetoothAdapter.getRemoteDevice(deviceAddress)
-            val deviceName = if (device.name != null) device.name else device.address
-            status("connecting...")
-            connected =
-                Connected.Pending
-            socket = SerialSocket()
-            service!!.connect(this, "Connected to $deviceName")
-            socket!!.connect(this, service, device)
-        } catch (e: Exception) {
-            onSerialConnectError(e)
-        }
-    }
 
-    private fun disconnect() {
-        connected =
-            Connected.False
-        service!!.disconnect()
-        socket?.disconnect()
-        socket = null
-    }
 
-    private fun send(str: String) {
-        if (connected != Connected.True) {
-            return
-        }
-        try {
-            val data = (str + newline).toByteArray()
-            /// hier schreibt man die daten ueber uart wichtig! byte[]
 
-            socket!!.write(data)
-        } catch (e: Exception) {
-            onSerialIoError(e)
-        }
-    }
-    // receive ist teil von impl. SerialListener onSerialRead l.225
 
-    private fun receive(data: ByteArray?) {
-        val stringData=String(data!!)
-        val indexEx=training?.exercises?.indexOfFirst {
-            it.sets.any { it.isDone.not() }
-        }
-
-        val firstExNotDone= training?.exercises?.get(indexEx!!)
-        val indexSet=firstExNotDone?.sets?.indexOfFirst{ it.isDone.not() }
-        val firstSetNotDone=firstExNotDone?.sets?.get(indexSet!!)
-        realm?.executeTransaction { firstSetNotDone?.reps=String(data!!).toInt() }
-        indexEx?.let { adapter?.notifyItemChanged(it) }
-    }
 
     private fun status(str: String) {
-        Toast.makeText(this,str,Toast.LENGTH_SHORT).show()
-
-    }
-    override fun onSerialConnect() {
-        status("connected")
-        connected = Connected.True
+    Log.d(Constants.TAG,str)
     }
 
-    override fun onSerialConnectError(e: Exception) {
-        status("connection failed: " + e.message)
-        disconnect()
-    }
-
-    override fun onSerialRead(data: ByteArray?) {
-        receive(data)
-    }
-
-    override fun onSerialIoError(e: Exception) {
-        status("connection lost: " + e.message)
-        disconnect()
-    }
 
     private fun setUpRecyclerView() {
         adapter = realm!!.where(Training::class.java).equalTo(
@@ -523,6 +653,19 @@ class EditTrainingActivity : AppCompatActivity(),ServiceConnection, SerialListen
         val id = item.itemId
         val returnIntent = Intent()
         when (id) {
+            R.id.action_test ->{
+                if (bluetooth_le_adapter?.setNotificationsState(
+                        Utility.normaliseUUID(BleAdapterService.EVENTSERVICE_SERVICE_UUID),
+                        Utility.normaliseUUID(BleAdapterService.MICROBITEVENT_CHARACTERISTIC_UUID),
+                        true
+                    )!!
+                ) {
+                    showMsg(Utility.htmlColorGreen("micro:bit event notifications ON"))
+                } else {
+                    showMsg(Utility.htmlColorRed("Failed to set micro:bit event notifications ON"))
+                }
+                return true
+            }
             R.id.action_editItems -> {
                 realm?.executeTransaction {
                     training?.isDone = false
@@ -622,6 +765,27 @@ class EditTrainingActivity : AppCompatActivity(),ServiceConnection, SerialListen
     override fun onBackPressed() {
         training?.let {
             if (it.isDone) {
+                Log.d(
+                    Constants.TAG,
+                    "onBackPressed connected=" + MicroBit.getInstance().isMicrobit_connected
+                        .toString() + " notifications_on=" + notifications_on.toString() + " exiting=" + exiting
+                )
+                if (MicroBit.getInstance().isMicrobit_connected && notifications_on) {
+                    bluetooth_le_adapter!!.setNotificationsState(
+                        Utility.normaliseUUID(BleAdapterService.EVENTSERVICE_SERVICE_UUID),
+                        Utility.normaliseUUID(BleAdapterService.MICROBITEVENT_CHARACTERISTIC_UUID),
+                        false
+                    )
+                }
+                exiting = true
+                if (!MicroBit.getInstance().isMicrobit_connected) {
+                    try {
+                        // may already have unbound. No API to check state so....
+                        unbindService(mServiceConnection)
+                    } catch (e: Exception) {
+                    }
+                    finish()
+                }
                 super.onBackPressed()
                 return
             }
@@ -629,8 +793,40 @@ class EditTrainingActivity : AppCompatActivity(),ServiceConnection, SerialListen
         val returnIntent = Intent()
         returnIntent.putExtra(TRAINING_ID, intent.getLongExtra(TRAINING_ID, 0))
         setResult(Activity.RESULT_OK, returnIntent)
+
+        Log.d(
+            Constants.TAG,
+            "onBackPressed connected=" + MicroBit.getInstance().isMicrobit_connected
+                .toString() + " notifications_on=" + notifications_on.toString() + " exiting=" + exiting
+        )
+        if (MicroBit.getInstance().isMicrobit_connected && notifications_on) {
+            bluetooth_le_adapter!!.setNotificationsState(
+                Utility.normaliseUUID(BleAdapterService.EVENTSERVICE_SERVICE_UUID),
+                Utility.normaliseUUID(BleAdapterService.MICROBITEVENT_CHARACTERISTIC_UUID),
+                false
+            )
+        }
+        exiting = true
+        if (!MicroBit.getInstance().isMicrobit_connected) {
+            try {
+                // may already have unbound. No API to check state so....
+                unbindService(mServiceConnection)
+            } catch (e: Exception) {
+            }
+            finish()
+        }
         super.onBackPressed()
     }
+
+    override fun serviceDiscoveryStatusChanged(new_state: Boolean) {
+    }
+
+    override fun connectionStatusChanged(connected: Boolean) {
+        if (connected) {
+            status(("Connected"))
+        } else {
+            status(("Disconnected"))
+        }    }
 
 
 }

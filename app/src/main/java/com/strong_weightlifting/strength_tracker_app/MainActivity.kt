@@ -28,7 +28,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.strong_weightlifting.strength_tracker_app.microbit_blue.TemperatureAlarmActivity
 import com.strong_weightlifting.strength_tracker_app.model.*
 import com.strong_weightlifting.strength_tracker_app.terminal_app.BluetoothActivity
 import com.strong_weightlifting.strength_tracker_app.ui.recyclerview.TrainingRecyclerViewAdapter
