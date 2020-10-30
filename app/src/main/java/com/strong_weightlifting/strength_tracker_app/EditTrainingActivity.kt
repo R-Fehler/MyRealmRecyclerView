@@ -15,6 +15,7 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Message
 import android.text.Editable
+import android.text.Html
 import android.text.TextWatcher
 import android.util.DisplayMetrics
 import android.util.Log
@@ -90,11 +91,6 @@ class EditTrainingActivity : AppCompatActivity(), ConnectionStatusListener {
             bluetooth_le_adapter?.setActivityHandler(mMessageHandler)
             connectToDevice()
 
-
-            setLowerLimit()
-            setUpperLimit()
-
-
             if (bluetooth_le_adapter?.setNotificationsState(
                     Utility.normaliseUUID(BleAdapterService.EVENTSERVICE_SERVICE_UUID),
                     Utility.normaliseUUID(BleAdapterService.MICROBITEVENT_CHARACTERISTIC_UUID),
@@ -157,7 +153,7 @@ class EditTrainingActivity : AppCompatActivity(), ConnectionStatusListener {
 
     private fun showMsg(msg: String) {
         Log.d(Constants.TAG, msg)
-
+        runOnUiThread {Toast.makeText(this,msg,Toast.LENGTH_SHORT).show() }
     }
     @SuppressLint("HandlerLeak")
     private val mMessageHandler: Handler = object : Handler() {
@@ -518,7 +514,7 @@ class EditTrainingActivity : AppCompatActivity(), ConnectionStatusListener {
 
 
     private fun status(str: String) {
-    Log.d(Constants.TAG,str)
+
     }
 
 
