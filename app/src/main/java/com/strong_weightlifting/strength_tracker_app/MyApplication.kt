@@ -33,6 +33,7 @@ class MyApplication : Application() {
             .migration(MyMigration())
 //            .deleteRealmIfMigrationNeeded()
             .schemaVersion(12)
+            .allowWritesOnUiThread(true)
             .build()
 
 //        Realm.deleteRealm(realmConfig) // Delete Realm between app restarts.

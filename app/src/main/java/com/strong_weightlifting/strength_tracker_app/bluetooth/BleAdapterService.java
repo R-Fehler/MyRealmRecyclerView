@@ -504,7 +504,7 @@ public class BleAdapterService extends Service implements Runnable{
     // connect to the device
     public boolean connect(final String address) {
 
-        if (bluetooth_adapter == null || address == null) {
+        if (bluetooth_adapter == null || address == null || address.equals("0")) {
             sendConsoleMessage("connect: bluetooth_adapter=null");
             return false;
         }
