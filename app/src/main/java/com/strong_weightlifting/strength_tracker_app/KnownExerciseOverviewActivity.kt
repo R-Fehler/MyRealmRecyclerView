@@ -2,7 +2,6 @@ package com.strong_weightlifting.strength_tracker_app
 
 import android.content.Intent
 import android.graphics.Color
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -28,10 +27,13 @@ import io.realm.Realm
 import io.realm.Sort
 import kotlinx.android.synthetic.main.activity_known_exercise_overview.*
 import java.lang.Math.abs
+import java.lang.NullPointerException
 import java.text.SimpleDateFormat
 import kotlin.math.roundToInt
 
-
+/**
+ * Shows all the entries of training where the exercise was done in a recyclerview and plots the load in 2D over time
+ */
 class KnownExerciseOverviewActivity : AppCompatActivity(), OnChartValueSelectedListener {
     private var realm: Realm? = null
     private var recyclerView: RecyclerView? = null
@@ -64,14 +66,21 @@ class KnownExerciseOverviewActivity : AppCompatActivity(), OnChartValueSelectedL
 
         val query=knownExercise?.doneInExercises
         val entryList= mutableListOf<Entry>()
-        query?.forEachIndexed { index, it ->
-            val bestSet=it.sets.maxBy { ExerciseSet.epleyValue(it.weight,it.reps) }
-
-            val entry= Entry(bestSet?.doneInExercises?.first()?.date?.time?.div(8.64e+7)?.toFloat()!!, ExerciseSet.epleyValue(bestSet?.weight!!,bestSet.reps).toFloat())
-            entryList.add(entry)
-            if(bestSet.isPR){
-                entry.icon= resources.getDrawable( ic_star_yellow_16dp,theme);
+        query?.forEachIndexed lambda@{ index, it ->
+            val isRoutine = it.doneInTrainings?.first()?.isRoutine
+            if (isRoutine!!){
+                return@lambda
             }
+            val bestSet=it.sets.maxBy { ExerciseSet.epleyValue(it.weight,it.reps) }
+            try {
+                val entry= Entry(bestSet?.doneInExercises?.first()?.date?.time?.div(8.64e+7)?.toFloat()!!, ExerciseSet.epleyValue(
+                    bestSet.weight,bestSet.reps).toFloat())
+                entryList.add(entry)
+                if(bestSet.isPR){
+                    entry.icon= resources.getDrawable( ic_star_yellow_16dp,theme);
+                }
+            } catch (e: NullPointerException){}
+
         }
 
         dataset= LineDataSet(entryList,"estimated 1RM kg")
@@ -94,7 +103,7 @@ class KnownExerciseOverviewActivity : AppCompatActivity(), OnChartValueSelectedL
 
 
         // create marker to display box when values are selected
-        val mv = MyMarkerView(this, R.layout.custom_marker_view)
+        val mv = PlottingMarkerView(this, R.layout.custom_marker_view)
         mv.chartView = chart
         chart.marker = mv
         chart.xAxis.axisLineColor= Color.WHITE
@@ -107,7 +116,7 @@ class KnownExerciseOverviewActivity : AppCompatActivity(), OnChartValueSelectedL
         chart.legend.textColor= Color.WHITE
         chart.setOnChartValueSelectedListener(this)
 
-        chart.xAxis.valueFormatter=MyValueFormatter()
+        chart.xAxis.valueFormatter=DateValueFormatter()
         chart.xAxis.granularity = 1f
         chart.xAxis.labelCount=4
         chart.description.isEnabled = false

@@ -16,6 +16,10 @@ import io.realm.RealmResults
 
 import kotlinx.android.synthetic.main.content_change_known_exercise.*
 
+/**
+ * changes already created exercise type. launched from KnownExerciseOverviewActivity from options menu
+ * when edit is clicked. then ID or Name can be changed while checks are done for existing IDs and Names.
+ */
 class ChangeKnownExerciseActivity : AppCompatActivity() {
 
 

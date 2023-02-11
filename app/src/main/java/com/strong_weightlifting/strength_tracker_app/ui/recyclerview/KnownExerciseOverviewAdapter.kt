@@ -3,17 +3,14 @@ package com.strong_weightlifting.strength_tracker_app.ui.recyclerview
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.strong_weightlifting.strength_tracker_app.R
 import com.strong_weightlifting.strength_tracker_app.model.Exercise
-import com.strong_weightlifting.strength_tracker_app.model.Training
 import io.realm.OrderedRealmCollection
 import io.realm.Realm
 import io.realm.RealmRecyclerViewAdapter
-import org.w3c.dom.Text
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -47,6 +44,14 @@ class KnownExerciseOverviewAdapter(data: OrderedRealmCollection<Exercise>) :
         val exercise = getItem(position)
         holder.data = exercise
         val itemUUID = exercise?.uuid
+
+        if(exercise?.isRoutine!!) {
+            holder.itemView.visibility=View.GONE
+            holder.itemView.layoutParams = RecyclerView.LayoutParams(0, 0)
+            return
+            }
+
+
         holder.date.text =
             SimpleDateFormat("EEE, d MMM yyyy HH:mm", Locale.getDefault()).format(holder.data?.date ?: 0)
         if(holder.data?.notes.isNullOrBlank().not()) {

@@ -1,8 +1,6 @@
 package com.strong_weightlifting.strength_tracker_app.ui.recyclerview
 
-import android.app.Activity
 import android.app.AlertDialog
-import android.text.Html
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
@@ -13,12 +11,8 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.PopupMenu
 import android.widget.TextView
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.strong_weightlifting.strength_tracker_app.EditTrainingActivity
-import com.strong_weightlifting.strength_tracker_app.MainActivity
 import com.strong_weightlifting.strength_tracker_app.R
 import com.strong_weightlifting.strength_tracker_app.model.DataHelper
 import com.strong_weightlifting.strength_tracker_app.model.Training
@@ -27,7 +21,6 @@ import io.realm.Realm
 import io.realm.RealmRecyclerViewAdapter
 import kotlinx.android.synthetic.main.training_item.view.*
 import java.text.SimpleDateFormat
-import java.util.*
 import java.util.regex.Pattern
 
 class TrainingRecyclerViewAdapter(data: OrderedRealmCollection<Training>) :
@@ -160,7 +153,7 @@ class TrainingRecyclerViewAdapter(data: OrderedRealmCollection<Training>) :
                     DataHelper.copyTraining(realm!!, holder.data!!)
                     this.updateData(this.data)
                 }
-                R.id.action_star -> {
+                R.id.action_asRoutine -> {
                    var createdSuccess=false
                     realm?.executeTransaction {  createdSuccess=Training.createAsRoutine(it, holder.data!!) }
                     if(!createdSuccess){
@@ -179,7 +172,7 @@ class TrainingRecyclerViewAdapter(data: OrderedRealmCollection<Training>) :
         popup.show()
     }
 
-        popup.menu.findItem(R.id.action_star).isVisible = showRoutines.not()
+        popup.menu.findItem(R.id.action_asRoutine).isVisible = showRoutines.not()
         popup.menu.findItem(R.id.action_copy_training).isVisible = showRoutines.not()
         popup.menu.findItem(R.id.action_editRoutine).isVisible=showRoutines
 

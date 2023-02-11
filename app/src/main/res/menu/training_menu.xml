@@ -4,7 +4,7 @@
     tools:context=".MyActivity">
     <group android:id="@+id/trainingOptionsGroup">
         <item
-            android:id="@+id/action_star"
+            android:id="@+id/action_asRoutine"
             android:title="@string/use_as_routine"
             app:showAsAction="never"
             />

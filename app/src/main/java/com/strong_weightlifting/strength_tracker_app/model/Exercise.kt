@@ -22,6 +22,9 @@ open class Exercise : RealmObject() {
 
     var knownExercise: KnownExercise? = null
     var sets: RealmList<ExerciseSet> = RealmList()
+    var isRoutine: Boolean = false
+
+
     @LinkingObjects("exercises")
     val doneInTrainings: RealmResults<Training>?=null
 
@@ -30,23 +33,27 @@ open class Exercise : RealmObject() {
         private val INTEGER_COUNTER = AtomicLong(0)
 
         fun create(realm: Realm, trainingID: Long): Long {
-            val exercises = realm.where(Training::class.java).equalTo(FIELD_UUID,trainingID).findFirst()?.exercises
+            val training =realm.where(Training::class.java).equalTo(FIELD_UUID,trainingID).findFirst()
+            val exercises = training?.exercises
 
             val maxid = realm.where(Exercise::class.java).findAll()?.max(FIELD_UUID)?.toLong()
             maxid?.let { INTEGER_COUNTER.set(it+1) }
             val primary= increment()
             val exercise =realm.createObject(Exercise::class.java, primary)
+            exercise.isRoutine = training?.isRoutine!!
             exercises?.add(exercise)
             return primary
         }
 
         fun createWithReturn(realm: Realm, trainingID: Long): Exercise? {
-            val exercises = realm.where(Training::class.java).equalTo(FIELD_UUID,trainingID).findFirst()?.exercises
+            val training =realm.where(Training::class.java).equalTo(FIELD_UUID,trainingID).findFirst()
+            val exercises = training?.exercises
 
             val maxid = realm.where(Exercise::class.java).findAll()?.max(FIELD_UUID)?.toLong()
             maxid?.let { INTEGER_COUNTER.set(it+1) }
             val primary= increment()
             val exercise =realm.createObject(Exercise::class.java, primary)
+            exercise.isRoutine = training?.isRoutine!!
             exercises?.add(exercise)
             return exercise
         }

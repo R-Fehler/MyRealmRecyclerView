@@ -69,6 +69,7 @@ open class Training : RealmObject() {
                             newRoutineTraining,
                             training.isRoutineWithPercentage
                         )
+                    newRoutineTraining?.isRoutine=true
 
                     }
 

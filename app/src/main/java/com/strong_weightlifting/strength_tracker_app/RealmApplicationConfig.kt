@@ -22,7 +22,7 @@ import io.realm.Realm
 import io.realm.RealmConfiguration
 
 
-class MyApplication : Application() {
+class RealmApplicationConfig : Application() {
 
     override fun onCreate() {
         super.onCreate()
@@ -30,9 +30,9 @@ class MyApplication : Application() {
         val realmConfig = RealmConfiguration.Builder()
             .name("com.strong_weightlifting.strength_tracker_app.default_realm")
             .initialData { realm -> realm.createObject(MasterParent::class.java) }
-            .migration(MyMigration())
+            .migration(RealmMigrationSchema())
 //            .deleteRealmIfMigrationNeeded()
-            .schemaVersion(12)
+            .schemaVersion(13)
             .allowWritesOnUiThread(true)
             .build()
 

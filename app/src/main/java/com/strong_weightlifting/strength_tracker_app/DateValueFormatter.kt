@@ -7,7 +7,7 @@ import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
-class MyValueFormatter() : ValueFormatter() {
+class DateValueFormatter() : ValueFormatter() {
     override fun getFormattedValue(value: Float): String {
         val date=Date(value.toLong()*8.64e+7.toLong())
         val dateformatted= SimpleDateFormat("d MMM yyyy").format(date)

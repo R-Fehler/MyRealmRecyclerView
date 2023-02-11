@@ -262,7 +262,7 @@ class EditTrainingActivity : AppCompatActivity(), ConnectionStatusListener {
                 BleAdapterService.MESSAGE -> {
                     bundle = msg.data
                     val text = bundle.getString(BleAdapterService.PARCEL_TEXT)
-                    showMsg(Utility.htmlColorRed(text))
+//                    showMsg(Utility.htmlColorRed(text))
                 }
             }
         }
@@ -308,26 +308,31 @@ class EditTrainingActivity : AppCompatActivity(), ConnectionStatusListener {
         setSupportActionBar(editTrainingToolbar)
         val sharedPreferences =
             PreferenceManager.getDefaultSharedPreferences(this)
-        deviceAddress = sharedPreferences.getString("device","0") //TODO aus Settings holen
-        if(deviceAddress=="0"){
-            Toast.makeText(this,"no ble device paired",Toast.LENGTH_SHORT).show()
-        }
-        val microbit = MicroBit.getInstance()
 
-        MicroBit.getInstance().microbit_name = "MyMicro"
-        MicroBit.getInstance().microbit_address =deviceAddress
-        MicroBit.getInstance().connection_status_listener = this
+        /**
+         * here is ble code
+         */
 
-
-        // connect to the Bluetooth service
-        val gattServiceIntent = Intent(this, BleAdapterService::class.java)
-        bindService(gattServiceIntent, mServiceConnection, Context.BIND_AUTO_CREATE)
-
-        notesOfTrainingEditText.setOnTouchListener { v, event ->
-            setLowerLimit()
-            setUpperLimit()
-            return@setOnTouchListener true
-        }
+//        deviceAddress = sharedPreferences.getString("device","0") //TODO aus Settings holen
+//        if(deviceAddress=="0"){
+////            Toast.makeText(this,"no ble device paired",Toast.LENGTH_SHORT).show() // TODO BLE Implementation seperieren
+//        }
+//        val microbit = MicroBit.getInstance()
+//
+//        MicroBit.getInstance().microbit_name = "MyMicro"
+//        MicroBit.getInstance().microbit_address =deviceAddress
+//        MicroBit.getInstance().connection_status_listener = this
+//
+//
+//        // connect to the Bluetooth service
+//        val gattServiceIntent = Intent(this, BleAdapterService::class.java)
+//        bindService(gattServiceIntent, mServiceConnection, Context.BIND_AUTO_CREATE)
+//    // used the notes edittext item to run set Limit functions for bluetooth services
+////        notesOfTrainingEditText.setOnTouchListener { v, event ->
+////            setLowerLimit()
+////            setUpperLimit()
+////            return@setOnTouchListener true
+////        }
 
         recyclerView = findViewById(R.id.recycler_view_exercises)
 

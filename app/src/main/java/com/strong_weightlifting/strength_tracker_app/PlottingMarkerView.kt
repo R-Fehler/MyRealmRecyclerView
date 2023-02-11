@@ -13,11 +13,10 @@ import kotlin.math.roundToInt
 
 /**
  * Custom implementation of the MarkerView.
- *
- * @author Philipp Jahoda
+ * for 2D plotting of exercise data.
  */
 @SuppressLint("ViewConstructor")
-class MyMarkerView(context: Context?, layoutResource: Int) :
+class PlottingMarkerView(context: Context?, layoutResource: Int) :
     MarkerView(context, layoutResource) {
     private val tvContent: TextView
     // runs every time the MarkerView is redrawn, can be used to update the

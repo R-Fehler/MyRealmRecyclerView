@@ -6,7 +6,7 @@ import io.realm.RealmMigration
 import java.util.*
 
 
-class MyMigration : RealmMigration {
+class RealmMigrationSchema : RealmMigration {
     override fun migrate(realm: DynamicRealm, oldVersion: Long, newVersion: Long) {
         var oldVersion = oldVersion
 
@@ -128,6 +128,10 @@ class MyMigration : RealmMigration {
         if(oldVersion==11L){
             schema.get("Training")!!
                 .addField("isRoutineWithAbsoluteIncrement", Boolean::class.javaPrimitiveType)
+        }
+        if (oldVersion==12L){
+            schema.get("Exercise")!!
+                .addField("isRoutine",Boolean::class.javaPrimitiveType)
         }
 
     }
